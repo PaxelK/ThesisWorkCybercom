@@ -35,7 +35,7 @@ sinky=50;
 
 %%% Energy Values %%%
 % Initial Energy of a Node (in Joules) % 
-Eo=2; % units in Joules
+Eo=3; % units in Joules
 % Energy required to run circuity (both for transmitter and receiver) %
 Eelec=50*10^(-9); % units in Joules/bit
 ETx=50*10^(-9); % units in Joules/bit
