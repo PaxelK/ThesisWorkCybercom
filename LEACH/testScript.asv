@@ -1,0 +1,46 @@
+clc
+clear all
+close all
+
+%%%%%%%%%%%%%%%%%%%% Network Establishment Parameters %%%%%%%%%%%%%%%%%%%%
+
+%%% Area of Operation %%%
+
+% Field Dimensions in meters %
+global xm;
+global ym;
+global x;% added for better display results of the plot
+global y;% added for better display results of the plot
+global n;% Number of Nodes in the field %
+global dead_nodes;% Number of Dead Nodes in the beggining %% Coordinates of the Sink (location is predetermined in this simulation) %
+global sinkx;
+global sinky;
+
+%%% Energy Values %%%
+% Initial Energy of a Node (in Joules) % 
+global Eo;% units in Joules
+global Eelec;% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
+global ETx% units in Joules/bit
+global ERx;% units in Joules/bit
+global Eamp;% Transmit Amplifier Types, units in Joules/bit/m^2 (amount of energy spent by the amplifier to transmit the bits)
+global EDA;% Data Aggregation Energy, units in Joules/bit
+global k;%% Size of data package, units in bits
+% Suggested percentage of cluster head %
+global p;% a 5 percent of the total amount of nodes used in the network is proposed to give good results
+global No;% Number of Clusters %
+global rnd;% Round of Operation %
+global operating_nodes; % Current Number of operating Nodes %
+operating_nodes=n-dead_nodes;
+global transmissions;
+transmissions=0; %Amount of transmissions that have been sent/recieved%
+global temp_val;
+global flag1stdead;
+%Weight distribution between the term taking SoC into account and the term making sure a cluster head
+%is being chosen even when all nodes have low SoC.
+global f;       
+%%%%%%%%%%%%%%%%%%%%%%%%%%% End of Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+setParams(0.5, 0.05);
