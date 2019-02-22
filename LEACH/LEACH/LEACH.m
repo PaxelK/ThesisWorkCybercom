@@ -31,7 +31,7 @@ n=100;
 dead_nodes=0;
 % Coordinates of the Sink (location is predetermined in this simulation) %
 sinkx=50;
-sinky=200;
+sinky=50;
 
 %%% Energy Values %%%
 % Initial Energy of a Node (in Joules) % 
