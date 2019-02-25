@@ -6,6 +6,13 @@ for i=1:params.n
     SN(i).id=i;	% sensor's ID number
     SN(i).x=rand(1,1)*params.xm;	% X-axis coordinates of sensor node
     SN(i).y=rand(1,1)*params.ym;	% Y-axis coordinates of sensor node
+    
+    if(strcmp(params.mode,'norm'))
+         SN(i).E=params.Eo;     % nodes energy levels (initially set to be equal to "Eo"
+    elseif(strcmp(params.mode,'rand'))
+         SN(i).E=params.Eo*rand;     % nodes energy levels (initially set to be equal to "Eo"
+    end
+    
     SN(i).E=params.Eo;     % nodes energy levels (initially set to be equal to "Eo"
     SN(i).role=0;   % node acts as normal if the value is '0', if elected as a cluster head it  gets the value '1' (initially all nodes are normal)
     SN(i).cluster=0;	% the cluster which a node belongs to

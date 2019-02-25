@@ -123,38 +123,45 @@ while operating_nodes>0
   
 % Energy Dissipation for normal nodes %
     
-    for i=1:n
-       if (SN(i).cond==1) && (SN(i).role==0) && (CLheads>0)
-       	if SN(i).E>0
-            ETx= Eelec*k + Eamp * k * SN(i).dtch^2;
-            SN(i).E=SN(i).E - ETx;
-            energy=energy+ETx;
-            
-        % Dissipation for cluster head during reception
-        if SN(SN(i).chid).E>0 && SN(SN(i).chid).cond==1 && SN(SN(i).chid).role==1
-            ERx=(Eelec+EDA)*k;
-            energy=energy+ERx;
-            SN(SN(i).chid).E=SN(SN(i).chid).E - ERx;
-             if SN(SN(i).chid).E<=0  % if cluster heads energy depletes with reception
-                SN(SN(i).chid).cond=0;
-                SN(SN(i).chid).rop=rnd;
+     for i=1:n
+       if ((SN(i).cond==1) && (SN(i).role==0))
+           if(CLheads>0)
+            if SN(i).E>0
+                ETx= Eelec*k + Eamp * k * SN(i).dtch^2;
+                SN(i).E=SN(i).E - ETx;
+                energy=energy+ETx;
+            end
+            % Dissipation for cluster head during reception
+            if SN(SN(i).chid).E>0 && SN(SN(i).chid).cond==1 && SN(SN(i).chid).role==1
+                ERx=(Eelec+EDA)*k;
+                energy=energy+ERx;
+                SN(SN(i).chid).E=SN(SN(i).chid).E - ERx;
+                 if SN(SN(i).chid).E<=0  % if cluster heads energy depletes with reception
+                    SN(SN(i).chid).cond=0;
+                    SN(SN(i).chid).rop=rnd;
+                    dead_nodes=dead_nodes +1;
+                    operating_nodes = operating_nodes - 1
+                 end
+            end        
+           else         %If there are no chosen cluster heads to connect to, send to sink directly
+               if SN(i).E>0
+                    ETx= Eelec*k + Eamp * k *(sqrt((sinkx-SN(i).x)^2 + (sinky-SN(i).y)^2))^2;  
+                    SN(i).E=SN(i).E - ETx;
+                    energy=energy+ETx;
+                     %fprintf(['NO CLUSTER HEADS, OpNodes: ', num2str(operating_nodes), '\n'...
+                      %      , '\t' , 'CLheads = ', num2str(CLheads), '\n'])
+               end
+           end
+        
+            if SN(i).E<=0       % if nodes energy depletes with transmission
                 dead_nodes=dead_nodes +1;
-                operating_nodes= operating_nodes - 1
-             end
-        end
-        end
-        
-        
-        if SN(i).E<=0       % if nodes energy depletes with transmission
-        dead_nodes=dead_nodes +1;
-        operating_nodes= operating_nodes - 1
-        SN(i).cond=0;
-        SN(i).chid=0;
-        SN(i).rop=rnd;
-        end
-        
-      end
-    end            
+                operating_nodes = operating_nodes - 1
+                SN(i).cond=0;
+                SN(i).chid=0;
+                SN(i).rop=rnd;
+            end      
+       end
+    end
     
     
     

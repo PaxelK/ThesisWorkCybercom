@@ -1,4 +1,4 @@
-function [output] = setParams(fWeight, pCH)
+function [output] = setParams(fWeight, pCH, nodeAmount, maxEnergy, distrMode)
 
 params = struct;
 
@@ -10,16 +10,15 @@ params.xm=100;
 params.ym=100;
 params.x=0; % added for better display results of the plot
 params.y=0; % added for better display results of the plot
-params.n=100;% Number of Nodes in the field %
+params.n=nodeAmount;% Number of Nodes in the field %
 params.dead_nodes=0;% Number of Dead Nodes in the beginning %
 % Coordinates of the Sink (location is predetermined in this simulation) %
 params.sinkx=50;
 params.sinky=50;
 
 %%% Energy Values %%%
-
-params.Eo=1;% Initial Energy of a Node (in Joules), units in Joules
-
+params.Eo=maxEnergy;% Initial Energy of a Node (in Joules), units in Joules
+params.mode = distrMode; %Tells which energy distribution mode is going to be tried
 params.Eelec=50*10^(-9);% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 params.ETx=50*10^(-9); % units in Joules/bit
 params.ERx=50*10^(-9); % units in Joules/bit

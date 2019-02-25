@@ -35,7 +35,7 @@ sinky=50;
 
 %%% Energy Values %%%
 % Initial Energy of a Node (in Joules) % 
-Eo=3; % units in Joules
+Eo=1; % units in Joules
 % Energy required to run circuity (both for transmitter and receiver) %
 Eelec=50*10^(-9); % units in Joules/bit
 ETx=50*10^(-9); % units in Joules/bit
@@ -130,22 +130,22 @@ while operating_nodes>0
                SN(i).rleft=SN(i).rleft-1;
             end
             
-            t=(1-f)*(p/(1-p*(mod(rnd,1/p))))*SN(i).SoC + ...
-                (1/(1-(1-f)*(p/(1-p*(mod(rnd,1/p))))))*f*(p/(1-p*(mod(rnd,1/p))));
+           % t=(1-f)*(p/(1-p*(mod(rnd,1/p))))*SN(i).SoC + ...
+            %    (1/(1-(1-f)*(p/(1-p*(mod(rnd,1/p))))))*f*(p/(1-p*(mod(rnd,1/p))));
             
             if (SN(i).E>0) && (SN(i).rleft==0)
                 generate=rand;	
                     if generate< t 
-                    SN(i).role=1;	% assigns the node role of acluster head
-                    SN(i).rn=rnd;	% assigns the round that the cluster head was elected to the data table
-                    SN(i).tel=SN(i).tel + 1;   % amount ofd times the node has become a cluster head
-                    SN(i).rleft=1/p-tleft;    % rounds for which the node will be unable to become a CH
-                    SN(i).dts=sqrt((sinkx-SN(i).x)^2 + (sinky-SN(i).y)^2); % calculates the distance between the sink and the cluster head
-                    CLheads=CLheads+1;	% sum of cluster heads that have been elected this round 
-                    SN(i).cluster=CLheads; % cluster of which the node got elected to be cluster head
-                    CL(CLheads).x=SN(i).x; % X-axis coordinates of elected cluster head
-                    CL(CLheads).y=SN(i).y; % Y-axis coordinates of elected cluster head
-                    CL(CLheads).id=i; % Assigns the node ID of the newly elected cluster head to an array
+                        SN(i).role=1;	% assigns the node role of a cluster head
+                        SN(i).rn=rnd;	% assigns the round that the cluster head was elected to the data table
+                        SN(i).tel=SN(i).tel + 1;   % amount of times the node has become a cluster head
+                        SN(i).rleft=1/p-tleft;    % rounds for which the node will be unable to become a CH
+                        SN(i).dts=sqrt((sinkx-SN(i).x)^2 + (sinky-SN(i).y)^2); % calculates the distance between the sink and the cluster head
+                        CLheads=CLheads+1;	% sum of cluster heads that have been elected this round 
+                        SN(i).cluster=CLheads; % cluster of which the node got elected to be cluster head
+                        CL(CLheads).x=SN(i).x; % X-axis coordinates of elected cluster head
+                        CL(CLheads).y=SN(i).y; % Y-axis coordinates of elected cluster head
+                        CL(CLheads).id=i; % Assigns the node ID of the newly elected cluster head to an array
                     end
         
             end
@@ -185,37 +185,44 @@ while operating_nodes>0
 % Energy Dissipation for normal nodes %
     
     for i=1:n
-       if (SN(i).cond==1) && (SN(i).role==0) && (CLheads>0)
-       	if SN(i).E>0
-            ETx= Eelec*k + Eamp * k * SN(i).dtch^2;
-            SN(i).E=SN(i).E - ETx;
-            energy=energy+ETx;
-            
-        % Dissipation for cluster head during reception
-        if SN(SN(i).chid).E>0 && SN(SN(i).chid).cond==1 && SN(SN(i).chid).role==1
-            ERx=(Eelec+EDA)*k;
-            energy=energy+ERx;
-            SN(SN(i).chid).E=SN(SN(i).chid).E - ERx;
-             if SN(SN(i).chid).E<=0  % if cluster heads energy depletes with reception
-                SN(SN(i).chid).cond=0;
-                SN(SN(i).chid).rop=rnd;
-                dead_nodes=dead_nodes +1;
-                operating_nodes= operating_nodes - 1
-             end
-        end
-        end
+       if ((SN(i).cond==1) && (SN(i).role==0))
+           if(CLheads>0)
+            if SN(i).E>0
+                ETx= Eelec*k + Eamp * k * SN(i).dtch^2;
+                SN(i).E=SN(i).E - ETx;
+                energy=energy+ETx;
+            end
+            % Dissipation for cluster head during reception
+            if SN(SN(i).chid).E>0 && SN(SN(i).chid).cond==1 && SN(SN(i).chid).role==1
+                ERx=(Eelec+EDA)*k;
+                energy=energy+ERx;
+                SN(SN(i).chid).E=SN(SN(i).chid).E - ERx;
+                 if SN(SN(i).chid).E<=0  % if cluster heads energy depletes with reception
+                    SN(SN(i).chid).cond=0;
+                    SN(SN(i).chid).rop=rnd;
+                    dead_nodes=dead_nodes +1;
+                    operating_nodes = operating_nodes - 1
+                 end
+            end        
+           else         %If there are no chosen cluster heads to connect to, send to sink directly
+               if SN(i).E>0
+                ETx= Eelec*k + Eamp * k *(sqrt((sinkx-SN(i).x)^2 + (sinky-SN(i).y)^2))^2;  
+                SN(i).E=SN(i).E - ETx;
+                energy=energy+ETx;
+                 %fprintf(['NO CLUSTER HEADS, OpNodes: ', num2str(operating_nodes), '\n'...
+                  %      , '\t' , 'CLheads = ', num2str(CLheads), '\n'])
+               end
+           end
         
-        
-        if SN(i).E<=0       % if nodes energy depletes with transmission
-        dead_nodes=dead_nodes +1;
-        operating_nodes= operating_nodes - 1
-        SN(i).cond=0;
-        SN(i).chid=0;
-        SN(i).rop=rnd;
-        end
-        
-      end
-    end            
+            if SN(i).E<=0       % if nodes energy depletes with transmission
+            dead_nodes=dead_nodes +1;
+            operating_nodes = operating_nodes - 1
+            SN(i).cond=0;
+            SN(i).chid=0;
+            SN(i).rop=rnd;
+            end      
+       end
+    end
     
     
     

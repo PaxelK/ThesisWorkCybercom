@@ -2,8 +2,16 @@ clc
 clear all
 close all
 
-                   %f      p
-params = setParams(0.05, 0.05);     %First argument is f (weight between the SoC function and the regular LEACH), p is the desired percentage of CHs each round
+%{
+%Arguments:
+ f = weight between the SoC function and the regular LEACH
+ p = the desired percentage of CHs each round
+ n = the number of nodes in the network 
+ Eo = Maximum energy for all nodes
+ Emode = energy mode, 'rand' = randomised energy distribution, 'norm' = all nodes begin with max energy 
+ %}
+                    %f    p    n   Eo  Emode
+params = setParams(0.5, 0.05, 100, 1, 'rand');     
 
 %Create the network and all nodes which are then stored in the array of
 %structs SN
