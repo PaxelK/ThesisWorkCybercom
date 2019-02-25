@@ -58,6 +58,9 @@ transmissions=0; %Amount of transmissions that have been sent/recieved%
 temp_val=0;
 flag1stdead=0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%% End of Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+f = 0.50;
+
+
 
 
 
@@ -126,6 +129,10 @@ while operating_nodes>0
             if SN(i).rleft>0
                SN(i).rleft=SN(i).rleft-1;
             end
+            
+            t=(1-f)*(p/(1-p*(mod(rnd,1/p))))*SN(i).SoC + ...
+                (1/(1-(1-f)*(p/(1-p*(mod(rnd,1/p))))))*f*(p/(1-p*(mod(rnd,1/p))));
+            
             if (SN(i).E>0) && (SN(i).rleft==0)
                 generate=rand;	
                     if generate< t 

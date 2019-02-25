@@ -67,8 +67,10 @@ while operating_nodes>0
                SN(i).rleft=SN(i).rleft-1;
             end
             
+            if(f>1)             %If we want to try without BLEACH, we simply set f>1
             t=(1-f)*(p/(1-p*(mod(rnd,1/p))))*SN(i).SoC + ...
                 (1/(1-(1-f)*(p/(1-p*(mod(rnd,1/p))))))*f*(p/(1-p*(mod(rnd,1/p))));
+            end
             
             if (SN(i).E>0) && (SN(i).rleft==0)
                 generate=rand;	
@@ -238,7 +240,7 @@ params.sinky = sinky;
 % Initial Energy of a Node (in Joules) % 
 params.Eo = Eo;% units in Joules
 params.Eelec = Eelec;% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
-params.ETx = ETx% units in Joules/bit
+params.ETx = ETx;% units in Joules/bit
 params.ERx = ERx;% units in Joules/bit
 params.Eamp = Eamp;% Transmit Amplifier Types, units in Joules/bit/m^2 (amount of energy spent by the amplifier to transmit the bits)
 params.EDA = EDA;% Data Aggregation Energy, units in Joules/bit
@@ -252,7 +254,7 @@ params.rnd = rnd;% Round of Operation %
 params.operating_nodes = operating_nodes; % Current Number of operating Nodes %
 params.transmissions = transmissions;%Amount of transmissions that have been sent/recieved%
 params.temp_val = temp_val;
-params.flaglstdead= flag1stdead;
+params.flag1stdead= flag1stdead;
 %Weight distribution between the term taking SoC into account and the term making sure a cluster head
 %is being chosen even when all nodes have low SoC.
 params.f = f;       

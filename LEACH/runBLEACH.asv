@@ -1,41 +1,41 @@
-function [output] = runBLEACH(SN, param)
-%%%%%%%%%%%%%%%%%%%% Network Establishment Parameters %%%%%%%%%%%%%%%%%%%%
+function [output] = runBLEACH(SN, params)
+%%%%%%%%%%%%%%%%%%%% Network Establishment paramseters %%%%%%%%%%%%%%%%%%%%
 
 %%% Area of Operation %%%
-xm = param.xm; % Field Dimensions in meters %
-ym = param.ym;
-x = param.x;% added for better display results of the plot
-y = param.y;% added for better display results of the plot
-n = param.n;% Number of Nodes in the field %
-dead_nodes = param.dead_nodes;% Number of Dead Nodes in the beggining %
+xm = params.xm; % Field Dimensions in meters %
+ym = params.ym;
+x = params.x;% added for better display results of the plot
+y = params.y;% added for better display results of the plot
+n = params.n;% Number of Nodes in the field %
+dead_nodes = params.dead_nodes;% Number of Dead Nodes in the beggining %
 
 % Coordinates of the Sink (location is predetermined in this simulation) %
-sinkx = param.sinkx;
-sinky = param.sinky;
+sinkx = params.sinkx;
+sinky = params.sinky;
 
 %%% Energy Values %%%
 % Initial Energy of a Node (in Joules) % 
-Eo = param.Eo;% units in Joules
-Eelec = param.Eelec;% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
-ETx = param.ETx% units in Joules/bit
-ERx = param.ERx;% units in Joules/bit
-Eamp = param.Eamp;% Transmit Amplifier Types, units in Joules/bit/m^2 (amount of energy spent by the amplifier to transmit the bits)
-EDA = param.EDA;% Data Aggregation Energy, units in Joules/bit
+Eo = params.Eo;% units in Joules
+Eelec = params.Eelec;% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
+ETx = params.ETx% units in Joules/bit
+ERx = params.ERx;% units in Joules/bit
+Eamp = params.Eamp;% Transmit Amplifier Types, units in Joules/bit/m^2 (amount of energy spent by the amplifier to transmit the bits)
+EDA = params.EDA;% Data Aggregation Energy, units in Joules/bit
 
-k = param.k;%% Size of data package, units in bits
+k = params.k;%% Size of data package, units in bits
 
 % Suggested percentage of cluster head %
-p = param.p;% a 5 percent of the total amount of nodes used in the network is proposed to give good results
-No = param.No;% Number of Clusters %
-rnd = param.rnd;% Round of Operation %
-operating_nodes = param.operating_nodes; % Current Number of operating Nodes %
-transmissions = param.transmissions;%Amount of transmissions that have been sent/recieved%
-temp_val = param.temp_val;
-flag1stdead = param.flaglstdead;
+p = params.p;% a 5 percent of the total amount of nodes used in the network is proposed to give good results
+No = params.No;% Number of Clusters %
+rnd = params.rnd;% Round of Operation %
+operating_nodes = params.operating_nodes; % Current Number of operating Nodes %
+transmissions = params.transmissions;%Amount of transmissions that have been sent/recieved%
+temp_val = params.temp_val;
+flag1stdead = params.flag1stdead;
 %Weight distribution between the term taking SoC into account and the term making sure a cluster head
 %is being chosen even when all nodes have low SoC.
-f = param.f;       
-%%%%%%%%%%%%%%%%%%%%%%%%%%% End of Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+f = params.f;       
+%%%%%%%%%%%%%%%%%%%%%%%%%%% End of paramseters %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 while operating_nodes>0
@@ -67,8 +67,10 @@ while operating_nodes>0
                SN(i).rleft=SN(i).rleft-1;
             end
             
+            if(f>1)%If we want to try without BLEACK
             t=(1-f)*(p/(1-p*(mod(rnd,1/p))))*SN(i).SoC + ...
                 (1/(1-(1-f)*(p/(1-p*(mod(rnd,1/p))))))*f*(p/(1-p*(mod(rnd,1/p))));
+            end
             
             if (SN(i).E>0) && (SN(i).rleft==0)
                 generate=rand;	
@@ -167,7 +169,7 @@ while operating_nodes>0
          end
          if  SN(i).E<=0     % if cluster heads energy depletes with transmission
          dead_nodes=dead_nodes +1;
-         operating_nodes= operating_nodes - 1
+         operating_nodes= operating_nodes - 1;
          SN(i).cond=0;
          SN(i).rop=rnd;
          end
@@ -217,47 +219,48 @@ for i=1:flag1stdead
 avg_node(i)=temp2;
 end
 
-param.nrg = nrg;
-param.op = op;
-param.avg_node
+params.nrg = nrg;
+params.op = op;
+params.avg_node = avg_node;
+params.tr = tr;
 
 %%% Area of Operation %%%
-param.xm = xm; % Field Dimensions in meters %
-param.ym = ym;
-param.x = x;% added for better display results of the plot
-param.y = y;% added for better display results of the plot
-param.n = n;% Number of Nodes in the field %
-param.dead_nodes = dead_nodes;% Number of Dead Nodes in the beggining %
+params.xm = xm; % Field Dimensions in meters %
+params.ym = ym;
+params.x = x;% added for better display results of the plot
+params.y = y;% added for better display results of the plot
+params.n = n;% Number of Nodes in the field %
+params.dead_nodes = dead_nodes;% Number of Dead Nodes in the beggining %
 
 % Coordinates of the Sink (location is predetermined in this simulation) %
-param.sinkx = sinkx;
-param.sinky = sinky;
+params.sinkx = sinkx;
+params.sinky = sinky;
 
 %%% Energy Values %%%
 % Initial Energy of a Node (in Joules) % 
-param.Eo = Eo;% units in Joules
-param.Eelec = Eelec;% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
-param.ETx = ETx% units in Joules/bit
-param.ERx = ERx;% units in Joules/bit
-param.Eamp = Eamp;% Transmit Amplifier Types, units in Joules/bit/m^2 (amount of energy spent by the amplifier to transmit the bits)
-param.EDA = EDA;% Data Aggregation Energy, units in Joules/bit
+params.Eo = Eo;% units in Joules
+params.Eelec = Eelec;% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
+params.ETx = ETx;% units in Joules/bit
+params.ERx = ERx;% units in Joules/bit
+params.Eamp = Eamp;% Transmit Amplifier Types, units in Joules/bit/m^2 (amount of energy spent by the amplifier to transmit the bits)
+params.EDA = EDA;% Data Aggregation Energy, units in Joules/bit
 
-param.k = k;%% Size of data package, units in bits
+params.k = k;%% Size of data package, units in bits
 
 % Suggested percentage of cluster head %
-param.p = p;% a 5 percent of the total amount of nodes used in the network is proposed to give good results
-param.No = No;% Number of Clusters %
-param.rnd = rnd;% Round of Operation %
-param.operating_nodes = operating_nodes; % Current Number of operating Nodes %
-param.transmissions = transmissions;%Amount of transmissions that have been sent/recieved%
-param.temp_val = temp_val;
-param.flaglstdead= flag1stdead;
+params.p = p;% a 5 percent of the total amount of nodes used in the network is proposed to give good results
+params.No = No;% Number of Clusters %
+params.rnd = rnd;% Round of Operation %
+params.operating_nodes = operating_nodes; % Current Number of operating Nodes %
+params.transmissions = transmissions;%Amount of transmissions that have been sent/recieved%
+params.temp_val = temp_val;
+params.flag1stdead= flag1stdead;
 %Weight distribution between the term taking SoC into account and the term making sure a cluster head
 %is being chosen even when all nodes have low SoC.
-param.f = f;       
-%%%%%%%%%%%%%%%%%%%%%%%%%%% End of Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+params.f = f;       
+%%%%%%%%%%%%%%%%%%%%%%%%%%% End of paramseters %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-output = param;
+output = params;
 
 end
 
