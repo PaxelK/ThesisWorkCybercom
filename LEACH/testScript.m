@@ -9,10 +9,10 @@ params = setParams(0.05, 0.05);     %First argument is f (weight between the SoC
 %structs SN
 [SN, params] = createNetwork(params);
 
+
 params = runBLEACH(SN, params);
 
 params = plotResults(params);
-
 
 
 
