@@ -8,11 +8,11 @@ close all
  term. A value above 1 switches to the regular LEACH protocol. 
  p = the desired percentage of CHs each round
  n = the number of nodes in the network 
- Eo = Maximum energy for all nodes
+ Eo = Maximum energy for all nodes [J]
  Emode = energy mode, 'rand' = randomised energy distribution, 'norm' = all nodes begin with max energy 
  %}
                     %f    p    n   Eo  Emode
-params = setParams(1.5, 0.05, 100, 1, 'rand');     
+params = setParams(0.6, 0.05, 100, 1, 'rand');     
 
 %Create the network and all nodes which are then stored in the array of
 %structs SN
