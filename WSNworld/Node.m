@@ -20,7 +20,7 @@ classdef Node
         CHparent          % Reference to current cluster head
         CHstatus    % Cluster head status. 1 if cluster head, 0 if not
         alive       % Boolean value indicating whether node has energy > 0 or not 
-        dtr         % Distance to eventual receiver
+        dtr         % Distance to eventual 
     end
     
     methods
