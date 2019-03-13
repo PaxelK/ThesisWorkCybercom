@@ -10,9 +10,10 @@ classdef Sink
     methods
         function obj = Sink(sizex, sizey) 
             %Construct an instance of the class Sink 
+            %  Input: sizex = WSN size, x 
+            %         sizey = WSN size, y
             %  This method creates an instance of this class
-            % sizex = WSN size, x 
-            % sizey = WSN size, y
+                        
             obj.pos = [sizex/2, sizey/2] ; % Initialize by placing sink in the middle of the WSN
             obj.packRec = 0; % Initial packets recieved is zero 
         end
