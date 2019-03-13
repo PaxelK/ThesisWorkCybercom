@@ -30,13 +30,9 @@ classdef Sink
         end
         
         function packetsRec = packRec(packSize)
-             %METHOD packRec
-             %   Input: Packsize = Size of package that was recieved 
-             
-             %   This method updates the aamount of packages that the sink
-             %   has recieved
-             %   return: packetsRec = The total amount of packets that have
-             %   been sent
+             %METHOD pack
+            %   The method moves the sink and stores the updated position
+            %   of the sink in obj.pos
             obj.packRec = obj.packRec + packSize;
             packetsRec = obj.packRate;
         end 
