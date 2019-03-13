@@ -19,12 +19,13 @@ classdef Node
         SoC         % State of Charge = energy/maxEnergy
         CHparent          % Reference to current cluster head
         CHstatus    % Cluster head status. 1 if cluster head, 0 if not
-        alive
+        alive       % Boolean value indicating whether node has energy > 0 or not 
+        dtr         % Distance to eventual receiver
     end
     
     methods
         
-        function obj = Node(id, x, y, ps, nrj, maxNrj)
+        function obj = Node(id, x, y, nrj, params)
         %{
         Constructor: takes in arguments for id, position, size of packages
         that get sent during transmission, starting energy level of node,
@@ -38,10 +39,10 @@ classdef Node
             obj.ID = id;
             obj.xPos = x;
             obj.yPos = y;
-            obj.pSize = ps;
+            obj.pSize = params.ps;
             obj.PA = 1;
             obj.energy = nrj;
-            obj.maxEnergy = maxNrj;
+            obj.maxEnergy = params.maxNrj;
             obj.SoC = obj.energy/obj.maxEnergy;
             obj.CHstatus = 0;
             
@@ -68,23 +69,47 @@ classdef Node
                 obj.CHparent = node;
                 fprintf('Node %d succeded to connect to node %d!\n', obj.ID, node.ID);
                 outcome = true;
+                
+                
+                
+                
+                
             else
                 if(~node.alive)
                     fprintf('Node %d failed to connect; target node %d is dead.\n', obj.ID, node.ID);
                 elseif(obj.CHstatus == 1)
-                    fprintf('Node %d failed to connect; this node is already a CH.\n', obj.ID, node.ID);
+                    fprintf('Node %d failed to connect; this node is already a CH.\n', obj.ID);
                 elseif(node.CHstatus == 0)
                     fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
                 end
+            end     
+        end
+        
+        function obj = clearConnection(obj)
+        % Sets the CHparent reference to null
+            obj.CHparent = [];
+        end
+        
+        function obj = sendMsg(obj)
+        %{
+        "Sends message" to a target node or sink. The function subtracts
+        energy from this node corresponding to the amount of data packets
+        sent. It also subtracts energy from the receiving node based on
+        the same premises.
+        %}
+            if(CHstatus == 0)       % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
+               obj.PA = 1; 
             end
+            tempP = obj.params;     % Takes the system parameters and converts them to a simpler format
+            k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
             
+            ETx = tempP.Eelec*k + tempP.Eamp * k * SN(i).dtch^2;
+            obj.energy = obj.energy - ETx;
+            
+         
             
         end
-
-        function tempSoC =  getSoC(obj)
-            %Returns the current state of charge
-            tempSoC = obj.SoC;
-        end
+        
     end
 end
 
