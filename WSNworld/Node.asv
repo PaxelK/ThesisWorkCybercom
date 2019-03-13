@@ -17,10 +17,11 @@ classdef Node
         energy      % Current amount of energy [J] residing in node
         maxEnergy   % Max amount of energy [J] that can be stored in node
         SoC         % State of Charge = energy/maxEnergy
-        CHparent          % Reference to current cluster head
+        CHparentPtr % Reference to current cluster head
         CHstatus    % Cluster head status. 1 if cluster head, 0 if not
         alive       % Boolean value indicating whether node has energy > 0 or not 
         dtr         % Distance to eventual receiver
+        dataRec     % Data received
     end
     
     methods
@@ -45,6 +46,7 @@ classdef Node
             obj.maxEnergy = params.maxNrj;
             obj.SoC = obj.energy/obj.maxEnergy;
             obj.CHstatus = 0;
+            obj.dataRec = 0;
             
             if(obj.energy > 0)
                 obj.alive = true;
@@ -70,10 +72,8 @@ classdef Node
                 fprintf('Node %d succeded to connect to node %d!\n', obj.ID, node.ID);
                 outcome = true;
                 
-                
-                
-                
-                
+                %Calculate distance to receiver.
+                dtr = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);     
             else
                 if(~node.alive)
                     fprintf('Node %d failed to connect; target node %d is dead.\n', obj.ID, node.ID);
@@ -90,21 +90,55 @@ classdef Node
             obj.CHparent = [];
         end
         
-        function obj = sendMsg(obj)
+        function obj, outcome = sendMsg(obj, node)
         %{
-        "Sends message" to a target node or sink. The function subtracts
-        energy from this node corresponding to the amount of data packets
-        sent. It also subtracts energy from the receiving node based on
-        the same premises.
+        Connection here adds another node object as a CH reference to
+        this object and is stored in CHparent. If the connection fails
+        due to the target node being dead, or not being a CH, or if this 
+        node is already a CH, an error message is printed out. The function
+        also returns true or false whether the connection was a success or
+        not.
         %}
-            if(CHstatus == 0)       % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
-               obj.PA = 1; 
-            end
-            tempP = obj.params;     % Takes the system parameters and converts them to a simpler format
-            k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
-            
-            ETx = tempP.Eelec*k + tempP.Eamp * k * SN(i).dtch^2;
-            obj.energy = obj.energy - ETx;
+            outcome = false;
+            if(node.alive && obj.CHstatus == 0)
+                obj.CHparent = node;
+                fprintf('Node %d succeded to connect to node %d!\n', obj.ID, node.ID);
+                outcome = true;
+                
+                %Calculate distance to receiver.
+                dtr = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);  
+                
+                %{
+                Then the node "sends message" to a target node or sink. The function subtracts
+                energy from this node corresponding to the amount of data packets
+                sent. It also subtracts energy from the receiving node based on
+                the same premises.
+                %}
+                if(CHstatus == 0)       % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
+                   obj.PA = 1; 
+                end
+                tempP = obj.params;     % Takes the system parameters and converts them to a simpler format
+                k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
+
+                ETx = tempP.Eelec*k + tempP.Eamp * k * obj.dtr^2;
+                obj.energy = obj.energy - ETx;
+
+                if(obj.energy >= 0)
+                    node.dataRec = node
+                end
+                if(obj.energy < 0)      
+                    obj.energy = 0;
+                end
+            else
+                if(~node.alive)
+                    fprintf('Node %d failed to connect; target node %d is dead.\n', obj.ID, node.ID);
+                elseif(obj.CHstatus == 1)
+                    fprintf('Node %d failed to connect; this node is already a CH.\n', obj.ID);
+                elseif(node.CHstatus == 0)
+                    fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
+                end
+            end         
+         
             
          
             
