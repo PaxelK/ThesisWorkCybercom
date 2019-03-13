@@ -6,10 +6,11 @@ parameters.maxNrj = 2;
 parameters.Eelec = 50*10^(-9);
 parameters.Eamp = 100*10^(-12);
 parameters.EDA = 5*10^(-9);
+parameters.f = 1.6;
+parameters.p = 0.05;
 
 
-
-a = Node(1, 1, 2, 1, parameters);    % Normal non-CH node
+a = Node(1, 1, 2, 2, parameters);    % Normal non-CH node
 b = Node(2, 5, 6, 1, parameters);    % Normal non-CH node
 
 c = Node(3, 8, 9, 0.5, parameters);    % Normal CH node
@@ -22,9 +23,11 @@ e.CHstatus = 1;
 
 f = Node(6, 17, 2, 0.0000001, parameters);  %NEAR dead normal node
 
+g = Node(7, 18, 3, 0.0000001, parameters);  %NEAR dead normal node
+
 
 %{
-Testing the connect function
+Testing the send function
 %}
 [a, result] = a.sendMsg(b);     % Normal to normal
 disp(result);                   % Boolean return
@@ -37,4 +40,9 @@ disp(result);
 [a, result] = a.sendMsg(d);     % Normal to dead normal
 [a, result] = a.sendMsg(e);     % Normal to dead CH
 
-[f, result] = f.sendMsg(a);     % Normal NEAR dead to normal node
+[f, result] = f.sendMsg(a);     % NEAR dead normal to normal node
+[g, result] = g.sendMsg(f);     % NEAR dead normal to NEAR dead normal node
+
+
+%Testing the CHstatus function
+a.generateCHstatus(parameters.f, parameters.p, 20);
