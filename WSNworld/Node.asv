@@ -103,8 +103,7 @@ classdef Node
             if(node.alive && obj.CHstatus == 0)
                 obj.CHparent = node;
                 fprintf('Node %d succeded to connect to node %d!\n', obj.ID, node.ID);
-                outcome = true;
-                
+
                 %Calculate distance to receiver.
                 dtr = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);  
                 
@@ -123,11 +122,15 @@ classdef Node
                 ETx = tempP.Eelec*k + tempP.Eamp * k * obj.dtr^2;
                 obj.energy = obj.energy - ETx;
 
-                if(obj.energy >= 0)
-                    node.dataRec = node
+                if(obj.energy >= 0 && node.energy >= 0)
+                    node.dataRec = node.dataRec + k;    % SHOULD HAPPEN LAST
+                    outcome = true;
                 end
                 if(obj.energy < 0)      
                     obj.energy = 0;
+                end
+                if(node.energy < 0)      
+                    node.energy = 0;
                 end
             else
                 if(~node.alive)
@@ -138,12 +141,7 @@ classdef Node
                     fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
                 end
             end         
-         
-            
-         
-            
-        end
-        
+        end      
     end
 end
 

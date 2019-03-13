@@ -24,13 +24,13 @@ e.CHstatus = 1;
 %{
 Testing the connect function
 %}
-[a, result] = a.connect(b);     % Normal to normal
+[a, result] = a.sendMsg(b);     % Normal to normal
 disp(result);                   % Boolean return
-[b, result] = b.connect(a);     % Normal to normal reversed
+[b, result] = b.sendMsg(a);     % Normal to normal reversed
                 
-[a, result] = a.connect(c);     % Normal to CH
-[c, result] = c.connect(b);     % CH to normal (fails)
+[a, result] = a.sendMsg(c);     % Normal to CH
+[c, result] = c.sendMsg(b);     % CH to normal (fails)
 disp(result);           
         
-[a, result] = a.connect(d);     % Normal to dead normal
-[a, result] = a.connect(e);     % Normal to dead CH
+[a, result] = a.sendMsg(d);     % Normal to dead normal
+[a, result] = a.sendMsg(e);     % Normal to dead CH

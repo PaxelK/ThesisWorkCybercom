@@ -56,35 +56,6 @@ classdef Node
             
         end
         
-        
-        function [obj, outcome] = connect(obj, node)
-        %{
-        The connect function adds another node object as a CH reference to
-        this object and is stored in CHparent. If the connection fails
-        due to the target node being dead, or not being a CH, or if this 
-        node is already a CH, an error message is printed out. The function
-        also returns true or false whether the connection was a success or
-        not.
-        %}
-            outcome = false;
-            if(node.alive && obj.CHstatus == 0)
-                obj.CHparent = node;
-                fprintf('Node %d succeded to connect to node %d!\n', obj.ID, node.ID);
-                outcome = true;
-                
-                %Calculate distance to receiver.
-                dtr = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);     
-            else
-                if(~node.alive)
-                    fprintf('Node %d failed to connect; target node %d is dead.\n', obj.ID, node.ID);
-                elseif(obj.CHstatus == 1)
-                    fprintf('Node %d failed to connect; this node is already a CH.\n', obj.ID);
-                elseif(node.CHstatus == 0)
-                    fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
-                end
-            end     
-        end
-        
         function obj = clearConnection(obj)
         % Sets the CHparent reference to null
             obj.CHparent = [];
@@ -103,8 +74,7 @@ classdef Node
             if(node.alive && obj.CHstatus == 0)
                 obj.CHparent = node;
                 fprintf('Node %d succeded to connect to node %d!\n', obj.ID, node.ID);
-                outcome = true;
-                
+
                 %Calculate distance to receiver.
                 dtr = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);  
                 
@@ -121,13 +91,20 @@ classdef Node
                 k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
 
                 ETx = tempP.Eelec*k + tempP.Eamp * k * obj.dtr^2;
+                ERx=(Eelec+EDA)*k;
+                
                 obj.energy = obj.energy - ETx;
-
-                if(obj.energy >= 0)
+                node.energy = node.energy - ERx;
+                
+                if(obj.energy >= 0 && node.energy >= 0)
                     node.dataRec = node.dataRec + k;    % SHOULD HAPPEN LAST
+                    outcome = true;
                 end
                 if(obj.energy < 0)      
                     obj.energy = 0;
+                end
+                if(node.energy < 0)      
+                    node.energy = 0;
                 end
             else
                 if(~node.alive)
@@ -138,12 +115,7 @@ classdef Node
                     fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
                 end
             end         
-         
-            
-         
-            
-        end
-        
+        end      
     end
 end
 
