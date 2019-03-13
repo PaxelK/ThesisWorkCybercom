@@ -1,6 +1,12 @@
 classdef Node
-    %NODE Summary of this class goes here
-    %   Detailed explanation goes here
+    %{
+    NODE Summary: class that represents a simple sensor node in a WSN
+    
+    The node is supposed to work together with a large amount of other 
+    nodes as well as a mobile sink. It stores information about it's 
+    position and the data and energy aggregated while functional (having
+    energy > 0).
+    %}
     
     properties
         ID          % Node's ID, expressed as a number
@@ -17,9 +23,18 @@ classdef Node
     end
     
     methods
+        
         function obj = Node(id, x, y, ps, nrj, maxNrj)
-            %NODE Construct an instance of this class
-            %   Detailed explanation goes here
+        %{
+        Constructor: takes in arguments for id, position, size of packages
+        that get sent during transmission, starting energy level of node,
+        maximum amount of energy that can be stored by the node
+        (which also lead to the current state of charge of the node)
+        
+        Initial amount of packets sent during each transmission is set to
+        1, cluster head status is set to 0 = NOT CLUSTER HEAD.
+        If node starts of with energy it is seen as alive.
+        %}
             obj.ID = id;
             obj.xPos = x;
             obj.yPos = y;
@@ -39,25 +54,35 @@ classdef Node
         end
         
         
-        function obj,outcome = connect(obj, node)
+        function [obj, outcome] = connect(obj, node)
+        %{
+        The connect function adds another node object as a CH reference to
+        this object and is stored in CHparent. If the connection fails
+        due to the target node being dead, or not being a CH, or if this 
+        node is already a CH, an error message is printed out. The function
+        also returns true or false whether the connection was a success or
+        not.
+        %}
             outcome = false;
             if(node.alive && obj.CHstatus == 0)
                 obj.CHparent = node;
+                fprintf('Node %d succeded to connect to node %d!\n', obj.ID, node.ID);
                 outcome = true;
             else
                 if(~node.alive)
                     fprintf('Node %d failed to connect; target node %d is dead.\n', obj.ID, node.ID);
                 elseif(obj.CHstatus == 1)
-                    fprintf('Node %d failed to connect; Is a CH\n', obj.ID, node.ID);
+                    fprintf('Node %d failed to connect; this node is already a CH.\n', obj.ID, node.ID);
+                elseif(node.CHstatus == 0)
+                    fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
                 end
             end
             
             
         end
-        
+
         function tempSoC =  getSoC(obj)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+            %Returns the current state of charge
             tempSoC = obj.SoC;
         end
     end
