@@ -3,7 +3,7 @@ clc, clear all, close all
 parameters = struct;
 parameters.ps = 200;
 parameters.maxNrj = 2;
-parameters.Elec = 50*10^(-9);
+parameters.Eelec = 50*10^(-9);
 parameters.Eamp = 100*10^(-12);
 parameters.EDA = 5*10^(-9);
 
@@ -20,6 +20,8 @@ d = Node(4, 11, 12, 0, parameters);    % Normal dead node
 e = Node(5, 15, 16, 0, parameters);    % dead CH node
 e.CHstatus = 1;
 
+f = Node(6, 17, 2, 0.0000001, parameters);  %NEAR dead normal node
+
 
 %{
 Testing the connect function
@@ -34,3 +36,5 @@ disp(result);
         
 [a, result] = a.sendMsg(d);     % Normal to dead normal
 [a, result] = a.sendMsg(e);     % Normal to dead CH
+
+[f, result] = f.sendMsg(a);     % Normal NEAR dead to normal node
