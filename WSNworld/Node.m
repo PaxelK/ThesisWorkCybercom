@@ -104,11 +104,11 @@ classdef Node
                     outcome = true;
                 end
                 if(obj.energy < 0)
-                    fprintf('Node %d ran out of energy while sending to node %d!\n', obj.ID, node.ID);
+                    fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, node.ID);
                     obj.energy = 0;
                 end
                 if(node.energy < 0)
-                    fprintf('Node %d ran out of energy while receiving from node %d!\n', node.ID, obj.ID);
+                    fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', node.ID, obj.ID);
                     node.energy = 0;
                 end
             else
@@ -120,7 +120,25 @@ classdef Node
                     fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
                 end
             end         
-        end      
+        end
+        
+        function obj = generateCHstatus(obj, f, p, rnd)
+            randVal = rand(1);
+            t=(p/(1-p*(mod(rnd,1/p))));
+            t
+            
+            if(f<1)             %If we want to try without BLEACH, we simply set f>1
+                t=(1-f)*(p/(1-p*(mod(rnd,1/p))))*obj.SoC + ...
+                    (1/(1-(1-f)*(p/(1-p*(mod(rnd,1/p))))))*f*(p/(1-p*(mod(rnd,1/p))));
+            end
+            
+            if(t>randVal)
+                obj.CHstatus = 1;
+            else
+                obj.CHstatus = 0;
+            end
+            fprintf('t = %d, randVal = %d, which results in CHS = %d \n', t, randVal, obj.CHstatus);
+        end
     end
 end
 
