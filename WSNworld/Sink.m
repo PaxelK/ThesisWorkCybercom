@@ -4,8 +4,9 @@ classdef Sink
     %  packets recieved
     
     properties
-        pos; % Position of mobile sink
-        packRecieved; % Amount of packets recieved by sink
+        xPos; % Position of mobile sink, x
+        yPos; % Position of mobile sink, y
+        dataRec; % Amount of packets received by sink
     end
     
     methods
@@ -15,8 +16,9 @@ classdef Sink
             %         sizey = WSN size, y
             %  This method creates an instance of this class
                         
-            obj.pos = [sizex/2, sizey/2] ; % Initialize by placing sink in the middle of the WSN
-            obj.packRecieved = 0; % Initial packets recieved is zero 
+            obj.xPos = sizex/2;  % Initialize by placing sink in the middle of the WSN
+            obj.yPos = sizey/2; % Initialize by placing sink in the middle of the WSN
+            obj.dataRec = 0; % Initial packets recieved is zero 
         end
         
         function obj = move(obj, deltax, deltay)
@@ -27,8 +29,8 @@ classdef Sink
             %   of the sink in obj.pos
             %   return: obj = Sink object 
             
-            sinkPos = [obj.pos(1)+deltax, obj.pos(2)+deltay];
-            obj.pos = sinkPos;
+            obj.xPos = obj.xPos+deltax;
+            obj.yPos = obj.yPos+deltay;
         end
         
         function obj = packRec(obj, packSize)
@@ -39,11 +41,10 @@ classdef Sink
              %   has recieved
              %   return: packetsRec = The total amount of packets that have
              %   been sent
-            obj.packRecieved = obj.packRecieved + packSize;
+            obj.dataRec = obj.dataRec + packSize;
             %packetsRec = obj.packRecieved;
         end 
         
    
     end
 end
-
