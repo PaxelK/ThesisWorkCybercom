@@ -9,6 +9,7 @@ classdef Node
     %}
     
     properties
+        params      % "real world" parameters
         ID          % Node's ID, expressed as a number
         xPos        % Node's position in x and y
         yPos
@@ -17,7 +18,7 @@ classdef Node
         energy      % Current amount of energy [J] residing in node
         maxEnergy   % Max amount of energy [J] that can be stored in node
         SoC         % State of Charge = energy/maxEnergy
-        CHparentPtr % Reference to current cluster head
+        CHparent % Reference to current cluster head
         CHstatus    % Cluster head status. 1 if cluster head, 0 if not
         alive       % Boolean value indicating whether node has energy > 0 or not 
         dtr         % Distance to eventual receiver
@@ -26,7 +27,7 @@ classdef Node
     
     methods
         
-        function obj = Node(id, x, y, nrj, params)
+        function obj = Node(id, x, y, nrj, parameters)
         %{
         Constructor: takes in arguments for id, position, size of packages
         that get sent during transmission, starting energy level of node,
@@ -37,13 +38,14 @@ classdef Node
         1, cluster head status is set to 0 = NOT CLUSTER HEAD.
         If node starts of with energy it is seen as alive.
         %}
+            obj.params = parameters;
             obj.ID = id;
             obj.xPos = x;
             obj.yPos = y;
-            obj.pSize = params.ps;
+            obj.pSize = parameters.ps;
             obj.PA = 1;
             obj.energy = nrj;
-            obj.maxEnergy = params.maxNrj;
+            obj.maxEnergy = parameters.maxNrj;
             obj.SoC = obj.energy/obj.maxEnergy;
             obj.CHstatus = 0;
             obj.dataRec = 0;
@@ -61,7 +63,7 @@ classdef Node
             obj.CHparent = [];
         end
         
-        function obj, outcome = sendMsg(obj, node)
+        function [obj, outcome] = sendMsg(obj, node)
         %{
         Connection here adds another node object as a CH reference to
         this object and is stored in CHparent. If the connection fails
@@ -73,10 +75,9 @@ classdef Node
             outcome = false;
             if(node.alive && obj.CHstatus == 0)
                 obj.CHparent = node;
-                fprintf('Node %d succeded to connect to node %d!\n', obj.ID, node.ID);
-
+                
                 %Calculate distance to receiver.
-                dtr = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);  
+                obj.dtr = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);  
                 
                 %{
                 Then the node "sends message" to a target node or sink. The function subtracts
@@ -84,26 +85,30 @@ classdef Node
                 sent. It also subtracts energy from the receiving node based on
                 the same premises.
                 %}
-                if(CHstatus == 0)       % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
+                if(obj.CHstatus == 0)       % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
                    obj.PA = 1; 
                 end
+                
                 tempP = obj.params;     % Takes the system parameters and converts them to a simpler format
                 k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
 
                 ETx = tempP.Eelec*k + tempP.Eamp * k * obj.dtr^2;
-                ERx=(Eelec+EDA)*k;
+                ERx=(tempP.Eelec+tempP.EDA)*k;
                 
                 obj.energy = obj.energy - ETx;
                 node.energy = node.energy - ERx;
                 
                 if(obj.energy >= 0 && node.energy >= 0)
+                    fprintf('Node %d succeded to send to node %d!\n', obj.ID, node.ID);
                     node.dataRec = node.dataRec + k;    % SHOULD HAPPEN LAST
                     outcome = true;
                 end
-                if(obj.energy < 0)      
+                if(obj.energy < 0)
+                    fprintf('Node %d ran out of energy while sending to node %d!\n', obj.ID, node.ID);
                     obj.energy = 0;
                 end
-                if(node.energy < 0)      
+                if(node.energy < 0)
+                    fprintf('Node %d ran out of energy while receiving from node %d!\n', node.ID, obj.ID);
                     node.energy = 0;
                 end
             else
