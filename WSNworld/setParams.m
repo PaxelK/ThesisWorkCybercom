@@ -1,4 +1,4 @@
-function [output] = setParams(fWeight, pCH, nodeAmount, maxEnergy, distrMode)
+function [output] = setParams(fWeight, pCH, nodeAmount, maxEnergy)
 
 params = struct;
 
@@ -17,12 +17,12 @@ params.ps = 1000;
 
 %%% Energy Values %%%
 params.maxNrj=maxEnergy;% Initial Energy of a Node (in Joules), units in Joules
-params.mode = distrMode; %Tells which energy distribution mode is going to be tried
 params.Eelec=50*10^(-9);% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 params.ETx=50*10^(-9); % units in Joules/bit
 params.ERx=50*10^(-9); % units in Joules/bit
 params.Eamp=100*10^(-12);% Transmit Amplifier Types, units in Joules/bit/m^2 (amount of energy spent by the amplifier to transmit the bits)
 params.EDA=5*10^(-9);% Data Aggregation Energy, units in Joules/bit
+params.nrjGenFac = 0.1; % Energy factor for generated energy
 
 
 %Weight distribution between the term taking SoC into account and the term making sure a cluster head

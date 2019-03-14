@@ -1,6 +1,6 @@
-clear all
-close all
-clc
+function [outputArg1,outputArg2] = setup(inputArg1,inputArg2)
+%SETUP Initialize all parameters
+%   Detailed explanation goes here
 
 %  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Arguments%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  f = weight between the SoC dependent term and the fully round dependent
@@ -18,6 +18,8 @@ nrj = 2; % Amount of energy for each node [J] if 'dist' is used
 
 
 params = setParams(f, p, n, E0, Emode);
+env = setEnvironment;
+
 
 % Construct Sink and Node object
 
@@ -33,33 +35,7 @@ elseif (Emode == "dist") % Same amount of energy for every node
     end
 else 
     fprintf("The choice of energy mode is invalid! \n")
+end;
+
 end
-
-while (params.dead_nodes ~= numNodes) 
-    % Run algorithm until all nodes are dead
-    
-    % Get CH status for each node st the beginning of each round
-    for i = 1:params.operating_nodes;
-        node(i) = node(i).generateCHstatus(f, p, params.rnd);
-    end
-    
-    % Connect non-CH to closest CH 
-    
-    % Send data to CH or mobile sink
-    
-    % Update energy of every node with consumed and generated energy
-    
-    % Update the amount of operating nodes and dead nodes 
-    
-    
-    params.rnd = params.rnd + 1; % Increment round counter 
-end 
-
-
-% Plot the energy and data packets sent
-
-
-
-
-
 
