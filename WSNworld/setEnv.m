@@ -6,7 +6,7 @@ env = {};
 
 sinkInstance = Sink(params.xm, params.ym); % Create instance of sink
 
-env = {env, sinkInstance};
+env = {sinkInstance};
 nodeArray = [];
 
 if (emode == "rand") % Random amount of energy for every node
@@ -26,6 +26,6 @@ else
     fprintf("The choice of energy mode is invalid! \n")
 end
 
-env = {env, nodeArray}
+env = {env, nodeArray};
 end
 
