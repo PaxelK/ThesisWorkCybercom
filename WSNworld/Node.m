@@ -18,7 +18,7 @@ classdef Node
         energy      % Current amount of energy [J] residing in node
         maxEnergy   % Max amount of energy [J] that can be stored in node
         SoC         % State of Charge = energy/maxEnergy
-        CHparent % Reference to current cluster head
+        CHparent    % Reference to current cluster head
         CHstatus    % Cluster head status. 1 if cluster head, 0 if not
         alive       % Boolean value indicating whether node has energy > 0 or not 
         dtr         % Distance to eventual receiver

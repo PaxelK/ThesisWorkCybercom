@@ -35,17 +35,8 @@ else
     fprintf("The choice of energy mode is invalid! \n")
 end
 
-while (params.dead_nodes ~= numNodes) 
-    % Run algorithm until all nodes are dead
+while (params.dead_nodes =! numNodes) 
     
-    for i:params.operating_nodes:
-        node(i) = node(i).generateCHstatus(f, p, params.rnd);
-    end
-    
-    
-    
-    
-    params.rnd = params.rnd + 1; % Increment round counter 
 end 
 
 

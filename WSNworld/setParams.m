@@ -12,8 +12,11 @@ params.y=0; % added for better display results of the plot
 params.n=nodeAmount;% Number of Nodes in the field %
 params.dead_nodes=0;% Number of Dead Nodes in the beginning %
 
+%%% Data Packet Info %%%
+params.ps = 1000;
+
 %%% Energy Values %%%
-params.Eo=maxEnergy;% Initial Energy of a Node (in Joules), units in Joules
+params.maxNrj=maxEnergy;% Initial Energy of a Node (in Joules), units in Joules
 params.mode = distrMode; %Tells which energy distribution mode is going to be tried
 params.Eelec=50*10^(-9);% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 params.ETx=50*10^(-9); % units in Joules/bit
