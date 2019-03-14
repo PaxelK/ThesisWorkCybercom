@@ -42,7 +42,7 @@ classdef Sink
              %   return: packetsRec = The total amount of packets that have
              %   been sent
             obj.dataRec = obj.dataRec + packSize;
-            %packetsRec = obj.packRecieved;
+            %packetsRec = obj.dataRec;
         end 
         
    
