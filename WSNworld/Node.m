@@ -82,6 +82,11 @@ classdef Node
            obj.SoC = obj.energy/obj.maxEnergy;
         end
         
+        function ener = getEnergy()
+            ener = obj.energy;
+        end
+        
+        
         function [obj, outcome] = sendMsg(obj, node)
         %{
         Connection here adds another node object as a CH reference to
