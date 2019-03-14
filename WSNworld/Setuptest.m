@@ -5,18 +5,18 @@ clc, clear all, close all
 
 
 % Test to move sink position 
-sinkpos = env.sink.move(30, 60); 
+sinkpos = env.move(30, 60); 
 
 
 % Testing energy generated
 
 
-env.node(5).generateNRJ();
-env.node(5).getEnergy()
-env.node(5).generateNRJ();
-env.node(5).getEnergy()
-env.node(5).generateNRJ();
-env.node(5).getEnergy()
+env.node(5) = env.node(5).generateNRJ();
+env().node(5)
+env.node(5) = env.node(5).generateNRJ();
+env.node(5)
+env.node(5) = env.node(5).generateNRJ();
+env.node(5)
 
 
 

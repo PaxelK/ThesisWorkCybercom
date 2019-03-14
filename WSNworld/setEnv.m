@@ -1,28 +1,31 @@
 function [env] = setEnv(params, emode, strtNrj)
-%SETENV Summary of this function goes here
-%   Detailed explanation goes here
-env = struct;
+%SETENV Sets the simulation environment
+%   This function initializes the simulation environment
 
+env = {};
 
-% Construct Sink and Node object
+sinkInstance = Sink(params.xm, params.ym); % Create instance of sink
 
-env.sink = Sink(params.xm, params.ym);
+env = {env, sinkInstance};
+nodeArray = [];
 
 if (emode == "rand") % Random amount of energy for every node
     for i = 1:params.n;
         nrj = rand*params.maxNrj;
-        env.node(i) = Node(i, rand*params.xm, rand*params.ym, nrj, params);
+        tempVal = Node(i, rand*params.xm, rand*params.ym, nrj, params);
+        nodeArray = [nodeArray, tempVal];
+
     end
 elseif (emode == "dist") % Same amount of energy for every node
     nrj = strtNrj; % Amount of energy for each node [J] if 'dist' is used 
     for i = 1:params.n;
-        env.node(i) = Node(i, rand*params.xm, rand*params.ym, nrj, params);
-    end
+        tempVal = Node(i, rand*params.xm, rand*params.ym, nrj, params);
+        nodeArray = [nodeArray, tempVal];
+   end
 else 
     fprintf("The choice of energy mode is invalid! \n")
 end
 
-
-
+env = {env, nodeArray}
 end
 

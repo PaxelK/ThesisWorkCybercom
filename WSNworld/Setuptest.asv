@@ -9,14 +9,15 @@ sinkpos = env.sink.move(30, 60);
 
 
 % Testing energy generated
-env.node(5) % Prints the struct of the 5th node  
 
-env.node(5).generateNRJ();
-env.node(5)
 
-nodeEnergy = env.node(5;
+env.node(5) = env.node(5).generateNRJ();
+env.node(5) = env.node(5).getEnergy()
+env.node(5) = env.node(5).generateNRJ();
+env.node(5) = env.node(5).getEnergy()
+env.node(5) = env.node(5).generateNRJ();
+env.node(5) = env.node(5).getEnergy()
 
-nodeEnergy).generateNRJ()
 
 
 % Testing generating CH status
