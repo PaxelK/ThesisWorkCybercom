@@ -38,18 +38,25 @@ end
 while (params.dead_nodes ~= numNodes) 
     % Run algorithm until all nodes are dead
     
-    for i:params.operating_nodes:
+    % Get CH status for each node st the beginning of each round
+    for i = 1:params.operating_nodes;
         node(i) = node(i).generateCHstatus(f, p, params.rnd);
     end
     
+    % Connect non-CH to closest CH 
     
+    % Send data to CH or mobile sink
+    
+    % Update energy of every node with consumed and generated energy
+    
+    % Update the amount of operating nodes and dead nodes 
     
     
     params.rnd = params.rnd + 1; % Increment round counter 
 end 
 
 
-
+% Plot the energy and data packets sent
 
 
 
