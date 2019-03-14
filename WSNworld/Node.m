@@ -78,6 +78,10 @@ classdef Node
             distance = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);
         end
         
+        function obj = updateSoC(obj)
+           obj.SoC = obj.energy/obj.maxEnergy;
+        end
+        
         function [obj, outcome] = sendMsg(obj, node)
         %{
         Connection here adds another node object as a CH reference to
@@ -111,8 +115,9 @@ classdef Node
                 ERx=(tempP.Eelec+tempP.EDA)*k;                      % Calculates the energy that will be spent by receiving signal
                 
                 obj.energy = obj.energy - ETx;                      % Energy is subtracted before data is transmitted since a power failure should result in a faulty transmission
+                obj.updateSoC();
                 node.energy = node.energy - ERx;
-                
+                node.updateSoC();
                 obj.nrjCons = obj.nrjCons + ETx;                    % Energy cost is also added to the nodes total energy consumed
                 node.nrjCons = node.nrjCons + ERx;
                 
@@ -124,11 +129,13 @@ classdef Node
                 if(obj.energy < 0)
                     fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, node.ID);
                     obj.energy = 0;
+                    obj.updateSoC();
                     obj.alive = false;
                 end
                 if(node.energy < 0)
                     fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', node.ID, obj.ID);
                     node.energy = 0;
+                    node.updateSoC();
                     node.alive = false;
                 end
             else
@@ -175,6 +182,7 @@ classdef Node
             maxNrjGenerated = obj.maxEnergy*obj.params.nrjGenFac;
             nrj_generated = rand(1)*maxNrjGenerated;
             obj.energy = obj.energy + nrj_generated;
+            obj.updateSoC();
             
         end
         
