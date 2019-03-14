@@ -82,7 +82,7 @@ classdef Node
            obj.SoC = obj.energy/obj.maxEnergy;
         end
         
-        function ener = getEnergy()
+        function ener = getEnergy(obj)
             ener = obj.energy;
         end
         

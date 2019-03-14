@@ -19,6 +19,6 @@ mode = "dist";
 strtNrj = 2;        % Starting energy [J]
 
 params = setParams(f, p, n, E0);
-env = setEnvironment(params, mode, strtNrj);
+env = setEnv(params, mode, strtNrj);
 end
 

@@ -8,12 +8,12 @@ env = struct;
 
 env.sink = Sink(params.xm, params.ym);
 
-if (params.mode == "rand") % Random amount of energy for every node
+if (emode == "rand") % Random amount of energy for every node
     for i = 1:params.n;
         nrj = rand*params.maxNrj;
         env.node(i) = Node(i, rand*params.xm, rand*params.ym, nrj, params);
     end
-elseif (params.mode == "dist") % Same amount of energy for every node
+elseif (emode == "dist") % Same amount of energy for every node
     nrj = strtNrj; % Amount of energy for each node [J] if 'dist' is used 
     for i = 1:params.n;
         env.node(i) = Node(i, rand*params.xm, rand*params.ym, nrj, params);
