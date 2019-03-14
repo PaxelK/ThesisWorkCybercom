@@ -63,6 +63,11 @@ classdef Node
             obj.CHparent = [];
         end
         
+        function distance = getDistance(obj, node)
+        % Returns the distance between this node and an arbitrary node.
+            distance = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);
+        end
+        
         function [obj, outcome] = sendMsg(obj, node)
         %{
         Connection here adds another node object as a CH reference to
@@ -92,24 +97,26 @@ classdef Node
                 tempP = obj.params;     % Takes the system parameters and converts them to a simpler format
                 k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
 
-                ETx = tempP.Eelec*k + tempP.Eamp * k * obj.dtr^2;
-                ERx=(tempP.Eelec+tempP.EDA)*k;
+                ETx = tempP.Eelec*k + tempP.Eamp * k * obj.dtr^2;   % Calculates the energy that will be spent by transmitting signal
+                ERx=(tempP.Eelec+tempP.EDA)*k;                      % Calculates the energy that will be spent by receiving signal
                 
-                obj.energy = obj.energy - ETx;
+                obj.energy = obj.energy - ETx;                      % Energy is subtracted before data is transmitted since a power failure should result in a faulty transmission
                 node.energy = node.energy - ERx;
                 
-                if(obj.energy >= 0 && node.energy >= 0)
+                if(obj.energy >= 0 && node.energy >= 0)             % If no power failure was had, data has been transmitted and received
                     fprintf('Node %d succeded to send to node %d!\n', obj.ID, node.ID);
-                    node.dataRec = node.dataRec + k;    % SHOULD HAPPEN LAST
+                    node.dataRec = node.dataRec + k;    
                     outcome = true;
                 end
                 if(obj.energy < 0)
                     fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, node.ID);
                     obj.energy = 0;
+                    obj.alive = false;
                 end
                 if(node.energy < 0)
                     fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', node.ID, obj.ID);
                     node.energy = 0;
+                    node.alive = false;
                 end
             else
                 if(~node.alive)
@@ -122,11 +129,18 @@ classdef Node
             end         
         end
         
+        function obj = generateNRJ(obj)
+            obj.maxEnergy
+            obj.params.nrjGenFac
+            maxNrjGenerated = obj.maxEnergy*obj.params.nrjGenFac
+            nrj_generated = rand(1)*maxNrjGenerated
+            obj.energy
+            
+        end
+        
         function obj = generateCHstatus(obj, f, p, rnd)
             randVal = rand(1);
-            t=(p/(1-p*(mod(rnd,1/p))));
-            t
-            
+            t=(p/(1-p*(mod(rnd,1/p))));          
             if(f<1)             %If we want to try without BLEACH, we simply set f>1
                 t=(1-f)*(p/(1-p*(mod(rnd,1/p))))*obj.SoC + ...
                     (1/(1-(1-f)*(p/(1-p*(mod(rnd,1/p))))))*f*(p/(1-p*(mod(rnd,1/p))));

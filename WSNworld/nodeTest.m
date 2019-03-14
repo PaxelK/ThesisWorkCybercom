@@ -6,9 +6,9 @@ parameters.maxNrj = 2;
 parameters.Eelec = 50*10^(-9);
 parameters.Eamp = 100*10^(-12);
 parameters.EDA = 5*10^(-9);
-parameters.f = 1.6;
+parameters.f = 0.6;
 parameters.p = 0.05;
-
+parameters.nrjGenFac = 0.1;
 
 a = Node(1, 1, 2, 2, parameters);    % Normal non-CH node
 b = Node(2, 5, 6, 1, parameters);    % Normal non-CH node
@@ -43,6 +43,12 @@ disp(result);
 [f, result] = f.sendMsg(a);     % NEAR dead normal to normal node
 [g, result] = g.sendMsg(f);     % NEAR dead normal to NEAR dead normal node
 
-
 %Testing the CHstatus function
-a.generateCHstatus(parameters.f, parameters.p, 20);
+%                       f           p           rnd
+a.generateCHstatus(parameters.f, parameters.p, 19);
+
+a.getDistance(b)
+a.getDistance(c)
+a.getDistance(d)
+
+a.generateNRJ
