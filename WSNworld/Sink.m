@@ -33,18 +33,11 @@ classdef Sink
             obj.yPos = obj.yPos+deltay;
         end
         
-        function obj = packRec(obj, packSize)
-             %METHOD packRec
-             %   Input: Packsize = Size of package that was recieved 
-             
-             %   This method updates the aamount of packages that the sink
-             %   has recieved
-             %   return: packetsRec = The total amount of packets that have
-             %   been sent
-            obj.dataRec = obj.dataRec + packSize;
-            %packetsRec = obj.dataRec;
-        end 
-        
+        function packRec = getDataRec(obj)
+            %METHID getDataRec
+            %   Output: Total amount of bits received by the sink 
+           packRec = obj.dataRec; 
+        end
    
     end
 end
