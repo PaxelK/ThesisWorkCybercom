@@ -7,6 +7,8 @@ classdef Sink
         xPos; % Position of mobile sink, x
         yPos; % Position of mobile sink, y
         dataRec; % Amount of packets received by sink
+        sizeX;
+        sizeY;
     end
     
     methods
@@ -19,6 +21,8 @@ classdef Sink
             obj.xPos = sizex/2;  % Initialize by placing sink in the middle of the WSN
             obj.yPos = sizey/2; % Initialize by placing sink in the middle of the WSN
             obj.dataRec = 0; % Initial packets recieved is zero 
+            obj.sizeX = sizex;
+            obj.sizeY = sizey;
         end
         
         function obj = move(obj, deltax, deltay)
@@ -28,9 +32,24 @@ classdef Sink
             %   The method moves the sink and stores the updated position
             %   of the sink in obj.pos
             %   return: obj = Sink object 
-            
-            obj.xPos = obj.xPos+deltax;
-            obj.yPos = obj.yPos+deltay;
+            %   If the sink "trie" to go out of bounds, it is placed at the
+            %   border of the grid.
+            if((obj.xPos + deltax <= obj.sizeX && obj.xPos + deltax >= 0) && (obj.yPos + deltay <= obj.sizeY && obj.yPos + deltay >= 0))
+                obj.xPos = obj.xPos+deltax;
+                obj.yPos = obj.yPos+deltay;
+            end
+            if(obj.xPos + deltax > obj.sizeX)
+                obj.xPos = obj.sizeX;
+            end
+            if(obj.xPos + deltax < 0)
+                obj.xPos = 0;
+            end
+            if(obj.yPos + deltay > obj.sizeY)
+                obj.yPos = obj.sizeY;
+            end
+            if(obj.yPos + deltay < 0)
+                obj.yPos = 0;
+            end 
         end
         
         function packRec = getDataRec(obj)
@@ -38,7 +57,11 @@ classdef Sink
             %   Output: Total amount of bits received by the sink 
            packRec = obj.dataRec; 
         end
-   
+        
+        function [xpos, ypos] = getPos(obj)
+            xpos = obj.xPos;
+            ypos = obj.yPos;
+        end
     end
 end
 

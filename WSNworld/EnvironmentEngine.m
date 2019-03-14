@@ -14,15 +14,20 @@ classdef EnvironmentEngine
             %   Detailed explanation goes here
             [parameters, env] = setup();
             obj.params = parameters;
-            obj.sink = env(1);
-            obj.nodes = env(2);
+            obj.sink = env{1}{1};
+            obj.nodes = env{2};
         end
         
         function obj = updateEnv(obj, deltaX, deltaY, packetRates)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
-            obj.sink.move(deltaX, deltaY);
+            obj.sink = obj.sink.move(deltaX, deltaY);
         end
+        
+        function [sinkX, sinkY, sinkDataRec] = sinkStatus(obj)
+            
+        end
+        
     end
 end
 
