@@ -25,7 +25,7 @@ f = Node(6, 17, 2, 0.0000001, parameters);  %NEAR dead normal node
 
 g = Node(7, 18, 3, 0.0000001, parameters);  %NEAR dead normal node
 
-
+sink = Sink(100,100);
 %{
 Testing the send function
 %}
@@ -47,8 +47,7 @@ disp(result);
 %                       f           p           rnd
 a.generateCHstatus(parameters.f, parameters.p, 19);
 
-a.getDistance(b)
-a.getDistance(c)
-a.getDistance(d)
+a.getDistance(b);
+a.getDistance(c);
+a.getDistance(d);
 
-a.generateNRJ

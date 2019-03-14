@@ -5,15 +5,17 @@ classdef EnvironmentEngine
     properties
         sink
         nodes
+        params
     end
     
     methods
-        function obj = EnvironmentEngine(parameters)
+        function obj = EnvironmentEngine()
             %ENVIRONMENTENGINE Construct an instance of this class
             %   Detailed explanation goes here
-            [theSink, theNodes] = setup(parameters);
-            obj.sink = theSink;
-            obj.nodes = theNodes;
+            [parameters, env] = setup();
+            obj.params = parameters;
+            obj.sink = env(1);
+            obj.nodes = env(2);
         end
         
         function obj = updateEnv(obj, deltaX, deltaY, packetRates)
