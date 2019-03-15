@@ -6,11 +6,15 @@ clc, clear all, close all
 % Run setup function, function has no inputs
 [params, env] = setup(); 
 
+sink = env{1}{1}; % Sink is first element in env cell array
+node = env{2};    % Node is second element in env cell array
+
+
 
 % % Test to move sink position 
-% sinkpos = env{1}{1}; 
-% 
-% sinkpos = sinkpos.move(30, 30);
+sink = sink.move(49,-49);
+sink.xPos
+sink.yPos
 
 
 % % Testing energy generated
@@ -27,27 +31,45 @@ clc, clear all, close all
 % % Testing generating CH status and clearing CH status
 
 
-node = env{2}; 
-CHamount = 0; % Amount of CH
+% CHamount = 0; % Amount of CH
+% 
+% 
+% for i=1:100; % Hard coded for the amount of nodes
+%     nodeCH(i) = node(i).generateCHstatus(0.6, 0.05, 0);
+%     if (nodeCH(i).CHstatus == 1) 
+%         CHamount = CHamount + 1; % Increments the CH counter 
+%     end
+% end
+% 
+% CHamount = 0; % Amount of CH
+% 
+% for i=1:100;
+%     nodeCH(i) = node(i).clearConnection(); % Try to clear CH status
+%     if (nodeCH(i).CHstatus == 1) 
+%         CHamount = CHamount + 1; % Increments the CH counter 
+%     end
+% end
+% 
+% CHamount % Displays the amount of nodes that are CH 
 
 
-for i=1:100; % Hard coded for the amount of nodes
-    nodeCH(i) = node(i).generateCHstatus(0.6, 0.05, 0);
-    if (nodeCH(i).CHstatus == 1) 
-        CHamount = CHamount + 1; % Increments the CH counter 
-    end
-end
+% % Test getdistance methos 
 
-CHamount = 0; % Amount of CH
+% node(5).xPos
+% node(5).yPos
+% disp('----------------------------')
+% node(6).xPos
+% node(6).yPos
+% disp('----------------------------')
+% 
+% disp('Distance from node 5 to 6')
+% node(5).getDistance(node(6))
+% disp('Distance from node 6 to 5')
+% node(6).getDistance(node(5))
 
-for i=1:100;
-    nodeCH(i) = node(i).clearConnection(); % Try to clear CH status
-    if (nodeCH(i).CHstatus == 1) 
-        CHamount = CHamount + 1; % Increments the CH counter 
-    end
-end
 
-CHamount % Displays the amount of nodes that are CH 
+
+
 
 % %%%%%%%%%%%% Printing to check code %%%%%%%%%%%%%%%%%%%%%%%%%
 %sinkpos 
