@@ -9,6 +9,12 @@ classdef Sink
         dataRec; % Amount of packets received by sink
         sizeX;
         sizeY;
+        alive;
+        energy;
+        maxenergy;
+        SoC;
+        nrjCons;
+        ID;
     end
     
     methods
@@ -23,6 +29,12 @@ classdef Sink
             obj.dataRec = 0; % Initial packets recieved is zero 
             obj.sizeX = sizex;
             obj.sizeY = sizey;
+            obj.alive = true;
+            obj.energy = inf;
+            obj.maxenergy = inf;
+            obj.SoC = obj.energy/obj.maxenergy;
+            obj.nrjCons = 0;
+            obj.ID = pi;
         end
         
         function obj = move(obj, deltax, deltay)
@@ -61,6 +73,10 @@ classdef Sink
         function [xpos, ypos] = getPos(obj)
             xpos = obj.xPos;
             ypos = obj.yPos;
+        end
+        
+        function obj = updateSoC(obj)
+            obj.SoC = obj.energy/obj.maxenergy;
         end
     end
 end
