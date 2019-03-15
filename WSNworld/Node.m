@@ -187,7 +187,13 @@ classdef Node
             maxNrjGenerated = obj.maxEnergy*obj.params.nrjGenFac;
             nrj_generated = rand(1)*maxNrjGenerated;
             obj.energy = obj.energy + nrj_generated;
-            obj.updateSoC();
+           
+            %Energy stored in node can't exceed the max energy stored
+            if (obj.energy > obj.maxEnergy)
+               obj.energy = obj.maxEnergy; 
+            end
+            
+            obj = obj.updateSoC();
             
         end
         
