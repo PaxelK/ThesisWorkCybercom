@@ -14,5 +14,5 @@ EE = EE.updateEnv(-40, -40, 50);
 [x y] = EE.sink.getPos();
 fprintf('x = %d, y = %d\n', x, y);
 EE = EE.updateEnv(-1000, -1000, 50);
-[x y] = EE.sink.getPos();
-fprintf('x = %d, y = %d\n', x, y);
+[x y d] = EE.sinkStatus();
+fprintf('x = %d, y = %d, dataRec = %d\n', x, y, d);

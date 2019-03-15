@@ -25,7 +25,14 @@ classdef EnvironmentEngine
         end
         
         function [sinkX, sinkY, sinkDataRec] = sinkStatus(obj)
-            
+            [sinkX, sinkY] = obj.sink.getPos();
+            sinkDataRec = obj.sink.getDataRec();
+        end
+        
+        function states = getStates(obj)
+            for node = obj.nodes
+                
+            end
         end
         
     end
