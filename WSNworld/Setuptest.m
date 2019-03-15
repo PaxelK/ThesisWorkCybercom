@@ -12,7 +12,15 @@ node = env{2};    % Node is second element in env cell array
 
 
 % % Test to move sink position 
-sink = sink.move(49,-49);
+sink = sink.move(34, 30);
+sink.xPos
+sink.yPos
+disp('------------------------')
+sink = sink.move(-15, -25);
+sink.xPos
+sink.yPos
+disp('------------------------')
+sink = sink.move(-2, -34);
 sink.xPos
 sink.yPos
 
