@@ -20,3 +20,7 @@ EE = EE.updateEnv(20, 20, 50);
 fprintf('x = %d, y = %d, dataRec = %d\n', x, y, d);
 
 states = EE.getStates();
+
+
+EE.rnd = 15;
+EE = EE.cluster();

@@ -15,6 +15,7 @@ classdef Sink
         SoC;
         nrjCons;
         ID;
+        CHstatus;
     end
     
     methods
@@ -35,6 +36,7 @@ classdef Sink
             obj.SoC = obj.energy/obj.maxenergy;
             obj.nrjCons = 0;
             obj.ID = pi;
+            obj.CHstatus = 1;
         end
         
         function obj = move(obj, deltax, deltay)

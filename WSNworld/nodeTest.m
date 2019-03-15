@@ -51,3 +51,6 @@ a.getDistance(b);
 a.getDistance(c);
 a.getDistance(d);
 
+b.CHstatus = 1;
+a.connect(b);
+

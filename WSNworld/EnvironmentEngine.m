@@ -8,6 +8,8 @@ classdef EnvironmentEngine
         sink                % Holds one sink object
         nodes               % Holds an array containing all nodes of the WSN
         params              % Parameters used for setting up the network
+        states              % Current systems states
+        rnd
     end
     
     methods
@@ -21,6 +23,7 @@ classdef EnvironmentEngine
             obj.params = parameters;
             obj.sink = env{1}{1};
             obj.nodes = env{2};
+            obj.rnd = 0;
         end
         
         function obj = updateEnv(obj, deltaX, deltaY, packetRates)
@@ -57,39 +60,61 @@ classdef EnvironmentEngine
             [sinkx, sinky, nodeVals1, nodeVals2,....., nodeValsN]^T          
             %}
             [x, y] = obj.sink.getPos();
-            states = [x; y];
-            for node = obj.nodes
-                states = [states; 
-                            node.xPos;
-                            node.yPos;
-                            node.CHstatus;
-                            node.PS;
-                            node.nrjCons;
-                          ];
+            obj.states = [x; y];
+            for node = obj.nodes              
+                [xN, yN] = node.getPos();
+                obj.states = [obj.states; 
+                    xN;
+                    yN;
+                    node.getCHstatus();
+                    node.getPS();
+                    node.getEC()
+                    ];
+            end
+            states = obj.states;
+        end
+        
+        function obj = cluster(obj)
+            %{
+            METHOD cluster
+            
+            
+            Iterates through all nodes and makes decide whether to be a CH
+            or not with generateCHstatus().
+            
+            After that, it iterates through all nodes that arent CHs and
+            compares it's distance to sink to all distances to all nodes
+            that are CHs. It uses the index jshortest to store which
+            distance was the shortest. If no distance to a CH was shorter
+            than the distance to the sink, the node simply connects to the
+            sink.
+            %}
+            for i=1:length(obj.nodes)
+                 obj.nodes(i) = obj.nodes(i).generateCHstatus(obj.params.f, obj.params.p, obj.rnd);
+            end  
+            
+            for i=1:length(obj.nodes)   
+               if(obj.nodes(i).getCHstatus == 0)                                        % If node is a simple node
+                   minDistance = obj.nodes(i).getDistance(obj.sink);                    % Starts off with the distance to sink
+                   jshortest = -1;                                                      % jshortest starts of as a "non index" number
+                   for j=1:length(obj.nodes)                                            
+                       if(obj.nodes(j).CHstatus == 1)                                   % Checks all cluster head nodes
+                            if(minDistance > obj.nodes(i).getDistance(obj.nodes(j)))    
+                                minDistance = obj.nodes(i).getDistance(obj.nodes(j));   % If distance to cluster head j was shorter than what has been measured before, make this the new minimum distance
+                                jshortest = j;                                          % Store index of this node
+                            end
+                       end
+                   end
+                   if(jshortest > 0)                                                    % If a CH with in-between distance shorter than that to the sink, connect to this CH
+                       obj.nodes(i) = obj.nodes(i).connect(obj.nodes(jshortest));
+                   else
+                       obj.nodes(i) = obj.nodes(i).connect(obj.sink);                   % Otherwise connect to the sink
+                   end
+                   
+               end
             end
         end
+        
+        
     end
 end
-
-
-% [params, env] = setup();
-% 
-% while (params.dead_nodes ~= numNodes) 
-%     % Run algorithm until all nodes are dead
-%     
-%     % Get CH status for each node st the beginning of each round
-%     for i = 1:params.operating_nodes;
-%         env.node(i) = env.node(i).generateCHstatus(f, p, params.rnd);
-%     end
-%     
-%     % Connect non-CH to closest CH 
-%     
-%     % Send data to CH or mobile sink
-%     
-%     % Update energy of every node with consumed and generated energy
-%     
-%     % Update the amount of operating nodes and dead nodes 
-%     
-%     
-%     params.rnd = params.rnd + 1; % Increment round counter 
-% end 

@@ -74,6 +74,15 @@ classdef Node
            eneCons = obj.nrjCons; 
         end
         
+        function [x, y] = getPos(obj)
+           x = obj.xPos;
+           y = obj.yPos;
+        end
+        
+        function CHS = getCHstatus(obj)
+           CHS = obj.CHstatus; 
+        end
+        
         function obj = clearConnection(obj)
         % Sets the CHparent reference to null
             obj.CHparent = [];
@@ -90,6 +99,21 @@ classdef Node
         
         function ener = getEnergy(obj)
             ener = obj.energy;
+        end
+        
+        function obj = connect(obj, node)     
+            if(node.alive && obj.CHstatus == 0 && node.CHstatus == 1)
+                obj.CHparent = node;
+                fprintf('Node %d connected successfully to target node %d.\n', obj.ID, node.ID);
+            else
+               if(~node.alive)
+                    fprintf('Node %d failed to connect; target node %d is dead.\n', obj.ID, node.ID);
+               elseif(obj.CHstatus == 1)
+                    fprintf('Node %d failed to connect; this node is already a CH.\n', obj.ID);
+               elseif(node.CHstatus == 0)
+                    fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
+               end 
+            end             
         end
         
         
@@ -218,7 +242,7 @@ classdef Node
             else
                 obj.CHstatus = 0;
             end
-            fprintf('t = %d, randVal = %d, which results in CHS = %d \n', t, randVal, obj.CHstatus);
+            %fprintf('t = %d, randVal = %d, which results in CHS = %d \n', t, randVal, obj.CHstatus);
         end
     end
 end
