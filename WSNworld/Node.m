@@ -23,6 +23,7 @@ classdef Node
         alive       % Boolean value indicating whether node has energy > 0 or not 
         dtr         % Distance to eventual receiver
         dataRec     % Total Data received
+        PS          % Packets sent
         nrjCons     % Total Energy consumed
     end
     
@@ -50,6 +51,7 @@ classdef Node
             obj.SoC = obj.energy/obj.maxEnergy;
             obj.CHstatus = 0;
             obj.dataRec = 0;
+            obj.PS = 0;
             obj.nrjCons = 0;
             
             if(obj.energy > 0)
@@ -62,6 +64,10 @@ classdef Node
         
         function packRec = getDataRec(obj)
            packRec = obj.dataRec; 
+        end
+        
+        function ps = getPS(obj)
+           ps = obj.PS;
         end
         
         function eneCons = getEC(obj)
@@ -128,6 +134,7 @@ classdef Node
                 
                 if(obj.energy >= 0 && node.energy >= 0)             % If no power failure was had, data has been transmitted and received
                     fprintf('Node %d succeded to send to node %d!\n', obj.ID, node.ID);
+                    obj.PS = obj.PS + k;
                     node.dataRec = node.dataRec + k;    
                     outcome = true;
                 end
