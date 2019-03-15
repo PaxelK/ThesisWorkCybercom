@@ -20,7 +20,7 @@ sink = sink.move(-15, -25);
 sink.xPos
 sink.yPos
 disp('------------------------')
-sink = sink.move(-43, -34);
+sink = sink.move(-2, -34);
 sink.xPos
 sink.yPos
 
