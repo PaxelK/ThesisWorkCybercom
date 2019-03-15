@@ -44,7 +44,7 @@ classdef Sink
             %   The method moves the sink and stores the updated position
             %   of the sink in obj.pos
             %   return: obj = Sink object 
-            %   If the sink "trie" to go out of bounds, it is placed at the
+            %   If the sink "tries" to go out of bounds, it is placed at the
             %   border of the grid.
            
             if(obj.xPos + deltax > obj.sizeX)
