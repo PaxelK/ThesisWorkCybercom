@@ -46,10 +46,7 @@ classdef Sink
             %   return: obj = Sink object 
             %   If the sink "trie" to go out of bounds, it is placed at the
             %   border of the grid.
-            if((obj.xPos + deltax <= obj.sizeX && obj.xPos + deltax >= 0) && (obj.yPos + deltay <= obj.sizeY && obj.yPos + deltay >= 0))
-                obj.xPos = obj.xPos+deltax;
-                obj.yPos = obj.yPos+deltay;
-            end
+           
             if(obj.xPos + deltax > obj.sizeX)
                 obj.xPos = obj.sizeX;
             end
@@ -62,6 +59,11 @@ classdef Sink
             if(obj.yPos + deltay < 0)
                 obj.yPos = 0;
             end 
+            if((obj.xPos + deltax <= obj.sizeX && obj.xPos + deltax >= 0) && (obj.yPos + deltay <= obj.sizeY && obj.yPos + deltay >= 0))
+                obj.xPos = obj.xPos+deltax;
+                obj.yPos = obj.yPos+deltay;
+            end
+           
         end
         
         function packRec = getDataRec(obj)
