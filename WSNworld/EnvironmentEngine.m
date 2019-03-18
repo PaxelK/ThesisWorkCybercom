@@ -10,6 +10,12 @@ classdef EnvironmentEngine
         params              % Parameters used for setting up the network
         states              % Current systems states
         rnd
+        nodesAlive
+        EClist
+        PackReclist
+        meanEClist
+        deadNodes
+        posNodes
     end
     
     methods
@@ -23,7 +29,38 @@ classdef EnvironmentEngine
             obj.params = parameters;
             obj.sink = env{1}{1};
             obj.nodes = env{2};
-            obj.rnd = 0;
+            obj.rnd = 1;
+            obj.nodesAlive = [];
+            obj.EClist = [];
+            obj.PackReclist = [];
+            obj.meanEClist = [];
+            obj.deadNodes = [];
+            obj.posNodes = [];
+            
+            tempNRJ = 0;
+            for node=obj.nodes
+                tempNRJ = tempNRJ + node.nrjCons;
+                if(node.alive)
+                    obj.nodesAlive = [obj.nodesAlive, node];
+                else
+                    obj.deadNodes = [obj.deadNodes, node];
+                end
+            end
+            
+            nrjMean = 0;
+            if(~isempty(obj.nodesAlive))
+                nrjMean = tempNRJ/length(obj.nodesAlive);
+            end
+            
+            obj.EClist = [obj.EClist, tempNRJ];
+            obj.PackReclist = [obj.PackReclist, obj.sink.dataRec];
+            obj.meanEClist = [obj.meanEClist, nrjMean];
+            
+            for node = obj.nodesAlive
+                [xnd, ynd] = node.getPos();
+                obj.posNodes = [obj.posNodes; xnd, ynd];               
+            end
+ 
         end
         
         function obj = updateEnv(obj, deltaX, deltaY, packetRates)
@@ -127,6 +164,55 @@ classdef EnvironmentEngine
             end
         end
         
+        function obj = iterateRound(obj)
+            tempNRJ = 0;
+            obj.nodesAlive = [];
+            obj.deadNodes = [];
+            
+            for node=obj.nodes
+                tempNRJ = tempNRJ + node.nrjCons;
+                if(node.alive)
+                    obj.nodesAlive = [obj.nodesAlive, node];
+                else
+                    obj.deadNodes = [obj.deadNodes, node];
+                end
+            end
+            
+            nrjMean = 0;
+            if(~isempty(obj.nodesAlive))
+                nrjMean = tempNRJ/length(obj.nodesAlive);
+            end
+            
+            obj.EClist = [obj.EClist, tempNRJ];
+            obj.PackReclist = [obj.PackReclist, obj.sink.dataRec];
+            obj.meanEClist = [obj.meanEClist, nrjMean];
+            
+            obj.posNodes = [];
+            for node = obj.nodesAlive
+                [xnd, ynd] = node.getPos();
+                obj.posNodes = [obj.posNodes; xnd, ynd];               
+            end 
+            obj.rnd = obj.rnd + 1;
+        end
         
+        
+        function [ecSUM, ecList] = getECstats(obj)
+            ecList = obj.EClist;
+            ecSUM = sum(obj.EClist);
+        end
+        
+        function [prSUM, prList] = getPRstats(obj)
+            prList = obj.PackReclist;
+            prSUM = sum(obj.PackReclist);
+        end
+        
+        function meanEClist = getECmeanStats(obj)
+            meanEClist = obj.meanEClist;
+        end
+        
+        function [nDead, deadList] = getDeadNodes(obj)
+            deadList = obj.deadNodes;
+            nDead = sum(obj.deadNodes);
+        end
     end
 end

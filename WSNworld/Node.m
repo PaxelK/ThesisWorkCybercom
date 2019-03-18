@@ -159,12 +159,14 @@ classdef Node
                     end
                     if(obj.energy < 0)
                         fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, obj.CHparent.ID);
+                        obj.nrjCons = obj.nrjCons + obj.energy;         % Corrects the energy consumed by taking away the "negative" energy that isnt consumed for real
                         obj.energy = 0;
                         obj.updateSoC();
                         obj.alive = false;
                     end
                     if(obj.CHparent.energy < 0)
                         fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', obj.CHparent.ID, obj.ID);
+                        obj.CHparent.nrjCons = obj.CHparent.nrjCons + obj.CHparent.energy;
                         obj.CHparent.energy = 0;
                         obj.CHparent.updateSoC();
                         obj.CHparent.alive = false;

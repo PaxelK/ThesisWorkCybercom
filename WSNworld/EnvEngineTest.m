@@ -22,6 +22,15 @@ fprintf('x = %d, y = %d, dataRec = %d\n', x, y, d);
 states = EE.getStates();
 
 
-EE.rnd = 15;
-EE = EE.cluster();
-EE = EE.communicate();
+
+
+for lel=1:50
+    plotgfx(EE);
+    EE = EE.updateEnv(1, 1, 5);
+    EE = EE.cluster();
+    EE = EE.communicate();
+    EE = EE.iterateRound(); 
+end
+
+
+
