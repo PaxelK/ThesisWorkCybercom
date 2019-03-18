@@ -77,8 +77,7 @@ classdef EnvironmentEngine
         function obj = cluster(obj)
             %{
             METHOD cluster
-            
-            
+                    
             Iterates through all nodes and makes decide whether to be a CH
             or not with generateCHstatus().
             
@@ -89,8 +88,12 @@ classdef EnvironmentEngine
             than the distance to the sink, the node simply connects to the
             sink.
             %}
-            for i=1:length(obj.nodes)
-                 obj.nodes(i) = obj.nodes(i).generateCHstatus(obj.params.f, obj.params.p, obj.rnd);
+            for i=1:length(obj.nodes)                                                   % Check if node is alive, then generate its CHS
+                if(obj.nodes(i).alive)
+                    obj.nodes(i) = obj.nodes(i).generateCHstatus(obj.params.f, obj.params.p, obj.rnd);
+                else
+                    obj.nodes(i).CHstatus = 0;
+                end
             end  
             
             for i=1:length(obj.nodes)   
@@ -110,8 +113,17 @@ classdef EnvironmentEngine
                    else
                        obj.nodes(i) = obj.nodes(i).connect(obj.sink);                   % Otherwise connect to the sink
                    end
-                   
+               else
+                   obj.nodes(i) = obj.nodes(i).connect(obj.sink);
                end
+            end
+        end
+        
+        function obj = communicate(obj)
+            for i=1:length(obj.nodes)
+                if(obj.nodes(i).alive)
+                    obj.nodes(i) = obj.nodes(i).sendMsg();
+                end
             end
         end
         

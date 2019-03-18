@@ -50,9 +50,11 @@ classdef Node
             obj.maxEnergy = parameters.maxNrj;
             obj.SoC = obj.energy/obj.maxEnergy;
             obj.CHstatus = 0;
+            obj.CHparent = [];
             obj.dataRec = 0;
             obj.PS = 0;
             obj.nrjCons = 0;
+            
             
             if(obj.energy > 0)
                 obj.alive = true;
@@ -101,15 +103,19 @@ classdef Node
             ener = obj.energy;
         end
         
-        function obj = connect(obj, node)     
-            if(node.alive && obj.CHstatus == 0 && node.CHstatus == 1)
+        function obj = connect(obj, node)               
+        %{
+        Connection here adds another node object as a CH reference to
+        this object and is stored in CHparent. If the connection fails
+        due to the target node being dead, or not being a CH, or if this 
+        node is already a CH, an error message is printed out.
+        %}    
+            if(node.alive)
                 obj.CHparent = node;
-                fprintf('Node %d connected successfully to target node %d.\n', obj.ID, node.ID);
+                fprintf('Node %d, of type %d, connected successfully to target node %d.\n', obj.ID, obj.CHstatus, node.ID);
             else
                if(~node.alive)
                     fprintf('Node %d failed to connect; target node %d is dead.\n', obj.ID, node.ID);
-               elseif(obj.CHstatus == 1)
-                    fprintf('Node %d failed to connect; this node is already a CH.\n', obj.ID);
                elseif(node.CHstatus == 0)
                     fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
                end 
@@ -117,72 +123,63 @@ classdef Node
         end
         
         
-        function [obj, outcome] = sendMsg(obj, node)
-        %{
-        Connection here adds another node object as a CH reference to
-        this object and is stored in CHparent. If the connection fails
-        due to the target node being dead, or not being a CH, or if this 
-        node is already a CH, an error message is printed out. The function
-        also returns true or false whether the connection was a success or
-        not.
-        %}
+        
+        function [obj, outcome] = sendMsg(obj)
             outcome = false;
-            if(node.alive && obj.CHstatus == 0)
-                obj.CHparent = node;
-                
-                %Calculate distance to receiver.
-                obj.dtr = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);  
-                
-                %{
-                Then the node "sends message" to a target node or sink. The function subtracts
-                energy from this node corresponding to the amount of data packets
-                sent. It also subtracts energy from the receiving node based on
-                the same premises.
-                %}
-                if(obj.CHstatus == 0)       % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
-                   obj.PA = 1; 
-                end
-                
-                tempP = obj.params;     % Takes the system parameters and converts them to a simpler format
-                k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
+            
+            if(~isempty(obj.CHparent))
+                if(obj.CHparent.alive)
+                    if(obj.CHstatus == 0)
+                        obj.PA = 1;             % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
+                    end
+                    %{
+                    The node "sends message" to a target node. The function subtracts
+                    energy from this node corresponding to the amount of data packets
+                    sent. It also subtracts energy from the receiving node based on
+                    the same premises.
+                    %}
+                    tempP = obj.params;     % Takes the system parameters and converts them to a simpler format
+                    k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
 
-                ETx = tempP.Eelec*k + tempP.Eamp * k * obj.dtr^2;   % Calculates the energy that will be spent by transmitting signal
-                ERx=(tempP.Eelec+tempP.EDA)*k;                      % Calculates the energy that will be spent by receiving signal
+                    ETx = tempP.Eelec*k + tempP.Eamp * k * obj.getDistance(obj.CHparent)^2;   % Calculates the energy that will be spent by transmitting signal
+                    ERx=(tempP.Eelec+tempP.EDA)*k;                      % Calculates the energy that will be spent by receiving signal
+
+                    obj.energy = obj.energy - ETx;                      % Energy is subtracted before data is transmitted since a power failure should result in a faulty transmission
+                    obj.updateSoC();                                    % State of charge has to be updated after every energy use...
+                    obj.CHparent.energy = obj.CHparent.energy - ERx;
+                    obj.CHparent.updateSoC();
+                    obj.nrjCons = obj.nrjCons + ETx;                    % Energy cost is also added to the nodes total energy consumed
+                    obj.CHparent.nrjCons = obj.CHparent.nrjCons + ERx;
+
+                    if(obj.energy >= 0 && obj.CHparent.energy >= 0)             % If no power failure was had, data has been transmitted and received
+                        fprintf('Node %d succeded to send to node %d!\n', obj.ID, obj.CHparent.ID);
+                        obj.PS = obj.PS + k;
+                        obj.CHparent.dataRec = obj.CHparent.dataRec + k;    
+                        outcome = true;
+                    end
+                    if(obj.energy < 0)
+                        fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, obj.CHparent.ID);
+                        obj.energy = 0;
+                        obj.updateSoC();
+                        obj.alive = false;
+                    end
+                    if(obj.CHparent.energy < 0)
+                        fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', obj.CHparent.ID, obj.ID);
+                        obj.CHparent.energy = 0;
+                        obj.CHparent.updateSoC();
+                        obj.CHparent.alive = false;
+                    end
+                else
+                    if(~obj.CHparent.alive)
+                        fprintf('Node %d failed to transmit; target node %d is dead.\n', obj.ID, obj.CHparent.ID);
+                    elseif(node.CHstatus == 0)
+                        fprintf('Node %d failed to transmit; target node %d is not a CH.\n', obj.ID, obj.CHparent.ID);
+                    end 
+                end
                 
-                obj.energy = obj.energy - ETx;                      % Energy is subtracted before data is transmitted since a power failure should result in a faulty transmission
-                obj.updateSoC();
-                node.energy = node.energy - ERx;
-                node.updateSoC();
-                obj.nrjCons = obj.nrjCons + ETx;                    % Energy cost is also added to the nodes total energy consumed
-                node.nrjCons = node.nrjCons + ERx;
-                
-                if(obj.energy >= 0 && node.energy >= 0)             % If no power failure was had, data has been transmitted and received
-                    fprintf('Node %d succeded to send to node %d!\n', obj.ID, node.ID);
-                    obj.PS = obj.PS + k;
-                    node.dataRec = node.dataRec + k;    
-                    outcome = true;
-                end
-                if(obj.energy < 0)
-                    fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, node.ID);
-                    obj.energy = 0;
-                    obj.updateSoC();
-                    obj.alive = false;
-                end
-                if(node.energy < 0)
-                    fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', node.ID, obj.ID);
-                    node.energy = 0;
-                    node.updateSoC();
-                    node.alive = false;
-                end
             else
-                if(~node.alive)
-                    fprintf('Node %d failed to connect; target node %d is dead.\n', obj.ID, node.ID);
-                elseif(obj.CHstatus == 1)
-                    fprintf('Node %d failed to connect; this node is already a CH.\n', obj.ID);
-                elseif(node.CHstatus == 0)
-                    fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
-                end
-            end         
+                fprintf('Failed to transmit: Not connected to a receiver.')  
+            end    
         end
         
         function obj = setPR(obj, desiredPR)

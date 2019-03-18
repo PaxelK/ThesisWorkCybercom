@@ -24,3 +24,4 @@ states = EE.getStates();
 
 EE.rnd = 15;
 EE = EE.cluster();
+EE = EE.communicate();
