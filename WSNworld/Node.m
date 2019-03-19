@@ -124,64 +124,109 @@ classdef Node
         
         
         
-        function [obj, outcome] = sendMsg(obj)
-            outcome = false;
+        function [nodes, sink, outcome] = sendMsg(obj, nodes, sink)
+        %{
+         The node "sends message" to a target node. The function subtracts
+         energy from this node corresponding to the amount of data packets
+         sent. It also subtracts energy from the receiving node based on
+         the same premises.
             
+         This is done by manipulating the input nodes-list.
+        %}
+            outcome = false;         
             if(~isempty(obj.CHparent))
-                if(obj.CHparent.alive)
-                    if(obj.CHstatus == 0)
-                        obj.PA = 1;             % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
+                tempP = obj.params;     % Takes the system parameters and converts them to a simpler format
+                k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
+
+                ETx = tempP.Eelec*k + tempP.Eamp * k * obj.getDistance(obj.CHparent)^2;   % Calculates the energy that will be spent by transmitting signal
+                ERx=(tempP.Eelec+tempP.EDA)*k;                      % Calculates the energy that will be spent by receiving signal
+                for it=1:length(nodes)
+                    if(obj.CHparent.ID == nodes(it).ID)
+                        if(nodes(it).alive)
+                            if(obj.CHstatus == 0)
+                                obj.PA = 1;             % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
+                            end
+                            obj.energy = obj.energy - ETx;                      % Energy is subtracted before data is transmitted since a power failure should result in a faulty transmission
+                            obj.updateSoC();                                    % State of charge has to be updated after every energy use...
+                            nodes(it).energy = nodes(it).energy - ERx;
+                            nodes(it).updateSoC();
+                            obj.nrjCons = obj.nrjCons + ETx;                    % Energy cost is also added to the nodes total energy consumed
+                            nodes(it).nrjCons = nodes(it).nrjCons + ERx;
+
+                            if(obj.energy >= 0 && nodes(it).energy >= 0)             % If no power failure was had, data has been transmitted and received
+                                fprintf('Node %d successfully sent to node %d!\n', obj.ID, nodes(it).ID);
+                                obj.PS = obj.PS + k;
+                                nodes(it).dataRec = nodes(it).dataRec + k;    
+                                outcome = true;
+                            end
+                            if(obj.energy < 0)
+                                fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, nodes(it).ID);
+                                obj.nrjCons = obj.nrjCons + obj.energy;         % Corrects the energy consumed by taking away the "negative" energy that isnt consumed for real
+                                obj.energy = 0;
+                                obj.updateSoC();
+                                obj.alive = false;
+                            end
+                            if(nodes(it).energy < 0)
+                                fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', nodes(it).ID, obj.ID);
+                                nodes(it).nrjCons = nodes(it).nrjCons + nodes(it).energy;
+                                nodes(it).energy = 0;
+                                nodes(it).updateSoC();
+                                nodes(it).alive = false;
+                            end
+                        else
+                            if(~nodes(it).alive)
+                                fprintf('Node %d failed to transmit; target node %d is dead.\n', obj.ID, nodes(it).ID);
+                            elseif(node.CHstatus == 0)
+                                fprintf('Node %d failed to transmit; target node %d is not a CH.\n', obj.ID, nodes(it).ID);
+                            end 
+                        end
+
                     end
-                    %{
-                    The node "sends message" to a target node. The function subtracts
-                    energy from this node corresponding to the amount of data packets
-                    sent. It also subtracts energy from the receiving node based on
-                    the same premises.
-                    %}
-                    tempP = obj.params;     % Takes the system parameters and converts them to a simpler format
-                    k = obj.PA*obj.pSize;   % k = the amount of bits that are sent 
-
-                    ETx = tempP.Eelec*k + tempP.Eamp * k * obj.getDistance(obj.CHparent)^2;   % Calculates the energy that will be spent by transmitting signal
-                    ERx=(tempP.Eelec+tempP.EDA)*k;                      % Calculates the energy that will be spent by receiving signal
-
+                end
+                
+                if(obj.CHparent.ID == sink.ID)
                     obj.energy = obj.energy - ETx;                      % Energy is subtracted before data is transmitted since a power failure should result in a faulty transmission
                     obj.updateSoC();                                    % State of charge has to be updated after every energy use...
-                    obj.CHparent.energy = obj.CHparent.energy - ERx;
-                    obj.CHparent.updateSoC();
+                    sink.energy = sink.energy - ERx;
+                    sink.updateSoC();
                     obj.nrjCons = obj.nrjCons + ETx;                    % Energy cost is also added to the nodes total energy consumed
-                    obj.CHparent.nrjCons = obj.CHparent.nrjCons + ERx;
-
-                    if(obj.energy >= 0 && obj.CHparent.energy >= 0)             % If no power failure was had, data has been transmitted and received
-                        fprintf('Node %d succeded to send to node %d!\n', obj.ID, obj.CHparent.ID);
+                    sink.nrjCons = sink.nrjCons + ERx;
+                    
+                    if(obj.energy >= 0 && sink.energy >= 0)             % If no power failure was had, data has been transmitted and received
+                        fprintf('Node %d successfully sent to node %d!\n', obj.ID, sink.ID);
                         obj.PS = obj.PS + k;
-                        obj.CHparent.dataRec = obj.CHparent.dataRec + k;    
+                        sink.dataRec = sink.dataRec + k;    
                         outcome = true;
                     end
                     if(obj.energy < 0)
-                        fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, obj.CHparent.ID);
+                        fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, sink.ID);
                         obj.nrjCons = obj.nrjCons + obj.energy;         % Corrects the energy consumed by taking away the "negative" energy that isnt consumed for real
                         obj.energy = 0;
                         obj.updateSoC();
                         obj.alive = false;
                     end
-                    if(obj.CHparent.energy < 0)
-                        fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', obj.CHparent.ID, obj.ID);
-                        obj.CHparent.nrjCons = obj.CHparent.nrjCons + obj.CHparent.energy;
-                        obj.CHparent.energy = 0;
-                        obj.CHparent.updateSoC();
-                        obj.CHparent.alive = false;
+                    if(sink.energy < 0)
+                        fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', sink.ID, obj.ID);
+                        sink.nrjCons = sink.nrjCons + sink.energy;
+                        sink.energy = 0;
+                        sink.updateSoC();
+                        sink.alive = false;
                     end
-                else
-                    if(~obj.CHparent.alive)
-                        fprintf('Node %d failed to transmit; target node %d is dead.\n', obj.ID, obj.CHparent.ID);
-                    elseif(node.CHstatus == 0)
-                        fprintf('Node %d failed to transmit; target node %d is not a CH.\n', obj.ID, obj.CHparent.ID);
-                    end 
                 end
                 
+                for iter=1:length(nodes)
+                    if(obj.ID == nodes(iter).ID)
+                        nodes(iter) = obj;
+                    end
+                end
             else
-                fprintf('Failed to transmit: Not connected to a receiver.')  
-            end    
+                fprintf('Failed to transmit: Not connected to a receiver.\n')  
+            end  
+            
+            
+                
+                
+              
         end
         
         function obj = setPR(obj, desiredPR)

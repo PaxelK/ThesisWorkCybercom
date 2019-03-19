@@ -159,7 +159,7 @@ classdef EnvironmentEngine
         function obj = communicate(obj)
             for i=1:length(obj.nodes)
                 if(obj.nodes(i).alive)
-                    obj.nodes(i) = obj.nodes(i).sendMsg();
+                    [obj.nodes, obj.sink, outcome] = obj.nodes(i).sendMsg(obj.nodes, obj.sink);
                 end
             end
         end
