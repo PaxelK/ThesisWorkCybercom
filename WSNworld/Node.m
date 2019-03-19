@@ -117,7 +117,7 @@ classdef Node
         %}    
             if(node.alive)
                 obj.CHparent = node;
-                obj.actionMsg = ['Node ',num2str(obj.ID),' of type', num2str(obj.CHstatus), ' connected successfully to target node ', num2str(node.ID), ' of type ', num2str(node.CHstatus),'.'];
+                obj.actionMsg = ['Node ',num2str(obj.ID),' of type ', num2str(obj.CHstatus), ' connected successfully to target node ', num2str(node.ID), ' of type ', num2str(node.CHstatus),'.'];
             else
                if(~node.alive)
                    obj.actionMsg = ['Node ',num2str(obj.ID), ' failed to connect; target node ', num2str(node.ID) ,' is dead.\n'];
@@ -191,6 +191,9 @@ classdef Node
                 end
                 
                 if(obj.CHparent.ID == sink.ID)
+                    if(obj.CHstatus == 0)
+                                obj.PA = 1;             % Makes sure that a node that is not a CH (e.g. not directly controlled) wont send more than one packet
+                    end
                     obj.energy = obj.energy - ETx;                      % Energy is subtracted before data is transmitted since a power failure should result in a faulty transmission
                     obj.updateSoC();                                    % State of charge has to be updated after every energy use...
                     sink.energy = sink.energy - ERx;

@@ -69,7 +69,7 @@ classdef EnvironmentEngine
                Input: deltaX = Sink movement in x
                       deltaY = Sink movement in y
                       packetRates = Packet rates for each CH in system
-                                    (is supposed to be an array of vals)
+                                    (is an array of IDs with corresponding PA-values)
             
                The method moves the sink and updates the amount of packets
                that the cluster heads are to send during next transmission
@@ -78,6 +78,15 @@ classdef EnvironmentEngine
                return: obj
             %}
             obj.sink = obj.sink.move(deltaX, deltaY);
+            
+            for i=1:length(packetRates)
+                for j=1:length(obj.nodes)
+                    if(obj.nodes(j).ID == packetRates(i,1))
+                        obj.nodes(j) = obj.nodes(j).setPR(packetRates(i,2));
+                    end
+                end
+            end
+            
             
         end
         
