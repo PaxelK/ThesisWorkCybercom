@@ -25,6 +25,7 @@ classdef Node
         dataRec     % Total Data received
         PS          % Packets sent
         nrjCons     % Total Energy consumed
+        actionMsg   % String containing information about connection and sending progress
     end
     
     methods
@@ -54,7 +55,7 @@ classdef Node
             obj.dataRec = 0;
             obj.PS = 0;
             obj.nrjCons = 0;
-            
+            obj.actionMsg = '';
             
             if(obj.energy > 0)
                 obj.alive = true;
@@ -79,6 +80,10 @@ classdef Node
         function [x, y] = getPos(obj)
            x = obj.xPos;
            y = obj.yPos;
+        end
+        
+        function msg = getActionMsg(obj)
+            msg = obj.actionMsg;   
         end
         
         function CHS = getCHstatus(obj)
@@ -112,12 +117,13 @@ classdef Node
         %}    
             if(node.alive)
                 obj.CHparent = node;
-                fprintf('Node %d, of type %d, connected successfully to target node %d.\n', obj.ID, obj.CHstatus, node.ID);
+                obj.actionMsg = ['Node ',num2str(obj.ID),' of type', num2str(obj.CHstatus), ' connected successfully to target node ', num2str(node.ID), ' of type ', num2str(node.CHstatus),'.'];
             else
                if(~node.alive)
-                    fprintf('Node %d failed to connect; target node %d is dead.\n', obj.ID, node.ID);
+                   obj.actionMsg = ['Node ',num2str(obj.ID), ' failed to connect; target node ', num2str(node.ID) ,' is dead.\n'];
                elseif(node.CHstatus == 0)
-                    fprintf('Node %d failed to connect; target node %d is not a CH.\n', obj.ID, node.ID);
+                   obj.actionMsg = ['Node ',num2str(obj.ID), ' failed to connect; target node ', num2str(node.ID) ,' is not a CH.\n'];
+                   
                end 
             end             
         end
@@ -154,20 +160,20 @@ classdef Node
                             nodes(it).nrjCons = nodes(it).nrjCons + ERx;
 
                             if(obj.energy >= 0 && nodes(it).energy >= 0)             % If no power failure was had, data has been transmitted and received
-                                fprintf('Node %d successfully sent to node %d!\n', obj.ID, nodes(it).ID);
+                                obj.actionMsg = ['Node ',num2str(obj.ID),' of type', num2str(obj.CHstatus), ' successfully sent to target node ', num2str(nodes(it).ID), ' of type ', num2str(nodes(it).CHstatus),'.'];
                                 obj.PS = obj.PS + k;
                                 nodes(it).dataRec = nodes(it).dataRec + k;    
                                 outcome = true;
                             end
                             if(obj.energy < 0)
-                                fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, nodes(it).ID);
+                                obj.actionMsg = ['Node ',num2str(obj.ID), ' failed to transmit; ran out of energy while sending to node ', num2str(nodes(it).ID) ,'.\n'];
                                 obj.nrjCons = obj.nrjCons + obj.energy;         % Corrects the energy consumed by taking away the "negative" energy that isnt consumed for real
                                 obj.energy = 0;
                                 obj.updateSoC();
                                 obj.alive = false;
                             end
                             if(nodes(it).energy < 0)
-                                fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', nodes(it).ID, obj.ID);
+                                obj.actionMsg = ['Failed to transmit: node ' ,num2str(nodes(it).ID), ' ran out of energy while receiving from node ',num2str(obj.ID), '.\n', nodes(it).ID, obj.ID];
                                 nodes(it).nrjCons = nodes(it).nrjCons + nodes(it).energy;
                                 nodes(it).energy = 0;
                                 nodes(it).updateSoC();
@@ -175,9 +181,9 @@ classdef Node
                             end
                         else
                             if(~nodes(it).alive)
-                                fprintf('Node %d failed to transmit; target node %d is dead.\n', obj.ID, nodes(it).ID);
-                            elseif(node.CHstatus == 0)
-                                fprintf('Node %d failed to transmit; target node %d is not a CH.\n', obj.ID, nodes(it).ID);
+                                obj.actionMsg = ['Node ',num2str(obj.ID), ' failed to transmit; target node ', num2str(nodes(it).ID) ,' is dead.\n'];
+                            elseif(nodes(it).CHstatus == 0)
+                                obj.actionMsg = ['Node ',num2str(obj.ID), ' failed to transmit; target node ', num2str(nodes(it).ID) ,' is not a CH.\n'];
                             end 
                         end
 
@@ -193,40 +199,34 @@ classdef Node
                     sink.nrjCons = sink.nrjCons + ERx;
                     
                     if(obj.energy >= 0 && sink.energy >= 0)             % If no power failure was had, data has been transmitted and received
-                        fprintf('Node %d successfully sent to node %d!\n', obj.ID, sink.ID);
+                        obj.actionMsg = ['Node ',num2str(obj.ID), ' successfully sent to sink ', num2str(sink.ID) ,'!\n'];
                         obj.PS = obj.PS + k;
                         sink.dataRec = sink.dataRec + k;    
                         outcome = true;
                     end
                     if(obj.energy < 0)
-                        fprintf('Failed to transmit: node %d ran out of energy while sending to node %d.\n', obj.ID, sink.ID);
+                        obj.actionMsg = ['Node ',num2str(obj.ID), ' failed to transmit; ran out of energy while sending to sink ', num2str(sink.ID) ,'.\n'];
                         obj.nrjCons = obj.nrjCons + obj.energy;         % Corrects the energy consumed by taking away the "negative" energy that isnt consumed for real
                         obj.energy = 0;
                         obj.updateSoC();
                         obj.alive = false;
                     end
                     if(sink.energy < 0)
-                        fprintf('Failed to transmit: node %d ran out of energy while receiving from node %d.\n', sink.ID, obj.ID);
+                        obj.actionMsg = ['Sink ',num2str(sink.ID), ' failed to receive; ran out of energy while receiving from node ', num2str(obj.ID) ,'.\n'];
                         sink.nrjCons = sink.nrjCons + sink.energy;
                         sink.energy = 0;
                         sink.updateSoC();
                         sink.alive = false;
                     end
-                end
-                
-                for iter=1:length(nodes)
+                end       
+            else
+                nodes.actionMsg = ['Failed to transmit: Not connected to a receiver.\n'];  
+            end    
+            for iter=1:length(nodes)
                     if(obj.ID == nodes(iter).ID)
                         nodes(iter) = obj;
                     end
-                end
-            else
-                fprintf('Failed to transmit: Not connected to a receiver.\n')  
-            end  
-            
-            
-                
-                
-              
+            end
         end
         
         function obj = setPR(obj, desiredPR)

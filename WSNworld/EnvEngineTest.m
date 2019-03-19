@@ -26,6 +26,7 @@ states = EE.getStates();
 
 for lel=1:50
     plotgfx(EE);
+    disp(EE.rnd)
     EE = EE.updateEnv(1, 1, 5);
     EE = EE.cluster();
     EE = EE.communicate();

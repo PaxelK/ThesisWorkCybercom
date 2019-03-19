@@ -35,33 +35,45 @@ Testing the send function
 %}
 fprintf('A energy: %d, B energy: %d \n', nodes(1).energy, nodes(2).energy);
 [a] = a.connect(b);
-[nodes, result] = a.sendMsg(nodes, sink);     % Normal to normal
-[nodes, result] = a.sendMsg(nodes, sink);     % Normal to normal
-[nodes, result] = a.sendMsg(nodes, sink);     % Normal to normal
-[nodes, result] = a.sendMsg(nodes, sink);     % Normal to normal
-[nodes, result] = a.sendMsg(nodes, sink);     % Normal to normal
+[nodes,sink, result] = a.sendMsg(nodes, sink);     % Normal to normal
+[nodes,sink, result] = a.sendMsg(nodes, sink);     % Normal to normal
+[nodes,sink, result] = a.sendMsg(nodes, sink);     % Normal to normal
+[nodes,sink, result] = a.sendMsg(nodes, sink);     % Normal to normal
+[nodes,sink, result] = a.sendMsg(nodes, sink);     % Normal to normal
 fprintf('A energy: %d, B energy: %d \n', nodes(1).energy, nodes(2).energy);
-% disp(result);                   % Boolean return
-% [b, result] = b.sendMsg(a);     % Normal to normal reversed
-%                 
-% [a, result] = a.sendMsg(c);     % Normal to CH
-% [c, result] = c.sendMsg(b);     % CH to normal (fails)
-% disp(result);           
-%         
-% [a, result] = a.sendMsg(d);     % Normal to dead normal
-% [a, result] = a.sendMsg(e);     % Normal to dead CH
+ disp(result);                   % Boolean return
+ 
+[b] = b.connect(a); 
+[nodes,sink, result] = b.sendMsg(a,sink);     % Normal to normal reversed
+  
+[a] = a.connect(c);
+[nodes,sink, result] = a.sendMsg(c,sink);     % Normal to CH
+
+[c] = c.connect(b);
+[nodes,sink, result] = c.sendMsg(b,sink);     % CH to normal (fails)
+disp(result);           
+%
+[a] = a.connect(d);
+[nodes,sink, result] = a.sendMsg(d,sink);     % Normal to dead normal
+
+[a] = a.connect(e);
+[nodes,sink, result] = a.sendMsg(e,sink);     % Normal to dead CH
 % 
-% [f, result] = f.sendMsg(a);     % NEAR dead normal to normal node
-% [g, result] = g.sendMsg(f);     % NEAR dead normal to NEAR dead normal node
+
+[f] = f.connect(a);
+[nodes,sink, result] = f.sendMsg(a,sink);     % NEAR dead normal to normal node
+
+[g] = g.connect(f);
+[nodes,sink, result] = g.sendMsg(f,sink);     % NEAR dead normal to NEAR dead normal node
 % 
 % %Testing the CHstatus function
 % %                       f           p           rnd
-% a.generateCHstatus(parameters.f, parameters.p, 19);
+a.generateCHstatus(parameters.f, parameters.p, 19);
 % 
-% a.getDistance(b);
-% a.getDistance(c);
-% a.getDistance(d);
+a.getDistance(b);
+a.getDistance(c);
+a.getDistance(d);
 % 
-% b.CHstatus = 1;
-% a.connect(b);
+b.CHstatus = 1;
+a.connect(b);
 
