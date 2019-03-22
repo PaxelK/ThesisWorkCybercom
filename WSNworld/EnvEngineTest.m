@@ -28,7 +28,7 @@ states = EE.getStates();
 
 
 
-for lel=1:50
+for lel=1:500
     plotgfx(EE);
     disp(EE.rnd)
     EE = EE.updateEnv(1, 1, PRcontrl);

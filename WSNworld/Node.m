@@ -26,6 +26,7 @@ classdef Node
         PS          % Packets sent
         nrjCons     % Total Energy consumed
         actionMsg   % String containing information about connection and sending progress
+        CHflag      % 
     end
     
     methods
@@ -56,6 +57,7 @@ classdef Node
             obj.PS = 0;
             obj.nrjCons = 0;
             obj.actionMsg = '';
+            obj.CHflag = 0;
             
             if(obj.energy > 0)
                 obj.alive = true;
@@ -276,6 +278,9 @@ classdef Node
         end
         
         function obj = generateCHstatus(obj, f, p, rnd)
+            if(mod(rnd, 1/p) == 0)
+                obj.CHflag = 0;
+            end
             randVal = rand(1);
             t=(p/(1-p*(mod(rnd,1/p))));          
             if(f<1)             %If we want to try without BLEACH, we simply set f>1
@@ -284,8 +289,9 @@ classdef Node
             end
             %If t is bigger than the randomized value, this node becomes a
             %CH
-            if(t>randVal)
+            if(t>randVal && obj.CHflag == 0)
                 obj.CHstatus = 1;
+                obj.CHflag = 1;
             else
                 obj.CHstatus = 0;
             end

@@ -12,8 +12,8 @@ function [params, env] = setup()
 %  numNodes = Number of nodes is WSN
 
 % Initialization
-numNodes = 100;
-f = 0.6; p = 0.05; n = 100; E0 = 3;% Emode = "rand";
+numNodes = 10;
+f = 0.6; p = 0.05; n = 10; E0 = 3;% Emode = "rand";
 
 mode = "dist";
 strtNrj = 2;        % Starting energy [J]
