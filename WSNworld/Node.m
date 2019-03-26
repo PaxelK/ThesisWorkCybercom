@@ -98,7 +98,6 @@ classdef Node
         end
         
         function distance = getDistance(obj, node)
-        % Returns the distance between this node and an arbitrary node.
             distance = sqrt((obj.xPos-node.xPos)^2 + (obj.yPos-node.yPos)^2);
         end
         
