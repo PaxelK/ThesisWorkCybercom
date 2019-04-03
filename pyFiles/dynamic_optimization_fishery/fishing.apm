@@ -1,0 +1,20 @@
+Constants
+  E = 1
+  c = 17.5
+  r = 0.71
+  k = 80.5
+  Umax = 20
+
+Parameters
+  p
+  u = 1 , >= 0 , <= 1
+
+Variables
+  x = 70
+  myObj = 0
+  
+Equations
+  maximize p * myObj
+
+  $myObj = (E-c/x) * u * Umax
+  $x = r * x * (1-x/k) - u * Umax
