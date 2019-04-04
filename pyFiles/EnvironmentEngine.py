@@ -58,6 +58,18 @@ class EnvironmentEngine:
             self.posNodes.append([xnd, ynd])
         self.posNodes = np.array(self.posNodes)
 
+        # For plotting a fixed time length
+        self.plotRnd = [1]
+        if (len(self.EClist) or len(self.PackReclist) or len(self.deadNodes) or len(self.meanEClist) or
+            len(self.plotRnd)) > plotlen:
+
+            del self.EClist[0]
+            del self.PackReclist[0]
+            del self.deadNodes[0]
+            del self.meanEClist[0]
+            del self.plotRnd[0]
+
+
 
     def updateEnv(self, deltaX, deltaY, packetRates):
         '''
@@ -194,6 +206,7 @@ class EnvironmentEngine:
         self.posNodes = np.array(self.posNodes)
 
         self.rnd += 1
+        self.plotRnd.append(self.rnd)
 
     def getECstats(self):
         '''

@@ -20,7 +20,7 @@ def plotEnv(env):
     plt.figure(1)
     plt.clf()
     plt.plot(nodePos[:, 0], nodePos[:, 1],  'ro', markersize = 8)
-    plt.plot(xs, ys, marker='o', markersize = 14, markerfacecolor= 'g')
+    plt.plot(xs, ys, marker='o', markersize = 16, markerfacecolor= 'g')
 
 
     # Create figure 2
@@ -29,8 +29,7 @@ def plotEnv(env):
     # Create sub-plot
     plt.subplot(133)
     # Create plot
-    xrnd = np.arange(1, env.rnd+1, 1)
-    plt.plot(xrnd, ECstats, linewidth=2, Color='r')
+    plt.plot(env.plotRnd, ECstats, linewidth=2, Color='r')
     # Create x-label
     plt.xlabel("Round", fontsize =11)
     # Create y-label
@@ -41,7 +40,7 @@ def plotEnv(env):
     # Create sub-plot
     subplot2 = plt.subplot(131)
     # Create plot
-    plt.plot(xrnd, PRstats, linewidth = 2, color = 'g')
+    plt.plot(env.plotRnd, PRstats, linewidth = 2, color = 'g')
     # Create x-label
     plt.xlabel("Round", fontsize =11)
     # Create y-label
@@ -53,7 +52,7 @@ def plotEnv(env):
     subplot3 = plt.subplot(132)
     # Create plot
     # print(f"Number of dead nodes = {ndead}")
-    plt.plot(env.rnd, ndead, linewidth = 2, color = 'b')
+    plt.plot(env.plotRnd, ndead, linewidth = 2, color = 'b')
     # Create x-label
     plt.xlabel("Round", fontsize =11)
     # Create y-label

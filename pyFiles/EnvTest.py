@@ -41,13 +41,25 @@ print("----------------------------------------")
 
 states = EE.getStates()
 
-for i in range(500):
+while True:  # Run until all node dies
     plotEnv(EE)
     print(f"Round = {EE.rnd}")
     EE.updateEnv(1, 1, PRcontrl)
     EE.cluster()
     EE.communicate()
     EE.iterateRound()
+
+    print(EE.plotRnd)
+    if (len(EE.EClist) or len(EE.PackReclist) or len(EE.deadNodes) or len(EE.meanEClist) or len(EE.plotRnd)) > plotlen:
+        del EE.EClist[0]
+        del EE.PackReclist[0]
+        del EE.deadNodes[0]
+        del EE.meanEClist[0]
+        del EE.plotRnd[0]
+
+
+    if len(EE.deadNodes) == numNodes: # Break when all nodes have died
+        break
 
 '''
 # Testing of classes starts here 
