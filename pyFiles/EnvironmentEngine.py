@@ -118,6 +118,7 @@ class EnvironmentEngine:
 
         # Check if node is alive, then generate its CHs
         for i in range(len(self.nodes)):
+            self.nodes[i].resetConChildren()
             if self.nodes[i].alive:  # Generate CH status with BLEACH if node is alive
                 self.nodes[i].generateCHstatus(f, p, self.rnd)
             else:  # If node is not alive, node cannot be CH
