@@ -1,0 +1,30 @@
+Constants
+  Eelec = 50*10^(-9)
+  Eamp = 100*10^(-12)
+  EDA = 5*10^(-9)
+  Egen = 1*10^(-5)
+  PRmax = 20000
+  const = 0.6
+  
+  packet = 1
+  E = 1
+  
+Parameters
+  p
+  pr = 1 , >= 0, <= 1
+
+Variables
+  nrj = 0.7
+  myObj = 0
+  d = 70
+  
+Intermediates
+  d2 = d^2
+End Intermediates  
+  
+Equations
+  maximize p * myObj
+  
+  $myObj = (E-const/nrj)*pr*PRmax
+  $nrj = Egen - ((Eelec+EDA)*packet + pr*PRmax*(Eelec + Eamp * d2)) 
+  $d = -0.5
