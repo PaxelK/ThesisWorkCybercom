@@ -101,7 +101,7 @@ class Node:
         '''
         Resets the number of connected "children" to this node
         '''
-        self.conChildren = 0;
+        self.conChildren = 0
 
     def connect(self, node):
         '''

@@ -24,6 +24,8 @@ class Sink:
         self.nrjCons = 0
         self.ID = math.pi
         self.CHstatus = 1
+        self.conChildren = 0
+
 
     def move(self, deltax, deltay):
         '''
@@ -107,3 +109,17 @@ class Sink:
         #self.nrjCons += self.energy
         self.energy = 0
         self.SoC = self.energy / self.maxEnergy  # State of charge has to be updated after every energy use
+
+
+    def incrementConChildren(self):
+        '''
+        Increments the number of connected "children" to this node
+        '''
+        self.conChildren += 1
+
+
+    def resetConChildren(self):
+        '''
+        Resets the number of connected "children" to this node
+        '''
+        self.conChildren = 0
