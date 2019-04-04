@@ -36,8 +36,8 @@ Model
   End Variables
 
   Intermediates
-    k = k0*exp(-EoverR/Temperature)
     rate = k * Concentration >= 0
+    k = k0*exp(-EoverR/Temperature)
   End Intermediates
 
   Equations

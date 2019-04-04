@@ -2,7 +2,7 @@
 from apm import *
     
 # Select server
-s = 'localhost'
+s = 'http://byu.apmonitor.com'
 
 ##################################
 # set up nonlinear MPC
