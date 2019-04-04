@@ -35,6 +35,7 @@ class Node:
         self.nrjCons = 0                       # Energy consumed [J] = Amount of energy the node has consumed
         self.actionMsg = ''                    # String containing message about connection and sending status
         self.CHflag = 0                        # Determines if node has been CH during a LEACH episode
+        self.conChildren = 0                   # Number of connected children.
 
         if self.energy > 0:
             self.alive = True                  # Boolean for if node is alive
@@ -90,12 +91,23 @@ class Node:
         '''
         self.CHparent = []
 
-
+    def incrementConChildren(self):
+        '''
+        Increments the number of connected "children" to this node
+        '''
+        self.conChildren += 1
+        
+    def resetConChildren(self):
+        '''
+        Resets the number of connected "children" to this node
+        '''
+        self.conChildren = 0;
 
     def connect(self, node):
         '''
         Connection here adds another node object as a CH reference to
-        this object and is stored in CHparent. If the connection fails
+        this object and is stored in CHparent. If the connection is a success, the number of connected children
+        for the parent node is incremented with "incrementConChildren()". If the connection fails
         due to the target node being dead, or not being a CH, or if this
         node is already a CH, an error message is printed out.
         :param node: Node that connection is established with
@@ -105,6 +117,7 @@ class Node:
             self.actionMsg = "Node " + str(self.ID) + " of type " + str(self.CHstatus) +\
                              " connected successfully to target node " + str(node.ID) + " of type " +\
                              str(node.CHstatus) + ".\n"
+            node.incrementConChildren()
         else:
             if not node.alive:
                 self.actionMsg = "Node " + str(self.ID) + " failed to connect; target node " + str(node.ID) +\
