@@ -124,7 +124,7 @@ class EnvironmentEngine:
                 self.nodes[i].CHstatus = 0
 
         for i in range(len(self.nodes)):  # Non-CH nodes connect to nearest CH/sink and CHs connect to sink
-            if self.nodes[i].getCHstatus == 0:  # If node is a simple node (non-CH)
+            if self.nodes[i].getCHstatus() == 0:  # If node is a simple node (non-CH)
                 minDistance = self.nodes[i].getDistance(self.sink)  # Starts off with the distance to sink
                 jshortest = -1  # jshortest starts of as a "non index" number
                 for j in range(len(self.nodes)):
