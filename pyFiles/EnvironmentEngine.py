@@ -128,7 +128,7 @@ class EnvironmentEngine:
                 minDistance = self.nodes[i].getDistance(self.sink)  # Starts off with the distance to sink
                 jshortest = -1  # jshortest starts of as a "non index" number
                 for j in range(len(self.nodes)):
-                    if self.nodes[j].CHstatus == 1:  # Checks all cluster head nodes
+                    if self.nodes[j].getCHstatus() == 1:  # Checks all cluster head nodes
                         if minDistance > self.nodes[i].getDistance(self.nodes[j]):
                             # If distance to cluster head j was shorter than what has been measured before, make
                             # this the new minimum distance
