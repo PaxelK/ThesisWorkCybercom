@@ -14,7 +14,7 @@ xSize = 100
 ySize = 100
 x = 0  # Added for better display results of the plot
 y = 0  # Added for better display results of the plot
-numNodes = 100  # Number of Nodes in the field
+numNodes = 10  # Number of Nodes in the field
 dead_nodes = 0 # Number of Dead Nodes in the beginning
 
 #### Data Packet Info ###
@@ -31,4 +31,4 @@ EDA = 5*10**(-9)      # Data Aggregation Energy, units in Joules/bit
 nrjGenFac = 0.1      # Energy factor for generated energy
 
 
-
+plotlen = 10 # Amount of rounds that the data is plotted at a time

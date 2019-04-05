@@ -36,6 +36,8 @@ class EnvironmentEngine:
         self.deadNodes = []  # Contains the amount of dead nodes after each round
         self.posNodes = []  # The position of the nodes
 
+        self.plotDeadNodes = []  # Used for plotting amount of dead nodes
+
         tempNRJ = 0
         for node in self.nodes:  # Iterate over all nodes
             tempNRJ += node.nrjCons
@@ -43,6 +45,8 @@ class EnvironmentEngine:
                 self.nodesAlive.append(node)
             else:  # Else node is dead
                 self.deadNodes.append(node)
+
+        self.plotDeadNodes = [len(self.deadNodes)]
 
         nrjMean = 0
         if self.nodesAlive:  # If there are nodes alive
@@ -57,6 +61,19 @@ class EnvironmentEngine:
             xnd, ynd = node.getPos()
             self.posNodes.append([xnd, ynd])
         self.posNodes = np.array(self.posNodes)
+
+        # For plotting a fixed time length
+        self.plotRnd = [1]
+
+        if (len(self.EClist) or len(self.PackReclist) or len(self.plotDeadNodes) or len(self.meanEClist) or
+            len(self.plotRnd)) > plotlen:
+
+            del self.EClist[0]
+            del self.PackReclist[0]
+            del self.plotDeadNodes[0]
+            del self.meanEClist[0]
+            del self.plotRnd[0]
+
 
 
     def updateEnv(self, deltaX, deltaY, packetRates):
@@ -178,6 +195,8 @@ class EnvironmentEngine:
             else:
                 self.deadNodes.append(node)
 
+        self.plotDeadNodes.append(len(self.deadNodes))
+
         nrjMean = 0
         if self.nodesAlive:  # If there are nodes alive
             nrjMean = tempNRJ / len(self.nodesAlive)
@@ -194,6 +213,7 @@ class EnvironmentEngine:
         self.posNodes = np.array(self.posNodes)
 
         self.rnd += 1
+        self.plotRnd.append(self.rnd)
 
     def getECstats(self):
         '''
@@ -227,5 +247,6 @@ class EnvironmentEngine:
         '''
         deadList = self.deadNodes
         nDead = len(self.deadNodes)
-        return nDead, deadList
+        plotDeadNodes = self.plotDeadNodes
+        return nDead, deadList, plotDeadNodes
 
