@@ -60,4 +60,4 @@ def plotEnv(env):
     plt.title("Number of dead node vs. round", fontsize =14)
 
     plt.show(block=False)
-    plt.pause(0.2)
+    plt.pause(0.1)

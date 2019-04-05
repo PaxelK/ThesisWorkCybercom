@@ -248,6 +248,5 @@ class EnvironmentEngine:
         deadList = self.deadNodes
         nDead = len(self.deadNodes)
         plotDeadNodes = self.plotDeadNodes
-        print(f"Length of plotDeadNodes = {len(plotDeadNodes)}")
         return nDead, deadList, plotDeadNodes
 
