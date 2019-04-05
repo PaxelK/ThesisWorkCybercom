@@ -1,22 +1,20 @@
+# Import libraries
 import gym
 import numpy as np
 import random
 from IPython.display import clear_output
 
-# Init Taxi-V2 Env
+# Init/make Taxi-V2 Env
 env = gym.make("Taxi-v2").env
 
-# Init arbitary values
+# Init q-table with xeros. The size of the q-table is observation space (row) X action space (col)
 q_table = np.zeros([env.observation_space.n, env.action_space.n])
 
-# Hyperparameters
-alpha = 0.1
-gamma = 0.6
-epsilon = 0.1
+# Hyper parameters for the learning process
+alpha = 0.1  # Learning rate
+gamma = 0.6  # Discount factor for q-values future in time
+epsilon = 0.1  # Exploration rate for exploring the model
 
-
-all_epochs = []
-all_penalties = []
 
 for i in range(1, 100001):
     state = env.reset()
@@ -53,7 +51,7 @@ for i in range(1, 100001):
 
     if i % 100 == 0:
         clear_output(wait=True)
-        print("Episode: {i}")
+        print(f"Episode: {i}")
 
 env.render()
 print("Training finished.")

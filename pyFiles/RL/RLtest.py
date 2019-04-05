@@ -1,26 +1,29 @@
-import gym # Imports gym library from OpenAI
-from IPython.display import clear_output # Clears console display
+# import libraries
+import gym  # Imports gym library from OpenAI
+from IPython.display import clear_output  # Clears console display
 from time import sleep
 import numpy as np
-import random   # Randomness for the exploration
+import random   # Used for randomness in the exploration rate
 
 
 # Brute force algorithm
 def brute_force(env):
-    epochs = 0
+    epochs = 0  # Timesteps
     penalties, rewards = 0, 0
 
     frames = [] # For animations
 
-    done = False
+    done = False  # bool for if one episode is completed
 
     while not done:
         action = env.action_space.sample() # Choose random action
-        state, reward, done, info = env.step(action) # Update relevant information
+        state, reward, done, info = env.step(action) # Update relevant information for q-learning
 
+        # Count amount of incorrect pick-up and drop-off
         if reward == -10:
             penalties += 1
 
+        # For animations
         frames.append({
             'frame': env.render(mode='ansi'),
             'state': state,
@@ -30,42 +33,45 @@ def brute_force(env):
 
         epochs +=1
 
-    print("Timesteps taken: {}".format(epochs)) # Print amount of iterations
-    print("Penalties incurred: {}".format(penalties))  #Print amount of penalties == -10
+    print(f"Timesteps taken: {epochs}") # Print amount of iterations
+    print(f"Penalties incurred: {penalties}")  # Print amount of penalties == -10
     return frames
 
 # Q-learning algorithm
 def q_learning(env):
-    # All values between 0 and 1
-    alpha = 0.2 # Learning rate
-    gamma = 0.6 # Discount factor
-    epsilon = 0.1 # For exploration
+    # Hyper parameters for the learning process
+    alpha = 0.1  # Learning rate of the model
+    gamma = 0.6  # Discount factor for q-values future in time
+    epsilon = 0.1  # Exploration rate for exploring the model
 
     episodes = 10000  # Amount of episodes that the agent trains on
 
     #For plotting
-    all_epochs = []
-    all_penalties =[]
+    all_epochs = []  # Time steps
+    all_penalties =[]  # Penalties
 
     total_epochs, total_penalties = 0, 0
 
-    q_table = np.zeros([env.observation_space.n, env.action_space.n]) # Initialize Q-table with zeros
+    # Init q-table with xeros. The size of the q-table is observation space (row) X action space (col)
+    q_table = np.zeros([env.observation_space.n, env.action_space.n])
 
-    for i in range(1,episodes+1): # for loop determines the amount of episodes
-        env.reset() # Reset environment after each episode
-        state = env.s  # Update state after reset
+    for i in range(1,episodes+1): # for loop determines the amount of episodes (set in beginning of function)
+        env.reset() # Reset environment to random position after each episode
+        state = env.s  # Check current state after reset
 
         epochs, penalties, reward = 0, 0, 0   # Zero these parameters after each episode
         done = False # Variable for if episode is finished
 
-        while not done:
-            if random.uniform(0,1) < epsilon: # If the random value is smaller than epsilon, we explore the environment
+        while not done: # Train the agent on an episode (done=True is set in the gym environment)
+            if random.uniform(0,1) < epsilon:  # If the random value is smaller than epsilon, we explore the environment
                 action = env.action_space.sample() # Chooses a random action
             else: # Otherwise exploit the model
-                action = np.argmax(q_table[state])  # Chooses action with largest value in Q-table for the current state
+                # Chooses action with largest value in Q-table for the current state. argmax() returns the index of the
+                # highest value
+                action = np.argmax(q_table[state])
 
-            next_state, reward, done, info = env.step(action) # Get relevant info for updating Q-table based on action
-
+            next_state, reward, done, info = env.step(action)  # Get relevant info for updating Q-table based on action
+            # START HERE ON MONDAY
             # Update Q-table
             old_value = q_table[state, action] # Old q-value
             next_max = np.max(q_table[next_state]) # Get the max value based on the chosen action
