@@ -36,7 +36,7 @@ class EnvironmentEngine:
         self.deadNodes = []  # Contains the amount of dead nodes after each round
         self.posNodes = []  # The position of the nodes
 
-        self.plotDeadNodes = [0]  # Used for plotting amount of dead nodes
+        self.plotDeadNodes = []  # Used for plotting amount of dead nodes
 
         tempNRJ = 0
         for node in self.nodes:  # Iterate over all nodes
@@ -45,7 +45,8 @@ class EnvironmentEngine:
                 self.nodesAlive.append(node)
             else:  # Else node is dead
                 self.deadNodes.append(node)
-                self.plotDeadNodes = [len(self.deadNodes)]
+
+        self.plotDeadNodes = [len(self.deadNodes)]
 
         nrjMean = 0
         if self.nodesAlive:  # If there are nodes alive
@@ -193,7 +194,8 @@ class EnvironmentEngine:
                 self.nodesAlive.append(node)
             else:
                 self.deadNodes.append(node)
-                self.plotDeadNodes.append(len(self.deadNodes))
+
+        self.plotDeadNodes.append(len(self.deadNodes))
 
         nrjMean = 0
         if self.nodesAlive:  # If there are nodes alive
