@@ -51,6 +51,9 @@ class Node:
     def getEC(self):
         return self.nrjCons
 
+    def getPA(self):
+        return self.PA
+
     def getPos(self):
         x = self.xPos
         y = self.yPos

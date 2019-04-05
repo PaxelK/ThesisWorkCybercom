@@ -27,3 +27,21 @@ for i in range(10):
     EE.cluster()
     EE.communicate()
     EE.iterateRound()
+    
+    
+
+
+
+
+
+
+
+def iterateNodeFunc(node):
+    EDA = 5*10**(-9)      # Data Aggregation Energy, units in Joules/bit
+    Eamp = 100*10**(-12)  # Transmit Amplifier Types, units in Joules/bit/m^2 (amount of energy spent by the amplifier to transmit the bits)        
+    Eelec = 50*10**(-9)   # Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
+    
+    e = node.getEnergy()
+    
+    nrj =  - ((Eelec+EDA)*packet + pr*PRmax*(Eelec + Eamp * d2)) 
+                    
