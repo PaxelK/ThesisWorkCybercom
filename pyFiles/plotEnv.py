@@ -13,7 +13,7 @@ def plotEnv(env):
     ECsum, ECstats = env.getECstats()
     PRsum, PRstats = env.getPRstats()
     meanEC = env.getECmeanStats()
-    ndead, deadNodes = env.getDeadNodes()
+    ndead, deadNodes, plotDeadNodes = env.getDeadNodes()
 
 
     # Create figure 1
@@ -51,8 +51,7 @@ def plotEnv(env):
     # Create sub-plot
     subplot3 = plt.subplot(132)
     # Create plot
-    # print(f"Number of dead nodes = {ndead}")
-    plt.plot(env.rnd, ndead, linewidth = 2, color = 'b')
+    plt.plot(env.plotRnd, plotDeadNodes, linewidth = 2, color = 'b')
     # Create x-label
     plt.xlabel("Round", fontsize =11)
     # Create y-label

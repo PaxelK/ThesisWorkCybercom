@@ -31,4 +31,4 @@ EDA = 5*10**(-9)      # Data Aggregation Energy, units in Joules/bit
 nrjGenFac = 0.1      # Energy factor for generated energy
 
 
-plotlen = 100 # Amount of rounds that the data is plotted at a time
+plotlen = 10 # Amount of rounds that the data is plotted at a time
