@@ -72,6 +72,7 @@ def q_learning(env):
 
             next_state, reward, done, info = env.step(action)  # Get relevant info for updating Q-table based on action
             # START HERE ON MONDAY
+
             # Update Q-table
             old_value = q_table[state, action] # Old q-value
             next_max = np.max(q_table[next_state]) # Get the max value based on the chosen action
