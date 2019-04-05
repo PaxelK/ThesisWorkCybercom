@@ -37,6 +37,7 @@ def plotEnv(env):
     # Create title
     plt.title("Sum of EC vs. round", fontsize =14)
 
+
     # Create sub-plot
     subplot2 = plt.subplot(131)
     # Create plot
