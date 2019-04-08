@@ -182,10 +182,9 @@ class Node:
             #if(self.ID == 9):
             #    print('PROBE PRINT: Real EC for node ' + str(EC))
             if((self.CHparent.alive) & (isinstance(self.CHparent, Node))):  # If data is sent to CH (not sink)
-                
-
                 self.updateEnergy(ETx)  # Updates energy for sending packet
                 self.CHparent.updateEnergy(ERx)  # Update energy for receiving packets
+                #print('ENERGY EXPENDED BY PARENT NODE: ' + str(ERx))
 
                 # Following if statements checks if nodes have run out of energy due to sending or receiving data
                 if self.energy >= 0 and self.CHparent.energy >= 0:
@@ -227,7 +226,7 @@ class Node:
                 # result in a faulty transmission
                 self.updateEnergy(ETx)
                 sink.updateEnergy(ERx)
-
+        
                 if self.energy >= 0 and sink.energy >= 0:
                     # If no power failure was had, data has been transmitted and received
                     self.actionMsg = "Node " + str(self.ID) + " successfully sent to sink " + str(sink.ID) + "!\n"

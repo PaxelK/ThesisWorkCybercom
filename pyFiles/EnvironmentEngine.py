@@ -171,7 +171,22 @@ class EnvironmentEngine:
         '''
         for i in range(len(self.nodes)):
             if self.nodes[i].alive:
-                outcome = self.nodes[i].sendMsg(self.sink)
+                if(self.nodes[i].CHstatus == 0)
+                    outcome = self.nodes[i].sendMsg(self.sink)
+                if not outcome:
+                    print(f"Node {self.nodes[i].ID} failed to send to node {self.nodes[i].CHparent.ID}!\n")
+                    actionmsg = self.nodes[i].getActionMsg()
+                    print(str(actionmsg) + "\n")
+                    
+        '''
+        SECOND LOOP NEEDED. It is required that the non-CHs do their data sending first. This is because every CH needs
+        to be able to fully record how much data it has received during the transmission round before it relays it to
+        the sink.
+        '''            
+        for i in range(len(self.nodes)):
+            if self.nodes[i].alive:
+                if(self.nodes[i].CHstatus == 1)
+                    outcome = self.nodes[i].sendMsg(self.sink)
                 if not outcome:
                     print(f"Node {self.nodes[i].ID} failed to send to node {self.nodes[i].CHparent.ID}!\n")
                     actionmsg = self.nodes[i].getActionMsg()
