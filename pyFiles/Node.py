@@ -168,17 +168,21 @@ class Node:
 
         outcome = False   # outcome = whether the node has sent a message
         if self.CHparent:  # If the node has a CH/sink, ie. NOT a cluster head, node sends data to CH/sink
-
-            k = self.PA * self.pSize  # k = the amount of bits that are sent
-
-            # Calculate the energy that will be spent by transmitting signal
-            ETx = Eelec * k + Eamp * k * self.getDistance(self.CHparent)**2
-            ERx = (Eelec + EDA) * k  # Calculate the energy that will be spent by receiving signal
-
-            if self.CHparent.alive:  # If data is sent to CH (not sink)
-                if self.CHstatus == 0:
+            if self.CHstatus == 0:
                     # Makes sure that the node is not a CH (e.g. not directly controlled) wont send more than one packet
                     self.PA = 1
+                    
+            k = self.PA * self.pSize  # k = the amount of bits that are sent
+            # Calculate the energy that will be spent by transmitting signal
+            distLEL = self.getDistance(self.CHparent)
+            #print('Node: ' + str(self.ID) + ', with dist: ' + str(distLEL))
+            ETx = Eelec * k + Eamp * k * self.getDistance(self.CHparent)**2
+            ERx = (Eelec + EDA) * self.pSize  # Calculate the energy that will be spent by receiving signal
+            EC = (Eelec + EDA) * self.pSize * self.conChildren + ETx
+            #if(self.ID == 9):
+            #    print('PROBE PRINT: Real EC for node ' + str(EC))
+            if((self.CHparent.alive) & (isinstance(self.CHparent, Node))):  # If data is sent to CH (not sink)
+                
 
                 self.updateEnergy(ETx)  # Updates energy for sending packet
                 self.CHparent.updateEnergy(ERx)  # Update energy for receiving packets
