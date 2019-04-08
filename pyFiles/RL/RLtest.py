@@ -71,48 +71,54 @@ def q_learning(env):
                 action = np.argmax(q_table[state])
 
             next_state, reward, done, info = env.step(action)  # Get relevant info for updating Q-table based on action
-            # START HERE ON MONDAY
 
             # Update Q-table
-            old_value = q_table[state, action] # Old q-value
-            next_max = np.max(q_table[next_state]) # Get the max value based on the chosen action
+            old_value = q_table[state, action] # Look up old q-value in Q-table
+            next_max = np.max(q_table[next_state]) # Get the max q-value given the chosen action
 
+            # Update q-value for the state
             new_value = (1 - alpha) * old_value + alpha *(reward + gamma * next_max)
             q_table[state, action] = new_value
 
+            # For plotting amount of -10 rewards
             if reward == -10:
                 penalties += -1
                 total_penalties += -1
 
+            # Update state, increment/append plotting parameters
             state = next_state
             epochs += 1
             total_epochs += 1
+            all_penalties.append(penalties)
+            all_epochs.append(epochs)
 
+        # Prints amount of episodes trained
         if i % 10000 == 0:
             clear_output(wait=True)
             print(f"Episode: {i}")
 
-        all_penalties.append(penalties)
-        all_epochs.append(epochs)
+
 
     print("Training finished \n")
 
-    # Evaluates performance of Q-learning algorithm
-    print(f"Penalties: {total_penalties}")
+    # Evaluate performance of Q-learning algorithm
+    print(f"Amount of penalties: {total_penalties}")
 
     print(f"Results after {episodes} episodes:")
     print(f"Average timesteps per episode: {total_epochs / episodes}")
     print(f"Average penalties per episode: {total_penalties / episodes}")
 
-    frames = []  # For animations
+    # Animating taxi after learning
+    frames = []
     epochs = 0
 
     done = False
 
     # Run Q-learning by exploiting model to evaluate performance
     env.reset() # reset position of taxi to random location
+    state = env.s  # Check current state after reset
     while not done:
-        action = np.argmax(q_table[state])  # Exploit learned values
+        action = np.argmax(q_table[state])  # Exploit learned values all the time
         next_state, reward, done, info = env.step(action)
         state = next_state
 
@@ -129,6 +135,11 @@ def q_learning(env):
 
 
 def print_frames(frames):
+    '''
+    This function displays the taxi environment and depicts the actions that are taken by the agent
+    :param frames: The frames from the brute_force or q_learning algorithm
+    :return: None
+    '''
     for i, frame in enumerate(frames):
         clear_output(wait=True)
         print(frame['frame'])
@@ -141,8 +152,11 @@ def print_frames(frames):
 
 
 
-
 def main():
+    '''
+    Main function. Call this function to start program
+    :return: None
+    '''
     env = gym.make("Taxi-v2").env  # Create an instance of the environment (environment interface)
     state = env.encode(3, 1, 2, 0)  # (taxi row, taxi column, passenger index, destination index)
     env.s = 328  # Set initial state to state index
@@ -158,13 +172,11 @@ def main():
     # Q-learning
     frames = q_learning(env)
 
-
-
     print_frames(frames)
 
     '''
-    print("Action Space {}".format(env.action_space))  # Print size of Action Space
-    print("State Space {}".format(env.observation_space)) # Print size of State Space
+    print(f"Action Space: {env.action_space}")  # Print size of Action Space
+    print(f"State Space: {env.observation_space}") # Print size of State Space
     '''
 
 
