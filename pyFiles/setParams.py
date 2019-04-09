@@ -22,7 +22,7 @@ ps = 1000
 
 ### Energy Values ###
 energyMode = "rand"  # Energy mode can be "rand"=random or "distr"=distributed
-maxNrj = 3
+maxNrj = 0.05
 Eelec = 50*10**(-9)   # Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 ETx = 50*10**(-9)     # Units in Joules/bit
 ERx = 50*10**(-9)     # Units in Joules/bit

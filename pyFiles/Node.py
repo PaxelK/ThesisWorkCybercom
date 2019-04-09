@@ -36,6 +36,7 @@ class Node:
         self.actionMsg = ''                    # String containing message about connection and sending status
         self.CHflag = 0                        # Determines if node has been CH during a LEACH episode
         self.conChildren = 0                   # Number of connected children.
+        self.tempDataRec = 0                   # Temporary held data that are then going to the sink.
 
         if self.energy > 0:
             self.alive = True                  # Boolean for if node is alive
@@ -88,6 +89,12 @@ class Node:
         '''
         return self.energy
 
+    def clearTempDataRec(self):
+        '''
+        Clears the temporary data received as a CH from child nodes during transmission round
+        '''
+        self.tempDataRec = 0
+    
     def clearConnection(self):
         '''
         Sets the CHparent variable to null
@@ -178,7 +185,7 @@ class Node:
             #print('Node: ' + str(self.ID) + ', with dist: ' + str(distLEL))
             ETx = Eelec * k + Eamp * k * self.getDistance(self.CHparent)**2
             ERx = (Eelec + EDA) * self.pSize  # Calculate the energy that will be spent by receiving signal
-            EC = (Eelec + EDA) * self.pSize * self.conChildren + ETx
+            #EC = (Eelec + EDA) * self.pSize * self.conChildren + ETx
             #if(self.ID == 9):
             #    print('PROBE PRINT: Real EC for node ' + str(EC))
             if((self.CHparent.alive) & (isinstance(self.CHparent, Node))):  # If data is sent to CH (not sink)
@@ -192,8 +199,9 @@ class Node:
                     self.actionMsg = "Node " + str(self.ID) + " of type " + str(self.CHstatus) +\
                                      " successfully sent to target node " + str(self.CHparent.ID) + " of type " +\
                                      str(self.CHparent.CHstatus) + '.'
-                    self.PS = self.PS + k  # Update packages sent
-                    self.CHparent.dataRec += k  # Update packets received for CH
+                    self.PS = self.PS + k               # Update packages sent
+                    self.CHparent.dataRec += k          # Update packets received for CH
+                    self.CHparent.tempDataRec += k      # Update temporary packets received for CH which are then sent on to the sink as well
                     outcome = True
 
                 if self.energy < 0:
@@ -231,7 +239,8 @@ class Node:
                     # If no power failure was had, data has been transmitted and received
                     self.actionMsg = "Node " + str(self.ID) + " successfully sent to sink " + str(sink.ID) + "!\n"
                     self.PS = self.PS + k
-                    sink.dataRec = sink.dataRec + k
+                    
+                    sink.dataRec += self.tempDataRec + k
                     outcome = True
 
                 if self.energy < 0:

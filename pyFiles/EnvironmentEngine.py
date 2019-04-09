@@ -136,6 +136,7 @@ class EnvironmentEngine:
         # Check if node is alive, then generate its CHs
         for i in range(len(self.nodes)):
             self.nodes[i].resetConChildren()
+            self.nodes[i].clearTempDataRec()
             if self.nodes[i].alive:  # Generate CH status with BLEACH if node is alive
                 self.nodes[i].generateCHstatus(f, p, self.rnd)
             else:  # If node is not alive, node cannot be CH
@@ -171,13 +172,12 @@ class EnvironmentEngine:
         '''
         for i in range(len(self.nodes)):
             if self.nodes[i].alive:
-                if(self.nodes[i].CHstatus == 0)
+                if(self.nodes[i].CHstatus == 0):
                     outcome = self.nodes[i].sendMsg(self.sink)
-                if not outcome:
-                    print(f"Node {self.nodes[i].ID} failed to send to node {self.nodes[i].CHparent.ID}!\n")
-                    actionmsg = self.nodes[i].getActionMsg()
-                    print(str(actionmsg) + "\n")
-                    
+                    if not outcome:
+                        print(f"Node {self.nodes[i].ID} failed to send to node {self.nodes[i].CHparent.ID}!\n")
+                        actionmsg = self.nodes[i].getActionMsg()
+                        print(str(actionmsg) + "\n")                  
         '''
         SECOND LOOP NEEDED. It is required that the non-CHs do their data sending first. This is because every CH needs
         to be able to fully record how much data it has received during the transmission round before it relays it to
@@ -185,12 +185,12 @@ class EnvironmentEngine:
         '''            
         for i in range(len(self.nodes)):
             if self.nodes[i].alive:
-                if(self.nodes[i].CHstatus == 1)
+                if(self.nodes[i].CHstatus == 1):
                     outcome = self.nodes[i].sendMsg(self.sink)
-                if not outcome:
-                    print(f"Node {self.nodes[i].ID} failed to send to node {self.nodes[i].CHparent.ID}!\n")
-                    actionmsg = self.nodes[i].getActionMsg()
-                    print(str(actionmsg) + "\n")
+                    if not outcome:
+                        print(f"Node {self.nodes[i].ID} failed to send to node {self.nodes[i].CHparent.ID}!\n")
+                        actionmsg = self.nodes[i].getActionMsg()
+                        print(str(actionmsg) + "\n")
 
     def iterateRound(self):
         '''
