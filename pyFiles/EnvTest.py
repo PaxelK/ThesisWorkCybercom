@@ -50,13 +50,13 @@ while True:  # Run until all node dies
     print(f"PackReclist Length = {len(EE.PackReclist)}")
     print(f"deadnodes Length = {len(EE.deadNodes)}")
     '''
-
+    plotEnv(EE)
     EE.updateEnv(1, 1, PRcontrl)
     EE.cluster()
     EE.communicate()
     EE.iterateRound()
 
-    plotEnv(EE)
+    
 
     if (len(EE.EClist) or len(EE.PackReclist) or len(EE.plotDeadNodes) or len(EE.meanEClist) or len(EE.plotRnd)) > plotlen:
         del EE.EClist[0]

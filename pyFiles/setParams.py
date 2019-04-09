@@ -22,7 +22,7 @@ ps = 1000
 
 ### Energy Values ###
 energyMode = "rand"  # Energy mode can be "rand"=random or "distr"=distributed
-maxNrj = 3
+maxNrj = 0.05
 Eelec = 50*10**(-9)   # Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 ETx = 50*10**(-9)     # Units in Joules/bit
 ERx = 50*10**(-9)     # Units in Joules/bit
@@ -31,4 +31,4 @@ EDA = 5*10**(-9)      # Data Aggregation Energy, units in Joules/bit
 nrjGenFac = 0.1      # Energy factor for generated energy
 
 
-plotlen = 10 # Amount of rounds that the data is plotted at a time
+plotlen = 10 # Amount of rounds that are plotted at the same time

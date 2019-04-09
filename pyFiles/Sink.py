@@ -26,7 +26,6 @@ class Sink:
         self.CHstatus = 1
         self.conChildren = 0
 
-
     def move(self, deltax, deltay):
         '''
         The method moves the sink and stores the updated position of the sink in self.pos
