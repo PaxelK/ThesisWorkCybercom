@@ -22,9 +22,13 @@ class TaxiEnv(discrete.DiscreteEnv):
     from "Hierarchical Reinforcement Learning with the MAXQ Value Function Decomposition"
     by Tom Dietterich
     Description:
-    There are four designated locations in the grid world indicated by R(ed), B(lue), G(reen), and Y(ellow). When the episode starts, the taxi starts off at a random square and the passenger is at a random location. The taxi drive to the passenger's location, pick up the passenger, drive to the passenger's destination (another one of the four specified locations), and then drop off the passenger. Once the passenger is dropped off, the episode ends.
+    There are four designated locations in the grid world indicated by R(ed), B(lue), G(reen), and Y(ellow). When the
+    episode starts, the taxi starts off at a random square and the passenger is at a random location. The taxi drive to
+    the passenger's location, pick up the passenger, drive to the passenger's destination (another one of the four
+    specified locations), and then drop off the passenger. Once the passenger is dropped off, the episode ends.
     Observations:
-    There are 500 discrete states since there are 25 taxi positions, 5 possible locations of the passenger (including the case when the passenger is the taxi), and 4 destination locations.
+    There are 500 discrete states since there are 25 taxi positions, 5 possible locations of the passenger
+    (including the case when the passenger is the taxi), and 4 destination locations.
 
     Actions:
     There are 6 discrete deterministic actions:
@@ -36,7 +40,8 @@ class TaxiEnv(discrete.DiscreteEnv):
     - 5: dropoff passenger
 
     Rewards:
-    There is a reward of -1 for each action and an additional reward of +20 for delievering the passenger. There is a reward of -10 for executing actions "pickup" and "dropoff" illegally.
+    There is a reward of -1 for each action and an additional reward of +20 for delievering the passenger.
+    There is a reward of -10 for executing actions "pickup" and "dropoff" illegally.
 
     Rendering:
     - blue: passenger
@@ -71,19 +76,21 @@ class TaxiEnv(discrete.DiscreteEnv):
         num_actions = 6
         P = {state: {action: []
                      for action in range(num_actions)} for state in range(num_states)}
+
         for row in range(num_rows):
             for col in range(num_columns):
                 for pass_idx in range(len(locs) + 1):  # +1 for being inside taxi
                     for dest_idx in range(len(locs)):
                         state = self.encode(row, col, pass_idx, dest_idx)
+                        # If the pick-up spot is not the drop off spot and if the passenger is not in taxi
                         if pass_idx < 4 and pass_idx != dest_idx:
                             initial_state_distrib[state] += 1
                         for action in range(num_actions):
-                            # defaults
+                            # Default values for what happens (rewards and next state, etc.) due to an action
                             new_row, new_col, new_pass_idx = row, col, pass_idx
-                            reward = -1  # default reward when there is no pickup/dropoff
-                            done = False
-                            taxi_loc = (row, col)
+                            reward = -1  # Default reward when there is no pickup/dropoff
+                            done = False  # Boolean for if episode is complete
+                            taxi_loc = (row, col)  # Position of Taxi
 
                             if action == 0:
                                 new_row = min(row + 1, max_row)
@@ -94,15 +101,17 @@ class TaxiEnv(discrete.DiscreteEnv):
                             elif action == 3 and self.desc[1 + row, 2 * col] == b":":
                                 new_col = max(col - 1, 0)
                             elif action == 4:  # pickup
-                                if (pass_idx < 4 and taxi_loc == locs[pass_idx]):
-                                    new_pass_idx = 4
-                                else:  # passenger not at location
+                                if (pass_idx < 4 and taxi_loc == locs[pass_idx]):  # If pass not in Taxi and at location
+                                    new_pass_idx = 4  # pass_idx == 4 if passenger is in taxi
+                                else:  # passenger not at location or pass already in taxi
                                     reward = -10
                             elif action == 5:  # dropoff
+                                # If passenger in vehicle and correct drop off
                                 if (taxi_loc == locs[dest_idx]) and pass_idx == 4:
                                     new_pass_idx = dest_idx
                                     done = True
                                     reward = 20
+                                # If passenger in car but incorrect drop off position
                                 elif (taxi_loc in locs) and pass_idx == 4:
                                     new_pass_idx = locs.index(taxi_loc)
                                 else:  # dropoff at wrong location
