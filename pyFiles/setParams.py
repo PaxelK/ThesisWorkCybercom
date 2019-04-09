@@ -32,3 +32,9 @@ nrjGenFac = 0.1      # Energy factor for generated energy
 
 
 plotlen = 10 # Amount of rounds that the data is plotted at a time
+
+################################ RL parameters ############################################
+# Hyper parameters for Q-learning
+alpha = 0.1  # Learning rate of the model
+gamma = 0.6  # Discount factor for q-values future in time
+epsilon = 0.1  # Exploration rate for exploring the model
