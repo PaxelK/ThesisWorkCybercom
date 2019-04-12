@@ -1,89 +1,117 @@
-"""
-Classic cart-pole system implemented by Rich Sutton et al.
-Copied from http://incompleteideas.net/sutton/book/code/pole.c
-permalink: https://perma.cc/C9ZM-652R
-"""
-
 import math
 import gym
 from gym import spaces, logger
 from gym.utils import seeding
 import numpy as np
 
+import sys
+sys.path.append("..")  # Adds higher directory to python modules path.
 
-class CartPoleEnv(gym.Env):
-    """
-    Description:
-        A pole is attached by an un-actuated joint to a cart, which moves along a frictionless track. The pendulum starts upright, and the goal is to prevent it from falling over by increasing and reducing the cart's velocity.
-    Source:
-        This environment corresponds to the version of the cart-pole problem described by Barto, Sutton, and Anderson
-    Observation:
-        Type: Box(4)
-        Num	Observation                 Min         Max
-        0	Cart Position             -4.8            4.8
-        1	Cart Velocity             -Inf            Inf
-        2	Pole Angle                 -24 deg        24 deg
-        3	Pole Velocity At Tip      -Inf            Inf
+from setParams import *
+from EnvironmentEngine import *
 
-    Actions:
-        Type: Discrete(2)
-        Num	Action
-        0	Push cart to the left
-        1	Push cart to the right
+EE = EnvironmentEngine()
 
-        Note: The amount the velocity that is reduced or increased is not fixed; it depends on the angle the pole is pointing. This is because the center of gravity of the pole increases the amount of energy needed to move the cart underneath it
-    Reward:
-        Reward is 1 for every step taken, including the termination step
-    Starting State:
-        All observations are assigned a uniform random value in [-0.05..0.05]
-    Episode Termination:
-        Pole Angle is more than 12 degrees
-        Cart Position is more than 2.4 (center of the cart reaches the edge of the display)
-        Episode length is greater than 200
-        Solved Requirements
-        Considered solved when the average reward is greater than or equal to 195.0 over 100 consecutive trials.
-    """
+class WSN(gym.Env):
+    '''
+    # Observations:
+    Type: Box(4)
+    Observation         Min     Max
+    X position          0       xSize
+    Y position          0       ySize
+    (CHstatus           0       1)
+    PR                  0       3
 
-    metadata = {
-        'render.modes': ['human', 'rgb_array'],
-        'video.frames_per_second': 50
-    }
-
+    # Actions:
+    Type: Discrete(6)
+    0 = Move south
+    1 = Move north
+    2 = Move east
+    3 = Move west
+    4 = Increase packet rate
+    5 = Decrease Packet rate
+    '''
     def __init__(self):
-        self.gravity = 9.8
-        self.masscart = 1.0
-        self.masspole = 0.1
-        self.total_mass = (self.masspole + self.masscart)
-        self.length = 0.5  # actually half the pole's length
-        self.polemass_length = (self.masspole * self.length)
-        self.force_mag = 10.0
-        self.tau = 0.02  # seconds between state updates
-        self.kinematics_integrator = 'euler'
+        EE = EnvironmentEngine()
 
-        # Angle at which to fail the episode
-        self.theta_threshold_radians = 12 * 2 * math.pi / 360
-        self.x_threshold = 2.4
+        self.xSize = xSize
+        self.ySize = ySize
 
-        # Angle limit set to 2 * theta_threshold_radians so failing observation is still within bounds
+        self.rnd = 0
+        self.numNodes = numNodes
+        self.PRamount = 4 # Amount of values PR can be
+
+        # By using a system grid size of 100x100 we get a step size of 2 m
         high = np.array([
-            self.x_threshold * 2,
-            np.finfo(np.float32).max,
-            self.theta_threshold_radians * 2,
-            np.finfo(np.float32).max])
+            int(self.xSize/50),
+            int(self.ySize/50),
+            4])
 
-        self.action_space = spaces.Discrete(2)
-        self.observation_space = spaces.Box(-high, high, dtype=np.float32)
+        low = np.array([
+            0,
+            0,
+            0])
+
+        self.action_space = spaces.Discrete(6)
+        self.observation_space = spaces.Box(low, high, dtype=np.float32)
 
         self.seed()
+        self.done = False
         self.viewer = None
-        self.state = None
+        self.state = EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
+        for i in range(numNodes):
+            self.state.append(EE.nodes[i].PA)
 
         self.steps_beyond_done = None
-
+    
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
+    def step(self, action):
+        assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
+        self.rnd += 1
+
+        self.state = EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
+        for i in range(numNodes):
+            self.state.append(EE.nodes[i].PA)
+
+        print(self.state)
+        xPos, yPos, PR = self.state
+        PR = [PR]
+
+        if len(EE.deadNodes) == numNodes:
+            done = True
+
+        if action == 0:
+            yPos -= 1
+            EE.updateEnv(xPos, yPos,PR)
+
+        elif action == 1:
+            yPos += 1
+            EE.updateEnv(xPos, yPos,PR)
+
+        elif action == 2:
+            xPos += 1
+            EE.updateEnv(xPos, yPos, PR)
+
+        elif action == 3:
+            yPos -= 1
+            EE.updateEnv(xPos, yPos, PR)
+
+        elif action == 4:
+            EE.nodes[1].PA = min(self.PRamount-1, EE.nodes[1].PA+1)
+            EE.updateEnv(xPos, yPos, PR)
+
+        elif action == 1:
+            EE.nodes[1].PA = max(0, EE.nodes[1].PA-1)
+            EE.updateEnv(xPos, yPos, PR)
+
+        return np.array(self.state), reward, done, {}
+
+
+
+    '''
     def step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
         state = self.state
@@ -189,3 +217,4 @@ class CartPoleEnv(gym.Env):
         if self.viewer:
             self.viewer.close()
             self.viewer = None
+    '''

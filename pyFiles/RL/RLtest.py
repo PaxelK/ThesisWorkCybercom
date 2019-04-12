@@ -160,14 +160,14 @@ def main():
     env = gym.make("Taxi-v2").env  # Create an instance of the environment (environment interface)
     state = env.encode(3, 1, 2, 0)  # (taxi row, taxi column, passenger index, destination index)
     env.s = 328  # Set initial state to state index
-    # env.s = state # Set current state to environment state
+    # envs.s = state # Set current state to environment state
     # print("State:", state)  # Displays which state index the agent is in
 
-    # env.render() # Displays the environment in the console
-    # print(env.P[328]) # Prints the look-up/reward table
+    # envs.render() # Displays the environment in the console
+    # print(envs.P[328]) # Prints the look-up/reward table
 
     # Brute Force
-    #frames = brute_force(env)
+    #frames = brute_force(envs)
 
     # Q-learning
     frames = q_learning(env)
@@ -175,8 +175,8 @@ def main():
     print_frames(frames)
 
     '''
-    print(f"Action Space: {env.action_space}")  # Print size of Action Space
-    print(f"State Space: {env.observation_space}") # Print size of State Space
+    print(f"Action Space: {envs.action_space}")  # Print size of Action Space
+    print(f"State Space: {envs.observation_space}") # Print size of State Space
     '''
 
 

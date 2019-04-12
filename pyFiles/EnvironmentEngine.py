@@ -115,7 +115,7 @@ class EnvironmentEngine:
         [sinkx, sinky, nodeVals1, nodeVals2, ....., nodeValsN] ^ T
         '''
         x, y = self.sink.getPos()
-        self.states = [[x], [y]]
+        self.states = [x, y]
         for node in self.nodes:
             xN, yN = node.getPos()
             self.states.append([[xN], [yN], [node.getCHstatus()], [node.getPS()], [node.getEC()]])
