@@ -3,12 +3,18 @@ sys.path.append("..")  # Adds higher directory to python modules path.
 import gym
 import gym_WSN
 
-from EnvironmentEngine import *
 from plotEnv import *
 
 ctrl = gym.make('WSN-v0') # Initiate RL environment
-ctrl.step(1)
+ctrl.step(5)
+ctrl.step(5)
+ctrl.step(5)
+ctrl.step(5)
 
+
+
+#print(a)
+#ctrl.reset()
 
 
 '''

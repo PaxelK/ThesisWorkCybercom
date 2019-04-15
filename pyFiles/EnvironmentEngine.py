@@ -91,7 +91,6 @@ class EnvironmentEngine:
         :return: self
         '''
         self.sink.move(deltaX, deltaY)  # Moves the sink in desired step length
-
         # Set the Packet Rate of all the nodes
         for i in range(len(packetRates)):
             for j in range(len(self.nodes)):

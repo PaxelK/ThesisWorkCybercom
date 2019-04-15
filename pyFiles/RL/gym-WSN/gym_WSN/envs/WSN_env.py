@@ -1,8 +1,8 @@
-import math
 import gym
-from gym import spaces, logger
+from gym import spaces
 from gym.utils import seeding
 import numpy as np
+from random import *
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
@@ -74,92 +74,66 @@ class WSN(gym.Env):
 
         self.state = EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
         for i in range(numNodes):
-            self.state.append(EE.nodes[i].PA)
+            self.state.append([EE.nodes[i].ID, EE.nodes[i].PA])
 
-        print(self.state)
+
         xPos, yPos, PR = self.state
-        PR = [PR]
+        PR = [PR]  # Convert to list
+
+        # Default values
+        reward = 0
+        done = False
 
         if len(EE.deadNodes) == numNodes:
             done = True
 
         if action == 0:
-            yPos -= 1
-            EE.updateEnv(xPos, yPos,PR)
+            self.state[1] -= 1  # yPos
+            EE.updateEnv(0, -1, PR)
+
 
         elif action == 1:
-            yPos += 1
-            EE.updateEnv(xPos, yPos,PR)
+            self.state[1] += 1  # yPos
+            EE.updateEnv(0, 1,PR)
 
         elif action == 2:
-            xPos += 1
-            EE.updateEnv(xPos, yPos, PR)
+            self.state[0] += 1
+            EE.updateEnv(1, 0, PR)
 
         elif action == 3:
-            yPos -= 1
-            EE.updateEnv(xPos, yPos, PR)
+            self.state[0] -= 1
+            EE.updateEnv(-1, 0, PR)
 
+        # PR is hard coded for one node
         elif action == 4:
-            EE.nodes[1].PA = min(self.PRamount-1, EE.nodes[1].PA+1)
-            EE.updateEnv(xPos, yPos, PR)
+            reward = 10
+            EE.nodes[0].PA = min(self.PRamount-1, EE.nodes[0].PA+1)
+            self.state[2][1] = EE.nodes[0].PA
+            EE.updateEnv(0, 0, PR)
 
-        elif action == 1:
-            EE.nodes[1].PA = max(0, EE.nodes[1].PA-1)
-            EE.updateEnv(xPos, yPos, PR)
+        elif action == 5:
+            reward = -10
+            EE.nodes[0].PA = max(0, EE.nodes[0].PA-1)
+            self.state[2][1] = EE.nodes[0].PA
+            EE.updateEnv(0, 0, PR)
 
+        print(self.state)
+        print("---------------------")
         return np.array(self.state), reward, done, {}
 
 
-
-    '''
-    def step(self, action):
-        assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
-        state = self.state
-        x, x_dot, theta, theta_dot = state
-        force = self.force_mag if action == 1 else -self.force_mag
-        costheta = math.cos(theta)
-        sintheta = math.sin(theta)
-        temp = (force + self.polemass_length * theta_dot * theta_dot * sintheta) / self.total_mass
-        thetaacc = (self.gravity * sintheta - costheta * temp) / (
-                    self.length * (4.0 / 3.0 - self.masspole * costheta * costheta / self.total_mass))
-        xacc = temp - self.polemass_length * thetaacc * costheta / self.total_mass
-        if self.kinematics_integrator == 'euler':
-            x = x + self.tau * x_dot
-            x_dot = x_dot + self.tau * xacc
-            theta = theta + self.tau * theta_dot
-            theta_dot = theta_dot + self.tau * thetaacc
-        else:  # semi-implicit euler
-            x_dot = x_dot + self.tau * xacc
-            x = x + self.tau * x_dot
-            theta_dot = theta_dot + self.tau * thetaacc
-            theta = theta + self.tau * theta_dot
-        self.state = (x, x_dot, theta, theta_dot)
-        done = x < -self.x_threshold \
-               or x > self.x_threshold \
-               or theta < -self.theta_threshold_radians \
-               or theta > self.theta_threshold_radians
-        done = bool(done)
-
-        if not done:
-            reward = 1.0
-        elif self.steps_beyond_done is None:
-            # Pole just fell!
-            self.steps_beyond_done = 0
-            reward = 1.0
-        else:
-            if self.steps_beyond_done == 0:
-                logger.warn(
-                    "You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
-            self.steps_beyond_done += 1
-            reward = 0.0
-
-        return np.array(self.state), reward, done, {}
 
     def reset(self):
-        self.state = self.np_random.uniform(low=-0.05, high=0.05, size=(4,))
-        self.steps_beyond_done = None
+        '''
+        Resets the entire WSN by placing the sink in a random position and all nodes have a random PR
+        '''
+        self.state = [random.randint(0,self.xSize), random.randint(0,self.ySize)]
+        for i in range(numNodes):
+            self.state.append([i, random.randint(0,self.PRamount-1)])
+        print(self.state)
         return np.array(self.state)
 
+    '''
     def render(self, mode='human'):
         screen_width = 600
         screen_height = 400

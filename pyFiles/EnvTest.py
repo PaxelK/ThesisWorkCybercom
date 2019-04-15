@@ -5,16 +5,23 @@ EE = EnvironmentEngine()  # Initiate environment
 
 x, y = EE.sink.getPos()  # Get position/coordinates of sink
 
+
+
+
+
 # Get PR for all nodes (PR should be zero for dead nodes)
 PRcontrl = []
 for i in range(numNodes):
     PRcontrl.append([i, 10])  # [Node ID, PR of node]
 
-'''
-PRcontrl[5] = [5, 6]
-EE.updateEnv(30, 30, PRcontrl)  # [sinkx, sinky, PRlist]
+
+
+EE.updateEnv(20, 43, PRcontrl)  # [sinkx, sinky, PRlist]
 x, y = EE.sink.getPos()
 print(f"x = {x},  y = {y} \n")
+
+
+'''
 print("----------------------------------------")
 for i in range(numNodes):
     print(EE.nodes[i].PA)
@@ -36,20 +43,20 @@ EE.updateEnv(20, 20, PRcontrl)
 x, y, d = EE.sinkStatus()
 print(f"x = {x},  y = {y}, dataRecieved = {d} \n")
 print("----------------------------------------")
-'''
+
 
 
 states = EE.getStates()
 
 while True:  # Run until all node dies
     print(f"Round = {EE.rnd}")
-    '''
+    
     print(f"plotRnd Length = {len(EE.plotRnd)}")
     print(f"meanEClist Length = {len(EE.meanEClist)}")
     print(f"EClist Length = {len(EE.EClist)}")
     print(f"PackReclist Length = {len(EE.PackReclist)}")
     print(f"deadnodes Length = {len(EE.deadNodes)}")
-    '''
+    
 
     EE.updateEnv(1, 1, PRcontrl)
     EE.cluster()
@@ -69,7 +76,7 @@ while True:  # Run until all node dies
     if len(EE.deadNodes) == numNodes: # Break when all nodes have died
         break
 
-'''
+
 # Testing of classes starts here 
 sink = Sink(100, 100)  # Creates an instance of the sink (sizex, sizey)
 
