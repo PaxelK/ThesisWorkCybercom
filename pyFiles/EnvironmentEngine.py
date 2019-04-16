@@ -211,6 +211,15 @@ class EnvironmentEngine:
             self.posNodes.append([xnd, ynd])
         self.posNodes = np.array(self.posNodes)
 
+        # For plotting, if list size is larger than plotlen then delete first element in all plot lists
+        if (len(self.EClist) or len(self.PackReclist) or len(self.plotDeadNodes) or len(self.meanEClist) or len(
+                self.plotRnd)) > plotlen:
+            del self.EClist[0]
+            del self.PackReclist[0]
+            del self.plotDeadNodes[0]
+            del self.meanEClist[0]
+            del self.plotRnd[0]
+
         self.rnd += 1
         self.plotRnd.append(self.rnd)
 

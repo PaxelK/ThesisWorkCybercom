@@ -15,13 +15,13 @@ for i in range(numNodes):
     PRcontrl.append([i, 10])  # [Node ID, PR of node]
 
 
-
+'''
 EE.updateEnv(20, 43, PRcontrl)  # [sinkx, sinky, PRlist]
 x, y = EE.sink.getPos()
 print(f"x = {x},  y = {y} \n")
 
 
-'''
+
 print("----------------------------------------")
 for i in range(numNodes):
     print(EE.nodes[i].PA)
@@ -47,36 +47,29 @@ print("----------------------------------------")
 
 
 states = EE.getStates()
-
+'''
 while True:  # Run until all node dies
     print(f"Round = {EE.rnd}")
     
-    print(f"plotRnd Length = {len(EE.plotRnd)}")
-    print(f"meanEClist Length = {len(EE.meanEClist)}")
-    print(f"EClist Length = {len(EE.EClist)}")
-    print(f"PackReclist Length = {len(EE.PackReclist)}")
-    print(f"deadnodes Length = {len(EE.deadNodes)}")
+    #print(f"plotRnd Length = {len(EE.plotRnd)}")
+    #print(f"meanEClist Length = {len(EE.meanEClist)}")
+    #print(f"EClist Length = {len(EE.EClist)}")
+    #print(f"PackReclist Length = {len(EE.PackReclist)}")
+    #print(f"deadnodes Length = {len(EE.deadNodes)}")
     
+    plotEnv(EE)
 
     EE.updateEnv(1, 1, PRcontrl)
     EE.cluster()
     EE.communicate()
     EE.iterateRound()
 
-    plotEnv(EE)
-
-    if (len(EE.EClist) or len(EE.PackReclist) or len(EE.plotDeadNodes) or len(EE.meanEClist) or len(EE.plotRnd)) > plotlen:
-        del EE.EClist[0]
-        del EE.PackReclist[0]
-        del EE.plotDeadNodes[0]
-        del EE.meanEClist[0]
-        del EE.plotRnd[0]
 
 
     if len(EE.deadNodes) == numNodes: # Break when all nodes have died
         break
 
-
+'''
 # Testing of classes starts here 
 sink = Sink(100, 100)  # Creates an instance of the sink (sizex, sizey)
 
