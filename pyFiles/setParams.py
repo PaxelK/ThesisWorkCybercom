@@ -1,3 +1,5 @@
+import math
+
 '''
 This function sets all the parameters that are needed in the simulation 
 '''
