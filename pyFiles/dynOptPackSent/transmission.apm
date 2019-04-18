@@ -4,7 +4,7 @@ Constants
   EDA = 5*10^(-9)
   Egen = 1*10^(-5)
   PRmax = 20000
-  const = 0.6
+  const = 0.2
   
   packet = 1
   E = 1
@@ -14,7 +14,7 @@ Parameters
   pr = 1 , >= 0, <= 1
 
 Variables
-  nrj = 0.7
+  nrj = 0.05
   myObj = 0
   d = 70
   

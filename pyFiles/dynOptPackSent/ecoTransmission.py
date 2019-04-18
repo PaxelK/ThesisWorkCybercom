@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 # create GEKKO model
 m = GEKKO(remote=False)
 # time points
-n=51
+n=501
 m.time = np.linspace(0,10,n)
 # constants
 
@@ -35,10 +35,10 @@ pr.DCOST = 0
 nrj = m.Var(value=0.7)                  # Energy Amount
 myObj = m.Var(value=0)
 d = m.Var(value=70)                     # Distance to receiver
-
+d2 = m.Intermediate(d**2)
 
 # fish population balance
-m.Equation(nrj.dt() == Egen - ((Eelec+EDA)*packet + pr*PRmax*(Eelec + Eamp * d**2)))
+m.Equation(nrj.dt() == Egen - ((Eelec+EDA)*packet + pr*PRmax*(Eelec + Eamp * d2)))
 m.Equation(d.dt() == -0.5)
 m.Equation(myObj.dt() == (E-const/nrj)*pr*PRmax)
 
