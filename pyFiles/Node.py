@@ -43,6 +43,7 @@ class Node:
         else:
             self.alive = False
 
+
     def getDataRec(self):
         return self.dataRec
 

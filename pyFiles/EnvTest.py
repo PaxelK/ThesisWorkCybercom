@@ -5,16 +5,23 @@ EE = EnvironmentEngine()  # Initiate environment
 
 x, y = EE.sink.getPos()  # Get position/coordinates of sink
 
+
+
+
+
 # Get PR for all nodes (PR should be zero for dead nodes)
 PRcontrl = []
 for i in range(numNodes):
     PRcontrl.append([i, 10])  # [Node ID, PR of node]
 
+
 '''
-PRcontrl[5] = [5, 6]
-EE.updateEnv(30, 30, PRcontrl)  # [sinkx, sinky, PRlist]
+EE.updateEnv(20, 43, PRcontrl)  # [sinkx, sinky, PRlist]
 x, y = EE.sink.getPos()
 print(f"x = {x},  y = {y} \n")
+
+
+
 print("----------------------------------------")
 for i in range(numNodes):
     print(EE.nodes[i].PA)
@@ -36,10 +43,9 @@ EE.updateEnv(20, 20, PRcontrl)
 x, y, d = EE.sinkStatus()
 print(f"x = {x},  y = {y}, dataRecieved = {d} \n")
 print("----------------------------------------")
-'''
 
 
-states = EE.getStates()
+
 
 while True:  # Run until all node dies
     print(f"Round = {EE.rnd}")
@@ -56,7 +62,7 @@ while True:  # Run until all node dies
     EE.communicate()
     EE.iterateRound()
 
-    
+
 
     if (len(EE.EClist) or len(EE.PackReclist) or len(EE.plotDeadNodes) or len(EE.meanEClist) or len(EE.plotRnd)) > plotlen:
         del EE.EClist[0]

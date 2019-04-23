@@ -91,7 +91,6 @@ class EnvironmentEngine:
         :return: self
         '''
         self.sink.move(deltaX, deltaY)  # Moves the sink in desired step length
-
         # Set the Packet Rate of all the nodes
         for i in range(len(packetRates)):
             for j in range(len(self.nodes)):
@@ -115,7 +114,7 @@ class EnvironmentEngine:
         [sinkx, sinky, nodeVals1, nodeVals2, ....., nodeValsN] ^ T
         '''
         x, y = self.sink.getPos()
-        self.states = [[x], [y]]
+        self.states = [x, y]
         for node in self.nodes:
             xN, yN = node.getPos()
             self.states.append([[xN], [yN], [node.getCHstatus()], [node.getPS()], [node.getEC()]])
@@ -226,6 +225,15 @@ class EnvironmentEngine:
             xnd, ynd = node.getPos()
             self.posNodes.append([xnd, ynd])
         self.posNodes = np.array(self.posNodes)
+
+        # For plotting, if list size is larger than plotlen then delete first element in all plot lists
+        if (len(self.EClist) or len(self.PackReclist) or len(self.plotDeadNodes) or len(self.meanEClist) or len(
+                self.plotRnd)) > plotlen:
+            del self.EClist[0]
+            del self.PackReclist[0]
+            del self.plotDeadNodes[0]
+            del self.meanEClist[0]
+            del self.plotRnd[0]
 
         self.rnd += 1
         self.plotRnd.append(self.rnd)
