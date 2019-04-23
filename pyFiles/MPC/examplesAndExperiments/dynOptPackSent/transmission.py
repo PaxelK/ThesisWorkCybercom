@@ -14,7 +14,7 @@ apm_option(s,a,'nlc.mv_type',1)
 
 apm_info(s,a,'MV','pr')
 apm_option(s,a,'pr.status',1)
-apm_option(s,a,'pr.dcost',1e-5)
+apm_option(s,a,'pr.dcost',0)
 
 output = apm(s,a,'solve')
 print (output)

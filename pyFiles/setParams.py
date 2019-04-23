@@ -16,7 +16,8 @@ xSize = 100
 ySize = 100
 x = 0  # Added for better display results of the plot
 y = 0  # Added for better display results of the plot
-numNodes = 1  # Number of Nodes in the field
+
+numNodes = 10  # Number of Nodes in the field
 dead_nodes = 0 # Number of Dead Nodes in the beginning
 
 #### Data Packet Info ###
@@ -24,7 +25,7 @@ ps = 1000
 
 ### Energy Values ###
 energyMode = "rand"  # Energy mode can be "rand"=random or "distr"=distributed
-maxNrj = 3
+maxNrj = 0.05
 Eelec = 50*10**(-9)   # Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 ETx = 50*10**(-9)     # Units in Joules/bit
 ERx = 50*10**(-9)     # Units in Joules/bit
@@ -32,11 +33,4 @@ Eamp = 100*10**(-12)  # Transmit Amplifier Types, units in Joules/bit/m^2 (amoun
 EDA = 5*10**(-9)      # Data Aggregation Energy, units in Joules/bit
 nrjGenFac = 0.1      # Energy factor for generated energy
 
-
-plotlen = 10 # Amount of rounds that the data is plotted at a time
-
-################################ RL parameters ############################################
-# Hyper parameters for Q-learning
-alpha = 0.1  # Learning rate of the model
-gamma = 0.6  # Discount factor for q-values future in time
-epsilon = 0.1  # Exploration rate for exploring the model
+plotlen = 10 # Amount of rounds that are plotted at the same time
