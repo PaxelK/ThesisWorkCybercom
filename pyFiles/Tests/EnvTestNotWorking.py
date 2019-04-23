@@ -1,5 +1,9 @@
+import sys
+sys.path.append("..")  # Adds higher directory to python modules path.
+
 from EnvironmentEngine import *
 from plotEnv import *
+from setParams import *
 
 EE = EnvironmentEngine()  # Initiate environment
 
@@ -50,12 +54,12 @@ print("----------------------------------------")
 while True:  # Run until all node dies
     print(f"Round = {EE.rnd}")
     '''
-    print(f"plotRnd Length = {len(EE.plotRnd)}")
-    print(f"meanEClist Length = {len(EE.meanEClist)}")
-    print(f"EClist Length = {len(EE.EClist)}")
-    print(f"PackReclist Length = {len(EE.PackReclist)}")
-    print(f"deadnodes Length = {len(EE.deadNodes)}")
-    '''
+print(f"plotRnd Length = {len(EE.plotRnd)}")
+print(f"meanEClist Length = {len(EE.meanEClist)}")
+print(f"EClist Length = {len(EE.EClist)}")
+print(f"PackReclist Length = {len(EE.PackReclist)}")
+print(f"deadnodes Length = {len(EE.deadNodes)}")
+'''
     plotEnv(EE)
     EE.updateEnv(1, 1, PRcontrl)
     EE.cluster()
@@ -179,5 +183,5 @@ nodeList[6].CHstatus = 1
 nodeList[4].connect(nodeList[6])
 nodeList[4].sendMsg(sink)
 print(nodeList[4].actionMsg)
-'''
+
 
