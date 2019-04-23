@@ -11,7 +11,6 @@ class Sink:
         :param sizex: WSN size, default x = 100
         :param sizey: WSN size, default y = 100
         '''
-
         self.xPos = sizex / 2  # Initialize by placing sink in the middle of the WSN
         self.yPos = sizey / 2  # Initialize by placing sink in the middle of the WSN
         self.dataRec = 0  # Initial packets received is zero
