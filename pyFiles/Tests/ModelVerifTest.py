@@ -4,6 +4,9 @@ Created on Thu Apr  4 16:44:30 2019
 
 @author: axkar1
 """
+import sys
+sys.path.append("..")  # Adds higher directory to python modules path.
+
 
 from EnvironmentEngine import *
 from plotEnv import *

@@ -1,59 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr 23 11:46:43 2019
+Created on Tue Apr 23 14:48:16 2019
 
 @author: axkar1
 """
-
-from gekko import GEKKO
-import numpy as np
-import matplotlib.pyplot as plt
-import sys
-sys.path.append("..")  # Adds higher directory to python modules path.
-from Node import Node
-import Sink
-from setParams import *
-
-class MPCnode(Node):
-    def __init__(self, id, x, y, nrj, ctrlHrz, ctrlRes):
-        super().__init__(id, x, y, nrj)  
-        self.ctrlHrz = ctrlHrz                  # Control Horizon
-        
-        # time points
-        self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
-        # constants
-        self.Egen = 1*10**-5
-        self.PRmax = 2000
-        self.const = 0.6
-        
-        self.packet = 1
-        self.E = 1
-        
-        self.m = GEKKO(remote=False)
-        self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
-        self.deltaDist = 0
-
-
-    def getDeltaDist(self, sinkX, sinkY, sdeltaX, sdeltaY, deltaDist):
-        
-        distBefore = np.sqrt((sinkX**2)+(sinkY**2))
-        distAfter = np.sqrt(((sinkX+sdeltaX)**2)+((sinkY+sdeltaY)**2))
-        self.deltaDist = distAfter - distBefore
-        return self.deltaDist
-
-
-
-
-
-
-
-if __name__ == "__main__":
-    testNode = MPCnode(1,20,20,0.005,10,11)
-
-
-
-'''
-
 
 # create GEKKO model
 m = GEKKO(remote=False)
@@ -127,4 +77,3 @@ plt.ylabel('Rate')
 plt.xlabel('Time (yr)')
 plt.legend()
 plt.show()
-'''
