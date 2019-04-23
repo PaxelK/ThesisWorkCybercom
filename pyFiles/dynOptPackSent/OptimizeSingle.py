@@ -7,20 +7,21 @@ Created on Thu Apr 18 13:34:38 2019
 from scipy.optimize import minimize
 import numpy as np
 
-Eelec = 50*10^(-9)
-Eamp = 100*10^(-12)
-EDA = 5*10^(-9)
-Egen = 1*10^(-5)
+Eelec = 1 #50*10^(-9)
+Eamp = 1 #100*10^(-12)
+EDA = 1 #5*10^(-9)
+Egen = 5 #1*10^(-5)
 const = 0.6
-nrj = 0.05
+nrj = 80
 
 
 conChildren = 5
 pSize = 20000
 
+stepLength = 2
 packet = 1
 E = 1
-d = 70
+dStart = 10
 T = 10
 
 
@@ -32,11 +33,13 @@ def objective(*arg):
     print(ec[1])
     for i in range(len(arg)):
         print(i)
-        pr[i] = (ec[i] - (Eelec+EDA)*pSize*conChildren)/(pSize*(Eelec + Eamp*d**2))   
+        pr[i] = (ec[i] - (Eelec+EDA)*pSize*conChildren)/(pSize*(Eelec + Eamp*distChange(dStart, i)**2))   
     bits = sum(pr)
     return bits 
 
-
+def distChange(sdist, steps):
+    d = sdist - stepLength*steps
+    return d
 
 cons = ({'type': 'ineq', 'fun': lambda x:  x[0]},
         {'type': 'ineq', 'fun': lambda x:  x[1]},

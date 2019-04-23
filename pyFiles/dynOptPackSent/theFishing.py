@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # create GEKKO model
-m = GEKKO()
+m = GEKKO(remote=False)
 
 # time points
 n=501
