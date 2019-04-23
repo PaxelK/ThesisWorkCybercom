@@ -18,13 +18,27 @@ import matplotlib.pyplot as plt
 
 
 class MPCnode():
-    def __init__():
+    # time points
+    n=11
+    
+    # constants
+    Eelec = 50*10**-9
+    Eamp = 100*10**-12
+    EDA = 5*10**-9
+    Egen = 1*10**-5
+    PRmax = 2000
+    const = 0.6
+    
+    packet = 1
+    E = 1
+    def __init__(self, horizon, resolution):
+        m = GEKKO(remote=False)
+        m.time = np.linspace(0,horizon,resolution)
 
 
 
-
-
-
+    def distUpdate(self, currDist, deltaDist):
+        self.
 
 
 
