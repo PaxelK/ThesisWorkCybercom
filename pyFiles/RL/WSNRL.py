@@ -1,3 +1,4 @@
+import math
 import gym
 import gym_WSN
 import random
@@ -5,6 +6,7 @@ import numpy as np
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
+from setParams import *
 from plotEnv import *
 from EnvironmentEngine import *
 
@@ -25,6 +27,7 @@ class RLctrl():
     def __init__(self):
         self.env = gym.make('WSN-v0')
 
+        self.buckets = (1, 1, 1)  # Down-scaling feature space to discretize range
         self.n_episodes = 1000  # Number of training episodes
         self.alpha = 0.1  # Learning rate
         self.epsilon = 0.1  # Exploration rate
@@ -35,12 +38,39 @@ class RLctrl():
         if max_env_steps is not None:
             self.env._max_episode_steps = max_env_steps
 
+        self.Q = np.zeros(self.buckets + (self.env.action_space.n,))
+
+    def discretize(self, obs):
+        # Needs to be updated to handle more than one node
+        upper_bounds = [self.env.observation_space.high[0], self.env.observation_space.high[1], self.env.observation_space.high[2]]
+        lower_bounds = [self.env.observation_space.low[0], self.env.observation_space.low[1], self.env.observation_space.low[2]]
+        ratios = [(obs[i] + abs(lower_bounds[i])) / (upper_bounds[i] - lower_bounds[i]) for i in range(len(obs)-1)]
+        ratios.append((obs[2][1] + abs(lower_bounds[2])) / (upper_bounds[2] - lower_bounds[2]))
+        new_obs = [int(round((self.buckets[i] - 1) * ratios[i])) for i in range(len(obs))]
+        new_obs = [min(self.buckets[i] - 1, max(0, new_obs[i])) for i in range(len(obs))]
+        return tuple(new_obs)
+
+    def choose_action(self, state, epsilon):
+        if (np.random.random() <= epsilon):
+            return self.env.action_space.sample()
+        else:
+            return np.argmax(self.Q[state])
+
+    def update_q(self, state_old, action, reward, state_new, alpha):
+        self.Q[state_old][action] += alpha * (reward + self.gamma * np.max(self.Q[state_new]) - self.Q[state_old][action])
 
     def run(self):
         current_state = self.discretize(self.env.reset())
-        while True:
-            self.env.step(self.env.action_space.sample())
+        done = False
+
+        while not done:
             self.env.render()
+            action = self.choose_action(current_state, self.epsilon)
+            obs, reward, done, _ = self.env.step(action)
+            new_state = self.discretize(obs)
+            self.update_q(current_state, action, reward, new_state, self.alpha)
+            current_state = new_state
+
 
 
 

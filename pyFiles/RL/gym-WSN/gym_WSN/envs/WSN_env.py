@@ -130,6 +130,8 @@ class WSN(gym.Env):
     def reset(self):
         '''
         Resets the entire WSN by placing the sink in a random position and all nodes have a random PR
+
+        TODO: Reset the environment parameters as well, eg. packets sent, energy consumed etc.
         '''
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
