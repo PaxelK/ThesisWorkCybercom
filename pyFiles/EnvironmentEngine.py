@@ -175,7 +175,6 @@ class EnvironmentEngine:
                     print(f"Node {self.nodes[i].ID} failed to send to node {self.nodes[i].CHparent.ID}!\n")
                     actionmsg = self.nodes[i].getActionMsg()
                     print(str(actionmsg) + "\n")
-                    print(self.rnd)
 
     def iterateRound(self):
         '''

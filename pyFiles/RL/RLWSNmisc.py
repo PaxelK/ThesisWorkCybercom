@@ -295,3 +295,153 @@ class WSN(gym.Env):
     def render(self, mode='human'):
         plotEnv(EE)
 
+
+'''
+# Discrete WSN class (Continuos WSN class in RLWSNmisc)
+class WSN(discrete.DiscreteEnv):
+'''
+    '''
+    # Observations:
+    Type: Discrete
+    Observation         Min     Step size       Max
+    X position          0       2               xSize
+    Y position          0       2               ySize
+    (CHstatus           0       1               1)  Not implemented as of now
+    PR                  0       1               3
+
+    # Actions:
+    Type: Discrete(6)
+    0 = Move south
+    1 = Move north
+    2 = Move east
+    3 = Move west
+    4 = Increase packet rate
+    5 = Decrease Packet rate
+    '''
+    '''
+    def __init__(self):
+        self.EE = EnvironmentEngine()  # Create an instance of EnvironmentEngine class
+        # Maximum size of WSN system
+        maxRow = ySize
+        maxCol = xSize
+
+        # Define amount of rows and columns that the system consists of
+        # In this case the step size becomes 2 m
+        self.numRows = int(ySize/2)
+        self.numCols = int(xSize/2)
+
+        self.PRamount = 4  # Amount of values PR can be, e.g. if PRamount is 4 the PR can be 0 1 2 and 3
+
+        numActions = 6  # Number of actions
+        numStates = 60000 # Hardcoded number of states to the amount of iterations there are in the following for loops
+        #numStates = int(self.numRows * self.numCols * (numNodes * self.PRamount) * (numNodes * 2)) # number of states
+
+
+        P = {state: {action: []
+                     for action in range(numActions)} for state in range(numStates)}  # Init to empty dict
+
+        iterations = 0
+        for row in range(self.numRows):
+            for col in range(self.numCols):
+                for node in range(len(self.EE.nodes)):
+                    for PR in range(self.PRamount):
+                        for action in range(numActions):
+                            iterations += 1
+
+                            # Define packet rate for state
+                            #PR = EE.nodes[node].PA
+
+                            state = self.encode(row, col, PR)
+
+                            # Set default values
+                            newRow, newCol, newPacketRates = row, col, PR
+                            reward = -1  # Default reward for moving sink
+                            done = False  # Boolean for if episode is complete
+
+                            # Actions: 0 = Move south, 1 = Move north, 2 = Move east, 3 = Move west,
+                            # 4 = Increase packet rate, 5 Decrease Packet rate
+                            if action == 0:  # Move sink south
+                                newRow = max(row - 1, 0)
+                            elif action == 1:  # Move sink north
+                                newRow = min(row + 1, maxRow)
+                            elif action == 2:  # Move sink east
+                                newCol = min(col + 1, maxCol)
+                            elif action == 3:  # Move sink west
+                                newCol = max(col - 1, 0)
+                            # PR is hard coded for one node
+                            elif action == 4:  # Increase PR of specific node
+                                self.EE.nodes[node].PA = min(self.EE.nodes[node].PA + 1, self.PRamount - 1)
+                                newPacketRates = self.EE.nodes[node].PA
+                                reward = 10
+                            elif action == 5:  # Decrease PR of specific node
+                                self.EE.nodes[node].PA = max(self.EE.nodes[node].PA - 1, 0)
+                                newPacketRates = self.EE.nodes[node].PA
+                                reward = -10
+
+                            newState = self.encode(newRow, newCol, newPacketRates)
+                            P[state][action].append((1.0, newState, reward, done))
+
+        # Investigate into what initialStateDistrib is
+        initialStateDistrib = np.ones(numStates)
+        #initialStateDistrib /= initialStateDistrib.sum()
+        discrete.DiscreteEnv.__init__(self, numStates, numActions, P, initialStateDistrib)
+        # Prints for debugging
+        print(f"Iterations: {iterations}")
+        print(f"numStates: {numStates}")
+
+
+    def encode(self, row, col, PR):
+        # (5) 5, 5, 4
+        i = row
+        i *= self.numCols
+        i += col
+        i *= self.PRamount
+        i += PR
+
+        return i
+
+    def decode(self, i):
+        out = []
+        out.append(i % self.PRamount)
+        i = i // self.PRamount
+        out.append(i % self.numCols)
+        i = i // self.numCols
+        out.append(i)
+        assert 0 <= i < self.numRows
+        return reversed(out)  # [row, col, PR]
+
+    def seed(self, seed=None):
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
+
+    def reset(self):
+    
+        #Resets the entire WSN by placing the sink in a random position and all nodes have a random PR
+    
+        self.EE.rnd = 1
+        # Reset sink
+        self.EE.sink.xPos = xSize / 2
+        self.EE.sink.yPos = ySize / 2
+        self.EE.sink.dataRec = 0
+        for i in range(numNodes):
+            # Resets the nodes. Needs to be fixed for random energy
+            self.EE.nodes[i].energy = self.EE.nodes[i].maxEnergy
+            self.EE.nodes[i].SoC = self.EE.nodes[i].energy / self.EE.nodes[i].maxEnergy
+            self.EE.nodes[i].PS = 0
+            self.EE.nodes[i].CHstatus = 0  # Cluster head status: 1 if CH, 0 if not CH
+            self.EE.nodes[i].CHparent = None  # Reference to the nodes current cluster head
+            self.EE.nodes[i].dataRec = 0  # Data received = amount of data the node has received
+            self.EE.nodes[i].PS = 0  # Packages sent = amount of packages the node has sent
+            self.EE.nodes[i].nrjCons = 0  # Energy consumed [J] = Amount of energy the node has consumed
+            self.EE.nodes[i].actionMsg = ''  # String containing message about connection and sending status
+            self.EE.nodes[i].CHflag = 0  # Determines if node has been CH during a LEACH episode
+            self.EE.nodes[i].conChildren = 0  # Number of connected children.
+
+            if self.EE.nodes[i].energy > 0:
+                self.EE.nodes[i].alive = True  # Boolean for if node is alive
+            else:
+                self.EE.nodes[i].alive = False
+
+
+    def render(self, mode='human'):
+        plotEnv(self.EE)'''

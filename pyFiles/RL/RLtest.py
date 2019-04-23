@@ -46,13 +46,13 @@ def q_learning(env):
 
     episodes = 10000  # Amount of episodes that the agent trains on
 
-    #For plotting
+    #For displaying results
     all_epochs = []  # Time steps
     all_penalties =[]  # Penalties
 
     total_epochs, total_penalties = 0, 0
 
-    # Init q-table with xeros. The size of the q-table is observation space (row) X action space (col)
+    # Init q-table with zeros. The size of the q-table is observation space (row) x action space (col)
     q_table = np.zeros([env.observation_space.n, env.action_space.n])
 
     for i in range(episodes): # for loop determines the amount of episodes (set in beginning of function)
