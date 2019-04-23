@@ -15,6 +15,7 @@ def plotEnv(env):
     meanEC = env.getECmeanStats()
     ndead, deadNodes, plotDeadNodes = env.getDeadNodes()
 
+
     # Create figure 1
     plt.figure(1)
     plt.clf()

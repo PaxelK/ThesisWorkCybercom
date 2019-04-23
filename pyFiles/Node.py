@@ -36,6 +36,7 @@ class Node:
         self.actionMsg = ''                    # String containing message about connection and sending status
         self.CHflag = 0                        # Determines if node has been CH during a LEACH episode
         self.conChildren = 0                   # Number of connected children.
+        self.tempDataRec = 0                   # Temporary held data that are then going to the sink.
 
         if self.energy > 0:
             self.alive = True                  # Boolean for if node is alive
@@ -51,6 +52,9 @@ class Node:
 
     def getEC(self):
         return self.nrjCons
+
+    def getPA(self):
+        return self.PA
 
     def getPos(self):
         x = self.xPos
@@ -86,6 +90,12 @@ class Node:
         '''
         return self.energy
 
+    def clearTempDataRec(self):
+        '''
+        Clears the temporary data received as a CH from child nodes during transmission round
+        '''
+        self.tempDataRec = 0
+    
     def clearConnection(self):
         '''
         Sets the CHparent variable to null
@@ -166,20 +176,23 @@ class Node:
 
         outcome = False   # outcome = whether the node has sent a message
         if self.CHparent:  # If the node has a CH/sink, ie. NOT a cluster head, node sends data to CH/sink
-
-            k = self.PA * self.pSize  # k = the amount of bits that are sent
-
-            # Calculate the energy that will be spent by transmitting signal
-            ETx = Eelec * k + Eamp * k * self.getDistance(self.CHparent)**2
-            ERx = (Eelec + EDA) * k  # Calculate the energy that will be spent by receiving signal
-
-            if self.CHparent.alive:  # If data is sent to CH (not sink)
-                if self.CHstatus == 0:
+            if self.CHstatus == 0:
                     # Makes sure that the node is not a CH (e.g. not directly controlled) wont send more than one packet
                     self.PA = 1
-
+                    
+            k = self.PA * self.pSize  # k = the amount of bits that are sent
+            # Calculate the energy that will be spent by transmitting signal
+            distLEL = self.getDistance(self.CHparent)
+            #print('Node: ' + str(self.ID) + ', with dist: ' + str(distLEL))
+            ETx = Eelec * k + Eamp * k * self.getDistance(self.CHparent)**2
+            ERx = (Eelec + EDA) * self.pSize  # Calculate the energy that will be spent by receiving signal
+            #EC = (Eelec + EDA) * self.pSize * self.conChildren + ETx
+            #if(self.ID == 9):
+            #    print('PROBE PRINT: Real EC for node ' + str(EC))
+            if((self.CHparent.alive) & (isinstance(self.CHparent, Node))):  # If data is sent to CH (not sink)
                 self.updateEnergy(ETx)  # Updates energy for sending packet
                 self.CHparent.updateEnergy(ERx)  # Update energy for receiving packets
+                #print('ENERGY EXPENDED BY PARENT NODE: ' + str(ERx))
 
                 # Following if statements checks if nodes have run out of energy due to sending or receiving data
                 if self.energy >= 0 and self.CHparent.energy >= 0:
@@ -187,8 +200,9 @@ class Node:
                     self.actionMsg = "Node " + str(self.ID) + " of type " + str(self.CHstatus) +\
                                      " successfully sent to target node " + str(self.CHparent.ID) + " of type " +\
                                      str(self.CHparent.CHstatus) + '.'
-                    self.PS = self.PS + k  # Update packages sent
-                    self.CHparent.dataRec += k  # Update packets received for CH
+                    self.PS = self.PS + k               # Update packages sent
+                    self.CHparent.dataRec += k          # Update packets received for CH
+                    self.CHparent.tempDataRec += k      # Update temporary packets received for CH which are then sent on to the sink as well
                     outcome = True
 
                 if self.energy < 0:
@@ -221,12 +235,13 @@ class Node:
                 # result in a faulty transmission
                 self.updateEnergy(ETx)
                 sink.updateEnergy(ERx)
-
+        
                 if self.energy >= 0 and sink.energy >= 0:
                     # If no power failure was had, data has been transmitted and received
                     self.actionMsg = "Node " + str(self.ID) + " successfully sent to sink " + str(sink.ID) + "!\n"
                     self.PS = self.PS + k
-                    sink.dataRec = sink.dataRec + k
+                    
+                    sink.dataRec += self.tempDataRec + k
                     outcome = True
 
                 if self.energy < 0:
