@@ -37,7 +37,7 @@ class Node:
         self.CHflag = 0                        # Determines if node has been CH during a LEACH episode
         self.conChildren = 0                   # Number of connected children.
         self.tempDataRec = 0                   # Temporary held data that are then going to the sink.
-
+        self.maxPR = sP.maxPR                  # Maximum amount of packets that can be sent during a transmission round
         if self.energy > 0:
             self.alive = True                  # Boolean for if node is alive
         else:

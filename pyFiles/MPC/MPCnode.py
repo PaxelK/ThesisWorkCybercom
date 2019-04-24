@@ -23,7 +23,6 @@ class MPCnode(Node):
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
         # constants
         self.Egen = 1*10**-5
-        self.PRmax = 2000
         self.const = 0.6
         
         self.packet = 1
@@ -34,12 +33,14 @@ class MPCnode(Node):
         self.deltaDist = 0
 
 
-    def getDeltaDist(self, sinkX, sinkY, sdeltaX, sdeltaY, deltaDist):
-        
+    def getDeltaDist(self, sinkX, sinkY, sdeltaX, sdeltaY, deltaDist):        
         distBefore = np.sqrt((sinkX**2)+(sinkY**2))
         distAfter = np.sqrt(((sinkX+sdeltaX)**2)+((sinkY+sdeltaY)**2))
         self.deltaDist = distAfter - distBefore
         return self.deltaDist
+    
+    def controlPR():
+        
 
 
 
@@ -49,6 +50,11 @@ class MPCnode(Node):
 
 if __name__ == "__main__":
     testNode = MPCnode(1,20,20,0.005,10,11)
+    dist = 70
+    for i in range(20):
+        testNode.controlPR()
+        print(testNode.PA)
+        dist -= 1
 
 
 
