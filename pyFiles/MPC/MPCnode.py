@@ -17,6 +17,9 @@ from setParams import *
 class MPCnode(Node):
     def __init__(self, id, x, y, nrj, ctrlHrz, ctrlRes):
         super().__init__(id, x, y, nrj)  
+        
+        self.verbose = True
+        
         self.ctrlHrz = ctrlHrz                  # Control Horizon
         
         # time points
@@ -30,7 +33,47 @@ class MPCnode(Node):
         
         self.m = GEKKO(remote=False)
         self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
-        self.deltaDist = 0
+        
+        
+        
+        #self.deltaDist = 1.5
+        self.deltaDist = self.m.SV(value = 1.5)
+        #self.deltaDist.STATUS = 1
+
+                # packet rate
+        self.pr = self.m.MV(value=self.PA, integer = True,lb=1,ub=20)
+        self.pr.STATUS = 1
+        self.pr.DCOST = 0
+        
+        # Energy Stored
+        self.nrj = self.m.Var(value=0.05, lb=0)                  # Energy Amount
+        self.d = self.m.Var(value=70, lb = 0)                     # Distance to receiver
+        self.d2 = self.m.Intermediate(self.d**2)
+        
+        
+        
+        # energy/pr balance
+        #self.m.Equation(self.d.dt() == -1.5)
+        self.m.Equation(self.d.dt() == self.deltaDist)
+        self.m.Equation(self.nrj >= self.Egen - ((Eelec+EDA)*self.packet + self.pr*self.pSize*(Eelec + Eamp * self.d2)))
+        self.m.Equation(self.nrj.dt() == self.Egen - ((Eelec+EDA)*self.packet + self.pr*self.pSize*(Eelec + Eamp * self.d2)))
+        
+        
+        # objective (profit)
+        self.J = self.m.Var(value=0)
+        # final objective
+        self.Jf = self.m.FV()
+        self.Jf.STATUS = 1
+        self.m.Connection(self.Jf,self.J,pos2='end')
+        self.m.Equation(self.J.dt() == self.pr*self.pSize)
+        # maximize profit
+        self.m.Obj(-self.Jf)
+        
+        # options
+        self.m.options.IMODE = 6  # optimal control
+        self.m.options.NODES = 3  # collocation nodes
+        self.m.options.SOLVER = 3 # solver (IPOPT)
+
 
 
     def getDeltaDist(self, sinkX, sinkY, sdeltaX, sdeltaY, deltaDist):        
@@ -39,22 +82,51 @@ class MPCnode(Node):
         self.deltaDist = distAfter - distBefore
         return self.deltaDist
     
-    def controlPR():
+    def controlPR(self, deltaD):        
+
         
+        # solve optimization problem
+        self.deltaDist = deltaD
 
-
-
-
-
+        self.m.solve(disp=False)
+        
+        self.setPR(self.pr.value[1])
+        #self.pr.value = self.pr.value[1]
+        
+        #self.m.GUI()
+        
+        # print profit
+        print('Optimal Profit: ' + str(self.Jf.value[0]))
+        
+        if self.verbose:
+            # plot results
+            plt.figure(1)
+            plt.subplot(2,1,1)
+            plt.plot(self.m.time,self.J.value,'r--',label='packets')
+            plt.plot(self.m.time[-1],self.Jf.value[0],'ro',markersize=10,\
+                     label='final packets = '+str(self.Jf.value[0]))
+            plt.plot(self.m.time,self.nrj.value,'b-',label='energy')
+            plt.ylabel('Value')
+            plt.legend()
+            plt.subplot(2,1,2)
+            plt.plot(self.m.time,self.pr.value,'k.-',label='packet rate')
+            plt.ylabel('Rate')
+            plt.xlabel('Time (yr)')
+            plt.legend()
+            plt.show()
 
 
 if __name__ == "__main__":
-    testNode = MPCnode(1,20,20,0.005,10,11)
+    testNode = MPCnode(1,20,20,15,10,11)
     dist = 70
-    for i in range(20):
-        testNode.controlPR()
+    """
+    for i in range(5):
+        testNode.controlPR(-0.5)
         print(testNode.PA)
-        dist -= 1
+    """
+    for i in range(1):
+        testNode.controlPR(-1.5)
+        print(testNode.PA)
 
 
 

@@ -275,7 +275,7 @@ class Node:
         :param desiredPR: The desired packet rate
         '''
 
-        if type(desiredPR) == int:
+        if desiredPR == round(desiredPR):
             self.PA = desiredPR
         else:  # In case the desired PR is not an int, the PR is rounded to closest int. THIS MIGHT NEED TO BE CHANGED!!
             self.PA = round(desiredPR)
