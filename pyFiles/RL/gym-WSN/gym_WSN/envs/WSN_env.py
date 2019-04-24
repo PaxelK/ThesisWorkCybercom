@@ -55,7 +55,7 @@ class WSN(gym.Env):
             0,
             0])
 
-        self.action_space = spaces.Discrete(6)
+        self.action_space = spaces.Discrete(5)
         self.observation_space = spaces.Box(low, high, dtype=np.float32)
 
         self.seed()
@@ -65,7 +65,6 @@ class WSN(gym.Env):
         for i in range(numNodes):
             self.state.append(self.EE.nodes[i].PA)
 
-        self.steps_beyond_done = None
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -82,28 +81,28 @@ class WSN(gym.Env):
         xPos, yPos, PR = self.state
         PR = [PR]  # Convert to list
 
-        # Default values
-        reward = 0
+        # Default values, Change if there are more than one node
+        reward = self.EE.nodes[0].getEnergy() * 10
         done = False
 
         if len(self.EE.deadNodes) == numNodes:
             done = True
 
         if action == 0:
-            self.state[1] -= 1  # yPos -
+            self.state[1] = max(0, self.state[1]-1)  # yPos -
             self.EE.updateEnv(0, -1, PR)
 
 
         elif action == 1:
-            self.state[1] += 1  # yPos +
+            self.state[1] = min(ySize, self.state[1] + 1)  # yPos +
             self.EE.updateEnv(0, 1, PR)
 
         elif action == 2:
-            self.state[0] += 1  # xPos +
+            self.state[0] = min(xSize, self.state[0] + 1)  # xPos +
             self.EE.updateEnv(1, 0, PR)
 
         elif action == 3:
-            self.state[0] -= 1  # xPos -
+            self.state[0] = max(0, self.state[0] - 1)  # xPos -
             self.EE.updateEnv(-1, 0, PR)
 
         # PR is hard coded for one node
@@ -119,6 +118,7 @@ class WSN(gym.Env):
             self.state[2][1] = self.EE.nodes[0].PA  # PR -
             self.EE.updateEnv(0, 0, PR)
 
+
         self.EE.cluster()
         self.EE.communicate()
         self.EE.iterateRound()
@@ -133,13 +133,88 @@ class WSN(gym.Env):
 
         TODO: Reset the environment parameters as well, eg. packets sent, energy consumed etc.
         '''
+        '''
+        self.EE = EnvironmentEngine()  # Reinitiate environment engine
+
+        self.rnd = 0
+        self.done = False
+        self.state = self.EE.getStates()[0:2]  # Gets the x and y position of sink
+        for i in range(numNodes):
+            self.state.append(self.EE.nodes[i].PA)
+        '''
+
+        # Currently designed for one node, needs to be changed later
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
             self.state.append([i, random.randint(0, self.PRamount - 1)])
+            self.EE.nodes[i].energy = random.random() * maxNrj
+            self.EE.nodes[i].SoC = self.EE.nodes[i].energy / self.EE.nodes[i].maxEnergy
+            self.PS = 0  # Packages sent = amount of packages the node has sent
+            self.EE.nrjCons = 0  # Energy consumed [J] = Amount of energy the node has consumed
+            self.EE.CHflag = 0  # Determines if node has been CH during a LEACH episode
+            self.EE.conChildren = 0  # Number of connected children.
+            self.EE.tempDataRec = 0  # Temporary held data that are then going to the sink.
+
+            if self.EE.nodes[i].energy > 0:
+                self.EE.nodes[i].alive = True  # Boolean for if node is alive
+            else:
+                self.EE.nodes[i].alive = False
+
+        self.EE.rnd = 1  # Round number
+        self.EE.nodesAlive = []  # Contains the amount of nodes that are alive after each round
+        self.EE.EClist = []  # List that  contains the energy consumed after each round
+        self.EE.PackReclist = []  # List that contains the data packets received for the sink after each round
+        self.EE.meanEClist = []  # List that contains the mean energy consumed after each round
+        self.EE.deadNodes = []  # Contains the amount of dead nodes after each round
+
+        self.EE.sink.dataRec = 0
+        self.EE.sink.nrjCons = 0
+        self.EE.sink.SoC = self.EE.sink.energy / self.EE.sink.maxEnergy
+
+        self.EE.plotDeadNodes = []  # Used for plotting amount of dead nodes
+
+        tempNRJ = 0
+
+        for node in self.EE.nodes:  # Iterate over all nodes
+            tempNRJ += node.nrjCons
+            if node.alive:  # If node is still alive
+                self.EE.nodesAlive.append(node)
+            else:  # Else node is dead
+                self.EE.deadNodes.append(node)
+
+        self.EE.plotDeadNodes = [len(self.EE.deadNodes)]
+
+        nrjMean = 0
+        if self.EE.nodesAlive:  # If there are nodes alive
+            nrjMean = tempNRJ / len(self.EE.nodesAlive)  # Mean energy consumed by all nodes
+
+        # For plotting purpose
+        self.EE.EClist.append(tempNRJ)
+        self.EE.PackReclist.append(self.EE.sink.dataRec)
+        self.EE.meanEClist.append(nrjMean)
+
+
+        # For plotting a fixed time length
+        self.EE.plotRnd = [1]
+
+        if (len(self.EE.EClist) or len(self.EE.PackReclist) or len(self.EE.plotDeadNodes) or len(self.EE.meanEClist) or
+            len(self.EE.plotRnd)) > plotlen:
+            del self.EE.EClist[0]
+            del self.EE.PackReclist[0]
+            del self.EE.plotDeadNodes[0]
+            del self.EE.meanEClist[0]
+            del self.EE.plotRnd[0]
+
         return np.array(self.state)
+
 
     def render(self, mode='human'):
         plotEnv(self.EE)
+
+
+
+
+
 
 
 

@@ -10,19 +10,6 @@ from setParams import *
 from plotEnv import *
 from EnvironmentEngine import *
 
-'''
-# Testing step method
-
-ctrl.step(0)
-ctrl.step(1)
-ctrl.step(2)
-ctrl.step(3)
-ctrl.step(4)
-ctrl.step(5)
-'''
-
-#print(a)
-#ctrl.reset()
 class RLctrl():
     def __init__(self):
         self.env = gym.make('WSN-v0')
@@ -60,16 +47,19 @@ class RLctrl():
         self.Q[state_old][action] += alpha * (reward + self.gamma * np.max(self.Q[state_new]) - self.Q[state_old][action])
 
     def run(self):
-        current_state = self.discretize(self.env.reset())
-        done = False
 
-        while not done:
-            self.env.render()
-            action = self.choose_action(current_state, self.epsilon)
-            obs, reward, done, _ = self.env.step(action)
-            new_state = self.discretize(obs)
-            self.update_q(current_state, action, reward, new_state, self.alpha)
-            current_state = new_state
+        for i in range(self.n_episodes):
+            current_state = self.discretize(self.env.reset())
+            done = False
+
+            while not done:
+                #self.env.render()
+                action = self.choose_action(current_state, self.epsilon)
+                obs, reward, done, _ = self.env.step(action)
+                new_state = self.discretize(obs)
+                self.update_q(current_state, action, reward, new_state, self.alpha)
+                current_state = new_state
+            print(f"i = {i}")
 
 
 
