@@ -1,8 +1,8 @@
-import math
 import gym
 import gym_WSN
 import random
 import numpy as np
+import math
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
@@ -14,12 +14,12 @@ class RLctrl():
     def __init__(self):
         self.env = gym.make('WSN-v0')
 
-        self.buckets = (1, 1, 1)  # Down-scaling feature space to discretize range
-        self.n_episodes = 1000  # Number of training episodes
-        self.alpha = 0.1  # Learning rate
-        self.epsilon = 0.1  # Exploration rate
-        self.gamma = 0.6  # Discount factor
-        self.ada_divisor = 25  # Used to decay learning parameters
+        self.buckets = (10, 10, 4)  # Down-scaling feature space to discretize range
+        self.n_episodes = 500  # Number of training episodes
+        self.min_alpha = 0.2  # Learning rate
+        self.min_epsilon = 0.15  # Exploration rate
+        self.gamma = 1  # Discount factor
+        self.ada_divisor = 40  # Used to decay learning parameters
 
         max_env_steps = None  # Maximum amount of steps in an episode
         if max_env_steps is not None:
@@ -41,28 +41,48 @@ class RLctrl():
         if (np.random.random() <= epsilon):
             return self.env.action_space.sample()
         else:
-            return np.argmax(self.Q[state])
+            return np.argmax(self.Q[state])  # returns the index of largest value
 
     def update_q(self, state_old, action, reward, state_new, alpha):
         self.Q[state_old][action] += alpha * (reward + self.gamma * np.max(self.Q[state_new]) - self.Q[state_old][action])
 
+    def get_epsilon(self, t):
+        return max(self.min_epsilon, min(1, 1.0 - math.log10((t + 1) / self.ada_divisor)))
+
+    def get_alpha(self, t):
+        return max(self.min_alpha, min(1, 1.0 - math.log10((t + 1) / self.ada_divisor)))
+
+
     def run(self):
+        avrRnd = []
+
 
         for i in range(self.n_episodes):
             current_state = self.discretize(self.env.reset())
-            done = False
 
+            alpha = self.get_alpha(i)
+            epsilon = self.get_epsilon(i)
+            done = False
+            ii = 0
             while not done:
+                ii += 1
                 #self.env.render()
-                action = self.choose_action(current_state, self.epsilon)
+                action = self.choose_action(current_state, epsilon)
                 obs, reward, done, _ = self.env.step(action)
                 new_state = self.discretize(obs)
-                self.update_q(current_state, action, reward, new_state, self.alpha)
+                self.update_q(current_state, action, reward, new_state, alpha)
                 current_state = new_state
-            print(f"i = {i}")
 
+            avrRnd.append(ii)
+            if (i%100==0):
+                print(f"i = {i}")
+                print(f"ii = {ii}")
+                print(f"avrRnd: {avrRnd}")
 
-
+        print(f"avrRnd: {avrRnd}")
+        file = open("qVal.txt", "w")
+        file.write(str(self.Q))
+        file.close()
 
 if __name__ == "__main__":
     solver = RLctrl()
@@ -178,9 +198,8 @@ for i in range(episodes):
         state = int(next_state)
 
 print("Training Finished")
-'''
 
-'''
+
 done = False
 # Run Q-learning after training by exploiting model to evaluate performance
 ctrl.reset() # reset position of taxi to random location

@@ -82,7 +82,7 @@ class WSN(gym.Env):
         PR = [PR]  # Convert to list
 
         # Default values, Change if there are more than one node
-        reward = self.EE.nodes[0].getEnergy() * 10
+        reward = self.EE.nodes[0].getEnergy() * 5000
         done = False
 
         if len(self.EE.deadNodes) == numNodes:
@@ -123,8 +123,8 @@ class WSN(gym.Env):
         self.EE.communicate()
         self.EE.iterateRound()
 
-        print(self.state)
-        print("---------------------")
+        #print(self.state)
+        #print("---------------------")
         return np.array(self.state), reward, done, {}
 
     def reset(self):
@@ -147,7 +147,7 @@ class WSN(gym.Env):
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
             self.state.append([i, random.randint(0, self.PRamount - 1)])
-            self.EE.nodes[i].energy = random.random() * maxNrj
+            self.EE.nodes[i].energy = maxNrj  #random.random() * maxNrj
             self.EE.nodes[i].SoC = self.EE.nodes[i].energy / self.EE.nodes[i].maxEnergy
             self.PS = 0  # Packages sent = amount of packages the node has sent
             self.EE.nrjCons = 0  # Energy consumed [J] = Amount of energy the node has consumed
