@@ -36,8 +36,8 @@ class MPCnode(Node):
         
         
         
-        #self.deltaDist = 1.5
-        self.deltaDist = self.m.SV(value = 1.5)
+        #self.deltaDist = -1.5
+        self.deltaDist = self.m.FV(value = -1.5)
         #self.deltaDist.STATUS = 1
 
                 # packet rate
@@ -72,7 +72,7 @@ class MPCnode(Node):
         # options
         self.m.options.IMODE = 6  # optimal control
         self.m.options.NODES = 3  # collocation nodes
-        self.m.options.SOLVER = 3 # solver (IPOPT)
+        self.m.options.SOLVER = 1 # solver (IPOPT)
 
 
 
@@ -86,7 +86,7 @@ class MPCnode(Node):
 
         
         # solve optimization problem
-        self.deltaDist = deltaD
+        self.deltaDist.value = 1.5
 
         self.m.solve(disp=False)
         

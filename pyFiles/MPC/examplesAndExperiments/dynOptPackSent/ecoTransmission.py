@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 m = GEKKO(remote=False)
 
 # time points
-n=101
+n=11
 m.time = np.linspace(0,10,n)
 
 # constants
@@ -24,7 +24,7 @@ PRmax = 20
 pSize = 2000
 const = 0.6
 
-packet = 1
+conChildren = 1
 E = 1
 
 # packet rate
@@ -32,7 +32,7 @@ pr = m.MV(value=1, integer = True,lb=1,ub=20)
 pr.STATUS = 1
 pr.DCOST = 0
 
-packets = m.CV(value=0)
+#packets = m.CV(value=0)
 # Energy Stored
 nrj = m.Var(value=0.05, lb=0)                  # Energy Amount
 d = m.Var(value=70, lb = 0)                     # Distance to receiver
@@ -41,8 +41,8 @@ d2 = m.Intermediate(d**2)
 
 # fish population balance
 m.Equation(d.dt() == 1.5)
-m.Equation(nrj >= Egen - ((Eelec+EDA)*packet + pr*pSize*(Eelec + Eamp * d2)))
-m.Equation(nrj.dt() == Egen - ((Eelec+EDA)*packet + pr*pSize*(Eelec + Eamp * d2)))
+m.Equation(nrj >= Egen - ((Eelec+EDA)*conChildren + pr*pSize*(Eelec + Eamp * d2)))
+m.Equation(nrj.dt() == Egen - ((Eelec+EDA)*conChildren + pr*pSize*(Eelec + Eamp * d2)))
 
 
 # objective (profit)
@@ -58,7 +58,7 @@ m.Obj(-Jf)
 # options
 m.options.IMODE = 6  # optimal control
 m.options.NODES = 3  # collocation nodes
-m.options.SOLVER = 3 # solver (IPOPT)
+m.options.SOLVER = 1 # solver (IPOPT)
 
 # solve optimization problem
 m.solve()
@@ -69,7 +69,7 @@ print('Optimal Profit: ' + str(Jf.value[0]))
 # plot results
 plt.figure(1)
 plt.subplot(2,1,1)
-plt.plot(m.time,J.value,'r--',label='packets')
+plt.plot(m.time,J.value,'r--',label='Bits')
 plt.plot(m.time[-1],Jf.value[0],'ro',markersize=10,\
          label='final packets = '+str(Jf.value[0]))
 plt.plot(m.time,nrj.value,'b-',label='energy')
