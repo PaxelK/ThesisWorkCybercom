@@ -126,6 +126,7 @@ class MPCnode(Node):
         self.v.value = self.vp
         #print(np.shape(testNode.vp))        
         
+        self.m.time = np.linspace(0, self.ctrlHrz, self.ctrlRes)
 
         self.m.solve(disp=False)
 
@@ -148,17 +149,20 @@ if __name__ == "__main__":
     for i in range(10):
         if(i==1):
             testNode.sendMsg(testNode2)
-        if((i>=2) & (i<6)):
-            testNode2.move(0,10)
+        if((i>=2) & (i<6)):        
             testNode.controlPR(10,i)
             testNode.sendMsg(testNode2)
+            testNode2.move(0,10) #May have to place this behind sendMsg()
             
         if(i>=6):
-            testNode2.move(0,-5)
             testNode.controlPR(-5,i)
             testNode.sendMsg(testNode2)
+            testNode2.move(0,-5)
         testNode.plot()
         print("Segment: {0}, PR: {1}".format(i,testNode.PA))
+        testNode.m.time 
+        
+    print(testNode2.getDataRec())
         
         
         
