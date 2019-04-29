@@ -17,16 +17,16 @@ ySize = 100
 x = 0  # Added for better display results of the plot
 y = 0  # Added for better display results of the plot
 
-numNodes = 10  # Number of Nodes in the field
+numNodes = 1  # Number of Nodes in the field
 dead_nodes = 0 # Number of Dead Nodes in the beginning
 
 #### Data Packet Info ###
-ps = 2000
+ps = 1000
 maxPR = 20				# Maximum amount of packages that can be sent during one transmission round
 
 ### Energy Values ###
 energyMode = "rand"  	# Energy mode can be "rand"=random or "distr"=distributed
-maxNrj = 0.05
+maxNrj = 2
 Eelec = 50*10**(-9)   	# Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 ETx = 50*10**(-9)     	# Units in Joules/bit
 ERx = 50*10**(-9)     	# Units in Joules/bit

@@ -17,7 +17,7 @@ class RLctrl():
         self.env = gym.make('WSN-v0')
 
         self.buckets = (51, 51, 4)  # Down-scaling feature space to discretize range
-        self.n_episodes = 2000  # Number of training episodes
+        self.n_episodes = 15  # Number of training episodes
 
         self.min_alpha = 0.2  # Learning rate
         self.min_epsilon = 0.1  # Exploration rate
@@ -46,13 +46,14 @@ class RLctrl():
         return tuple(new_obs)
 
     def choose_action(self, state, epsilon):
-        if (np.random.random() >= epsilon):
+        if (np.random.random() <= epsilon):
             return self.env.action_space.sample()
         else:
             return np.argmax(self.Q[state])  # returns the index of largest value
 
     def update_q(self, state_old, action, reward, state_new, alpha):
-        self.Q[state_old][action] += alpha * (reward + self.gamma * np.max(self.Q[state_new]) - self.Q[state_old][action])
+        self.Q[state_old][action] = (1-alpha) * self.Q[state_old][action] + alpha \
+                                    * (reward + self.gamma * np.max(self.Q[state_new]) - self.Q[state_old][action])
 
     def get_epsilon(self, t):
         return max(self.min_epsilon, min(1, 1.0 - math.log10((t + 1) / self.ada_divisor)))

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from setParams import *
 
 
 def plotEnv(env):
@@ -21,7 +22,8 @@ def plotEnv(env):
     plt.clf()
     plt.plot(nodePos[:, 0], nodePos[:, 1],  'ro', markersize = 8)
     plt.plot(xs, ys, marker='o', markersize = 16, markerfacecolor= 'g')
-
+    plt.xlim(0, xSize)
+    plt.ylim(0, ySize)
 
     # Create figure 2
     plt.figure(2)
