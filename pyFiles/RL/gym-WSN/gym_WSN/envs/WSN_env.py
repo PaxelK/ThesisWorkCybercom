@@ -12,6 +12,8 @@ from EnvironmentEngine import *
 from plotEnv import *
 
 
+
+
 # Continous WSN class
 class WSN(gym.Env):
     '''
@@ -37,6 +39,7 @@ class WSN(gym.Env):
 
         self.EE = EnvironmentEngine()
 
+
         self.xSize = xSize
         self.ySize = ySize
 
@@ -46,16 +49,20 @@ class WSN(gym.Env):
 
         # By using a system grid size of 100x100 we get a step size of 2 m
         high = np.array([
-            int(self.xSize / 50),
-            int(self.ySize / 50),
-            4])
+            int(self.xSize),
+            int(self.ySize),
+            self.PRamount])
+        #high = np.array([
+              #int(self.xSize / 50),
+              #int(self.ySize / 50),
+              #6])
 
         low = np.array([
             0,
             0,
             0])
 
-        self.action_space = spaces.Discrete(5)
+        self.action_space = spaces.Discrete(6)
         self.observation_space = spaces.Box(low, high, dtype=np.float32)
 
         self.seed()
@@ -82,49 +89,59 @@ class WSN(gym.Env):
         PR = [PR]  # Convert to list
 
         # Default values, Change if there are more than one node
-        reward = self.EE.nodes[0].getEnergy() * 5000
+        reward = self.EE.nodes[0].getEnergy() * 0.1
         done = False
 
         if len(self.EE.deadNodes) == numNodes:
             done = True
 
         if action == 0:
-            self.state[1] = max(0, self.state[1]-1)  # yPos -
-            self.EE.updateEnv(0, -1, PR)
-
+            self.state[1] = max(0, self.state[1]-2)  # yPos -
+            self.EE.updateEnv(0, -2, PR)
 
         elif action == 1:
-            self.state[1] = min(ySize, self.state[1] + 1)  # yPos +
-            self.EE.updateEnv(0, 1, PR)
+            self.state[1] = min(ySize, self.state[1] + 2)  # yPos +
+            self.EE.updateEnv(0, 2, PR)
 
         elif action == 2:
-            self.state[0] = min(xSize, self.state[0] + 1)  # xPos +
-            self.EE.updateEnv(1, 0, PR)
+            self.state[0] = min(xSize, self.state[0] + 2)  # xPos +
+            self.EE.updateEnv(2, 0, PR)
 
         elif action == 3:
-            self.state[0] = max(0, self.state[0] - 1)  # xPos -
-            self.EE.updateEnv(-1, 0, PR)
+            self.state[0] = max(0, self.state[0] - 2)  # xPos -
+            self.EE.updateEnv(-2, 0, PR)
 
         # PR is hard coded for one node
         elif action == 4:
-            reward = 10
-            self.EE.nodes[0].PA = min(self.PRamount - 1, self.EE.nodes[0].PA + 1)
-            self.state[2][1] = self.EE.nodes[0].PA  # PR +
-            self.EE.updateEnv(0, 0, PR)
+            if self.EE.nodes[0].PA < self.PRamount:
+                reward += 10
+                PR = [[PR[0][0], PR[0][1]+1]]
+                self.state[2][1] = self.EE.nodes[0].PA  # PR +
+                self.EE.updateEnv(0, 0, PR)
+            else:
+                reward = -10
 
         elif action == 5:
-            reward = -10
-            self.EE.nodes[0].PA = max(0, self.EE.nodes[0].PA - 1)
-            self.state[2][1] = self.EE.nodes[0].PA  # PR -
-            self.EE.updateEnv(0, 0, PR)
+            if self.EE.nodes[0].PA > 1:
+                reward += -10
+                PR = [[PR[0][0], PR[0][1]-1]]
+                self.state[2][1] = self.EE.nodes[0].PA  # PR -
+                self.EE.updateEnv(0, 0, PR)
+            else:
+                reward = - 10
 
 
         self.EE.cluster()
+        self.EE.nodes[0].CHstatus = 1
         self.EE.communicate()
         self.EE.iterateRound()
 
-        #print(self.state)
-        #print("---------------------")
+        '''
+        print(f"self.state: {self.state}")
+        print(f"self.EE.sink.getPos(): {self.EE.sink.getPos(), self.EE.nodes[0].PA}")
+        print("---------------------")
+        '''
+
         return np.array(self.state), reward, done, {}
 
     def reset(self):
@@ -146,10 +163,10 @@ class WSN(gym.Env):
         # Currently designed for one node, needs to be changed later
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
-            self.state.append([i, random.randint(0, self.PRamount - 1)])
+            self.state.append([i, random.randint(0, self.PRamount)])
             self.EE.nodes[i].energy = maxNrj  #random.random() * maxNrj
             self.EE.nodes[i].SoC = self.EE.nodes[i].energy / self.EE.nodes[i].maxEnergy
-            self.PS = 0  # Packages sent = amount of packages the node has sent
+            self.EE.PS = 0  # Packages sent = amount of packages the node has sent
             self.EE.nrjCons = 0  # Energy consumed [J] = Amount of energy the node has consumed
             self.EE.CHflag = 0  # Determines if node has been CH during a LEACH episode
             self.EE.conChildren = 0  # Number of connected children.
@@ -160,15 +177,20 @@ class WSN(gym.Env):
             else:
                 self.EE.nodes[i].alive = False
 
+
         self.EE.rnd = 1  # Round number
         self.EE.nodesAlive = []  # Contains the amount of nodes that are alive after each round
         self.EE.EClist = []  # List that  contains the energy consumed after each round
         self.EE.PackReclist = []  # List that contains the data packets received for the sink after each round
         self.EE.meanEClist = []  # List that contains the mean energy consumed after each round
         self.EE.deadNodes = []  # Contains the amount of dead nodes after each round
+        self.EE.posNodes = []  # The position of the nodes
+
 
         self.EE.sink.dataRec = 0
         self.EE.sink.nrjCons = 0
+        self.EE.sink.xPos = int(xSize * random.random())
+        self.EE.sink.yPos = int(ySize * random.random())
         self.EE.sink.SoC = self.EE.sink.energy / self.EE.sink.maxEnergy
 
         self.EE.plotDeadNodes = []  # Used for plotting amount of dead nodes
@@ -193,6 +215,10 @@ class WSN(gym.Env):
         self.EE.PackReclist.append(self.EE.sink.dataRec)
         self.EE.meanEClist.append(nrjMean)
 
+        for node in self.EE.nodesAlive:  # Saves the position of all the nodes in a list
+            xnd, ynd = node.getPos()
+            self.EE.posNodes.append([xnd, ynd])
+        self.EE.posNodes = np.array(self.EE.posNodes)
 
         # For plotting a fixed time length
         self.EE.plotRnd = [1]
@@ -204,6 +230,7 @@ class WSN(gym.Env):
             del self.EE.plotDeadNodes[0]
             del self.EE.meanEClist[0]
             del self.EE.plotRnd[0]
+
 
         return np.array(self.state)
 

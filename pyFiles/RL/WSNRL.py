@@ -10,15 +10,19 @@ from setParams import *
 from plotEnv import *
 from EnvironmentEngine import *
 
+import matplotlib.pyplot as plt
+
 class RLctrl():
     def __init__(self):
         self.env = gym.make('WSN-v0')
 
-        self.buckets = (10, 10, 4)  # Down-scaling feature space to discretize range
-        self.n_episodes = 500  # Number of training episodes
+        self.buckets = (51, 51, 4)  # Down-scaling feature space to discretize range
+        self.n_episodes = 2000  # Number of training episodes
+
         self.min_alpha = 0.2  # Learning rate
-        self.min_epsilon = 0.15  # Exploration rate
-        self.gamma = 1  # Discount factor
+        self.min_epsilon = 0.1  # Exploration rate
+        self.gamma = 0.6
+        # Discount factor
         self.ada_divisor = 40  # Used to decay learning parameters
 
         max_env_steps = None  # Maximum amount of steps in an episode
@@ -26,6 +30,10 @@ class RLctrl():
             self.env._max_episode_steps = max_env_steps
 
         self.Q = np.zeros(self.buckets + (self.env.action_space.n,))
+
+        print(f"len(self.Q): {len(self.Q)}")
+        print(f"len(self.Q)[1]: {len(self.Q[0])}")
+        #print(f"self.Q: {self.Q}")
 
     def discretize(self, obs):
         # Needs to be updated to handle more than one node
@@ -38,7 +46,7 @@ class RLctrl():
         return tuple(new_obs)
 
     def choose_action(self, state, epsilon):
-        if (np.random.random() <= epsilon):
+        if (np.random.random() >= epsilon):
             return self.env.action_space.sample()
         else:
             return np.argmax(self.Q[state])  # returns the index of largest value
@@ -55,7 +63,6 @@ class RLctrl():
 
     def run(self):
         avrRnd = []
-
 
         for i in range(self.n_episodes):
             current_state = self.discretize(self.env.reset())
@@ -75,14 +82,33 @@ class RLctrl():
 
             avrRnd.append(ii)
             if (i%100==0):
-                print(f"i = {i}")
-                print(f"ii = {ii}")
+                print(f"i = {i}")  # Amount of episodes
+                print(f"ii = {ii}")  # Amount of rounds per episodes
                 print(f"avrRnd: {avrRnd}")
 
         print(f"avrRnd: {avrRnd}")
-        file = open("qVal.txt", "w")
-        file.write(str(self.Q))
-        file.close()
+
+        x = np.linspace(0, len(avrRnd), num=len(avrRnd), endpoint=True)
+        plt.plot(x, avrRnd)
+        plt.show()
+
+
+        # Render the learned model
+
+        current_state = self.discretize(self.env.reset())
+        done = False
+        while not done:
+            self.env.render()
+            action = self.choose_action(current_state, epsilon)
+            obs, reward, done, _ = self.env.step(action)
+            new_state = self.discretize(obs)
+            self.update_q(current_state, action, reward, new_state, alpha)
+            current_state = new_state
+
+
+
+
+
 
 if __name__ == "__main__":
     solver = RLctrl()

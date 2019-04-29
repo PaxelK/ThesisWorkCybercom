@@ -13,7 +13,6 @@ class EnvironmentEngine:
         '''
         The __init__ method is the class constructor and initializes the variables
         '''
-
         self.sink = Sink(xSize, ySize)  # Creates an instance of sink class
         self.nodes = []  # Create an empty list to hold the nodes
         # Initializes a node for each node in WSN
