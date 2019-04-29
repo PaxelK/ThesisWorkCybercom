@@ -1,6 +1,6 @@
 import math  # Needed for sqrt
 import random
-from setParams import *
+import setParams as sP
 
 
 class Node:
@@ -23,10 +23,10 @@ class Node:
         self.ID = id                           # ID of node
         self.xPos = x                          # x and y position of node
         self.yPos = y
-        self.pSize = ps                        # Preset packet size of each message
+        self.pSize = sP.ps                        # Preset packet size of each message
         self.PA = 1                            # Packet amount = amount of packets sent each transmission round
         self.energy = nrj                      # Create amount of energy [J] residing in node
-        self.maxEnergy = maxNrj                  # Max amount of energy [J] that can be stored in node
+        self.maxEnergy = sP.maxNrj                  # Max amount of energy [J] that can be stored in node
         self.SoC = self.energy / self.maxEnergy  # State of charge = Percentage of charge in node
         self.CHstatus = 0                      # Cluster head status: 1 if CH, 0 if not CH
         self.CHparent = None                   # Reference to the nodes current cluster head
@@ -37,7 +37,7 @@ class Node:
         self.CHflag = 0                        # Determines if node has been CH during a LEACH episode
         self.conChildren = 0                   # Number of connected children.
         self.tempDataRec = 0                   # Temporary held data that are then going to the sink.
-
+        self.maxPR = sP.maxPR                  # Maximum amount of packets that can be sent during a transmission round
         if self.energy > 0:
             self.alive = True                  # Boolean for if node is alive
         else:
@@ -182,10 +182,10 @@ class Node:
                     
             k = self.PA * self.pSize  # k = the amount of bits that are sent
             # Calculate the energy that will be spent by transmitting signal
-            distLEL = self.getDistance(self.CHparent)
+            #distLEL = self.getDistance(self.CHparent)
             #print('Node: ' + str(self.ID) + ', with dist: ' + str(distLEL))
-            ETx = Eelec * k + Eamp * k * self.getDistance(self.CHparent)**2
-            ERx = (Eelec + EDA) * self.pSize  # Calculate the energy that will be spent by receiving signal
+            ETx = sP.Eelec * k + sP.Eamp * k * self.getDistance(self.CHparent)**2
+            ERx = (sP.Eelec + sP.EDA) * self.pSize  # Calculate the energy that will be spent by receiving signal
             #EC = (Eelec + EDA) * self.pSize * self.conChildren + ETx
             #if(self.ID == 9):
             #    print('PROBE PRINT: Real EC for node ' + str(EC))
@@ -275,7 +275,7 @@ class Node:
         :param desiredPR: The desired packet rate
         '''
 
-        if type(desiredPR) == int:
+        if desiredPR == round(desiredPR):
             self.PA = desiredPR
         else:  # In case the desired PR is not an int, the PR is rounded to closest int. THIS MIGHT NEED TO BE CHANGED!!
             self.PA = round(desiredPR)
@@ -293,7 +293,7 @@ class Node:
         to make it more "natural".
         '''
 
-        maxNrjGenerated = self.maxEnergy * nrjGenFac
+        maxNrjGenerated = self.maxEnergy * sP.nrjGenFac
         nrj_generated = random.random() * maxNrjGenerated
         self.energy = self.energy + nrj_generated
 
