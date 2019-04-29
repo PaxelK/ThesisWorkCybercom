@@ -50,16 +50,24 @@ class MPCnode(Node):
         # define how much data must be transmitted
         amount = self.pSize*100 
         self.data = self.m.Var(value = amount, lb = 0)
+        self.ps = self.m.Var(value = self.PS, lb = 0)
         
         # energy to transmit
         self.e = self.m.Intermediate(((Eelec+EDA)*self.packet + self.dtr*self.pSize*(Eelec + Eamp * self.dist**2)) - self.Egen)
         # equations
         
+        # Set a deadline counter EXPERIMENTAL
+        #self.deadline = self.m.Var(value = 0, ub = self.ctrlRes)
+        #self.m.Equation(self.deadline.dt() == 1)
+        
         # track the position
         self.m.Equation(self.dist.dt() == self.v)
         self.m.Equation(self.nrj_stored.dt() == -self.e)
+        self.m.Equation(self.ps.dt() == self.dtr*self.pSize)
         # as data is transmitted, remaining data stored decreases
         self.m.Equation(self.data.dt() == -self.dtr*self.pSize)
+        
+        
         # self.m.Equation(self.energy >= self.e)
         
         # objective
@@ -68,7 +76,10 @@ class MPCnode(Node):
         # soft (objective constraint)
         self.final = self.m.Param(value=np.zeros(self.ctrlRes))
         self.final.value[-1] = 1
+        #self.m.Equation(self.final*(self.data)<=0)
         self.m.Obj(self.data*self.final) # transmit data by the end
+        
+        
         
         # hard constraint
         # this form may cause infeasibility if it can't achieve
@@ -97,6 +108,10 @@ class MPCnode(Node):
         plt.plot(self.m.time,self.e.value,'b-',label='Energy Consumption')
         plt.legend()
         
+        #plt.subplot(6,1,3)
+        #plt.plot(self.m.time,self.ps,'b-',label='Bits Sent')
+        #plt.legend()
+        
         plt.subplot(6,1,4)
         plt.plot(self.m.time, self.data.value,'k.-',label='Data Remaining')
         plt.legend()
@@ -121,32 +136,51 @@ class MPCnode(Node):
     
     def controlPR(self, velocity, timepoint):        
         # solve optimization problem
-        self.vp = np.ones(self.ctrlRes)
+        self.vp = np.zeros(self.ctrlRes)
         self.vp[timepoint:] = velocity
         self.v.value = self.vp
         #print(np.shape(testNode.vp))        
         
-        self.m.time = np.linspace(0, self.ctrlHrz, self.ctrlRes)
+        self.dtrp = np.zeros(self.ctrlRes)
+        self.dtrp[:timepoint] = self.dtr.value[timepoint]
+        self.dtr.value = self.dtrp
+        
+        #self.deadlinep = np.zeros(self.ctrlRes)
+        #self.deadlinep[:timepoint] = self.deadline.value[timepoint]
+        #self.deadline.value = self.deadlinep
 
+        
+        #self.data.value = 
+        #self.datap = np.zeros(self.ctrlRes)
+        #self.datap[:timepoint] = self.data.value[timepoint]
+        #self.data.value = self.datap
+        
         self.m.solve(disp=False)
 
-        self.setPR(self.dtr.value[timepoint+1])
+        self.setPR(self.dtr.value[timepoint])
+        print(self.dtr.value[timepoint])
+        print(self.PA)
 
 
 
 if __name__ == "__main__":
-    testNode = MPCnode(1,20,20,0.05,10,11)
+    Hrz = 10
+    Res = Hrz + 1
+    
+    testNode = MPCnode(1,20,20,0.05,Hrz,Res)
     testNode.CHstatus = 1
     testNode2 = Sink(100, 100)
     testNode.connect(testNode2)
-    print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
+    #print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
     testNode2.move(-30,-10)
-    print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
-    print('Distance to sink: {0}'.format(testNode.getDistance(testNode2)))
+    #print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
+    #print('Distance to sink: {0}'.format(testNode.getDistance(testNode2)))
     
     
     testNode.plot()
-    for i in range(10):
+    #testNode.controlPR(0,0)
+    for i in range(Hrz):
+        """
         if(i==1):
             testNode.sendMsg(testNode2)
         if((i>=2) & (i<6)):        
@@ -158,9 +192,14 @@ if __name__ == "__main__":
             testNode.controlPR(-5,i)
             testNode.sendMsg(testNode2)
             testNode2.move(0,-5)
+        """
+        #testNode.setPR(testNode.dtr.value[i])
+        testNode.controlPR(0,i)
+        testNode.sendMsg(testNode2)
+        print("Segment: {0}, PR: {1}, PS: {2}".format(i,testNode.PA, testNode.getPS()))
+        print(testNode.data.value)
+        #print(sum(testNode.dtr.value))
         testNode.plot()
-        print("Segment: {0}, PR: {1}".format(i,testNode.PA))
-        testNode.m.time 
         
     print(testNode2.getDataRec())
         
