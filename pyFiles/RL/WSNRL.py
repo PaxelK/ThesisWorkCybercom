@@ -16,14 +16,13 @@ class RLctrl():
     def __init__(self):
         self.env = gym.make('WSN-v0')
 
-        self.buckets = (51, 51, 4)  # Down-scaling feature space to discretize range
-        self.n_episodes = 15  # Number of training episodes
+        self.buckets = (101, 101, 5)  # Down-scaling feature space to discretize range
+        self.n_episodes = 750  # Number of training episodes
 
         self.min_alpha = 0.2  # Learning rate
         self.min_epsilon = 0.1  # Exploration rate
-        self.gamma = 0.6
-        # Discount factor
-        self.ada_divisor = 40  # Used to decay learning parameters
+        self.gamma = 0.6  # Discount factor
+        self.ada_divisor = 25  # Used to decay learning parameters
 
         max_env_steps = None  # Maximum amount of steps in an episode
         if max_env_steps is not None:
@@ -36,6 +35,7 @@ class RLctrl():
         #print(f"self.Q: {self.Q}")
 
     def discretize(self, obs):
+        # This method discretizes each state into the sizes that are specified in self.buckets
         # Needs to be updated to handle more than one node
         upper_bounds = [self.env.observation_space.high[0], self.env.observation_space.high[1], self.env.observation_space.high[2]]
         lower_bounds = [self.env.observation_space.low[0], self.env.observation_space.low[1], self.env.observation_space.low[2]]
@@ -75,12 +75,13 @@ class RLctrl():
             while not done:
                 ii += 1
                 #self.env.render()
-                action = self.choose_action(current_state, epsilon)
+                action = self.choose_action(current_state, self.min_epsilon)
                 obs, reward, done, _ = self.env.step(action)
                 new_state = self.discretize(obs)
-                self.update_q(current_state, action, reward, new_state, alpha)
+                self.update_q(current_state, action, reward, new_state, self.min_alpha)
                 current_state = new_state
 
+            # Development stuff
             avrRnd.append(ii)
             if (i%100==0):
                 print(f"i = {i}")  # Amount of episodes
@@ -104,8 +105,9 @@ class RLctrl():
             obs, reward, done, _ = self.env.step(action)
             new_state = self.discretize(obs)
             self.update_q(current_state, action, reward, new_state, alpha)
+            print(f"state_old: {current_state}")
+            print(f"action: {action}")
             current_state = new_state
-
 
 
 

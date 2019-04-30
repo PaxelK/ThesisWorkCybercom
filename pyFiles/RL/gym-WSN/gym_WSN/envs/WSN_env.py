@@ -43,7 +43,6 @@ class WSN(gym.Env):
         self.xSize = xSize
         self.ySize = ySize
 
-        self.rnd = 0
         self.numNodes = numNodes
         self.PRamount = 4  # Amount of values PR can be
 
@@ -79,7 +78,6 @@ class WSN(gym.Env):
 
     def step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
-        self.rnd += 1
 
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
         for i in range(numNodes):
@@ -88,28 +86,43 @@ class WSN(gym.Env):
         xPos, yPos, PR = self.state
         PR = [PR]  # Convert to list
 
-        # Default values, Change if there are more than one node
-        reward = self.EE.nodes[0].getEnergy() * 0.1
+        # Default values, needs to be changed if there are more than one node
+        reward = - 2
+        reward -= (self.EE.nodes[0].getDistance(self.EE.sink) * 0.01)
+        reward += (self.EE.nodes[0].getEnergy() * 0.0011)
+
         done = False
 
         if len(self.EE.deadNodes) == numNodes:
             done = True
 
         if action == 0:
-            self.state[1] = max(0, self.state[1]-2)  # yPos -
-            self.EE.updateEnv(0, -2, PR)
+            if self.state[1] > 0:
+                self.state[1] -= 1  # yPos -
+                self.EE.updateEnv(0, -1, PR)
+            else:
+                reward = -5
 
         elif action == 1:
-            self.state[1] = min(ySize, self.state[1] + 2)  # yPos +
-            self.EE.updateEnv(0, 2, PR)
+            if self.state[1] < ySize:
+                self.state[1] += 1  # yPos +
+                self.EE.updateEnv(0, 1, PR)
+            else:
+                reward = -5
 
         elif action == 2:
-            self.state[0] = min(xSize, self.state[0] + 2)  # xPos +
-            self.EE.updateEnv(2, 0, PR)
+            if self.state[0] < xSize:
+                self.state[0] += 1  # xPos +
+                self.EE.updateEnv(1, 0, PR)
+            else:
+                reward = -5
 
         elif action == 3:
-            self.state[0] = max(0, self.state[0] - 2)  # xPos -
-            self.EE.updateEnv(-2, 0, PR)
+            if self.state[0] > 0:
+                self.state[0] -= 1  # xPos -
+                self.EE.updateEnv(-1, 0, PR)
+            else:
+                reward = -5
 
         # PR is hard coded for one node
         elif action == 4:
@@ -128,7 +141,7 @@ class WSN(gym.Env):
                 self.state[2][1] = self.EE.nodes[0].PA  # PR -
                 self.EE.updateEnv(0, 0, PR)
             else:
-                reward = - 10
+                reward = -10
 
 
         self.EE.cluster()

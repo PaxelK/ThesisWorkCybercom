@@ -44,7 +44,7 @@ def q_learning(env):
     gamma = 0.6  # Discount factor for q-values future in time
     epsilon = 0.1  # Exploration rate for exploring the model
 
-    episodes = 10000  # Amount of episodes that the agent trains on
+    episodes = 1000  # Amount of episodes that the agent trains on
 
     #For displaying results
     all_epochs = []  # Time steps
