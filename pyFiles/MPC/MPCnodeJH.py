@@ -20,6 +20,7 @@ class MPCnode(Node):
         self.verbose = False
         
         self.m = GEKKO(remote=False)
+        
         # time points
         self.ctrlHrz = ctrlHrz                  # Control Horizon
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
@@ -48,8 +49,8 @@ class MPCnode(Node):
         self.nrj_stored = self.m.Var(value = self.energy, lb = 0)
         
         # define how much data must be transmitted
-        amount = self.pSize*100 
-        self.data = self.m.Var(value = amount, lb = 0)
+        amount = self.pSize*100
+        self.data = self.m.Var(value = amount, lb  = 0)
         self.ps = self.m.Var(value = self.PS, lb = 0)
         
         # energy to transmit
@@ -91,7 +92,9 @@ class MPCnode(Node):
         self.m.options.SOLVER = 1 # solver (IPOPT)
         self.m.solve(disp=False)
         
-       
+        self.setPR(self.dtr.value[0])
+        
+        
         
         
     def plot(self):
@@ -136,35 +139,34 @@ class MPCnode(Node):
     
     def controlPR(self, velocity, timepoint):        
         # solve optimization problem
-        self.vp = np.zeros(self.ctrlRes)
-        self.vp[timepoint:] = velocity
-        self.v.value = self.vp
+        #self.vp = np.zeros(self.ctrlRes)
+        #self.vp[timepoint:] = velocity
+        #self.v.value = self.vp
         #print(np.shape(testNode.vp))        
         
         self.dtrp = np.zeros(self.ctrlRes)
-        self.dtrp[:timepoint] = self.dtr.value[timepoint]
+        self.dtrp[0] = self.dtr.value[1]
         self.dtr.value = self.dtrp
         
         #self.deadlinep = np.zeros(self.ctrlRes)
         #self.deadlinep[:timepoint] = self.deadline.value[timepoint]
         #self.deadline.value = self.deadlinep
-
         
-        #self.data.value = 
-        #self.datap = np.zeros(self.ctrlRes)
-        #self.datap[:timepoint] = self.data.value[timepoint]
-        #self.data.value = self.datap
-        
+        self.datap = np.zeros(self.ctrlRes)
+        self.datap[0] = self.data.value[1]
+        self.data.value = self.datap
+        self.m.TIME_SHIFT = 1
         self.m.solve(disp=False)
+        
 
-        self.setPR(self.dtr.value[timepoint])
-        print(self.dtr.value[timepoint])
-        print(self.PA)
+        self.setPR(self.dtr.value[0])
+        #print(self.dtr.value[timepoint])
+        #print(self.PA)
 
 
 
 if __name__ == "__main__":
-    Hrz = 10
+    Hrz = 8
     Res = Hrz + 1
     
     testNode = MPCnode(1,20,20,0.05,Hrz,Res)
@@ -175,10 +177,13 @@ if __name__ == "__main__":
     testNode2.move(-30,-10)
     #print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
     #print('Distance to sink: {0}'.format(testNode.getDistance(testNode2)))
-    
+    print("Segment: {0}, PR: {1}, PS: {2}".format(0,testNode.PA, testNode.getPS()))
+    print(testNode.data.value)
+    testNode.sendMsg(testNode2)
     
     testNode.plot()
     #testNode.controlPR(0,0)
+    #testNode.m.time[Hrz-1] = testNode.m.time[Hrz]-0.0000000000001
     for i in range(Hrz):
         """
         if(i==1):
@@ -194,12 +199,16 @@ if __name__ == "__main__":
             testNode2.move(0,-5)
         """
         #testNode.setPR(testNode.dtr.value[i])
-        testNode.controlPR(0,i)
-        testNode.sendMsg(testNode2)
-        print("Segment: {0}, PR: {1}, PS: {2}".format(i,testNode.PA, testNode.getPS()))
+        testNode.controlPR(0,i+1)
+        print("Segment: {0}, PR: {1}, PS: {2}".format(i+1,testNode.PA, testNode.getPS()))
         print(testNode.data.value)
+        testNode.sendMsg(testNode2)
+     
+        
         #print(sum(testNode.dtr.value))
         testNode.plot()
+        #testNode.m.time[Hrz-(i+1)] = testNode.m.time[Hrz]-0.00000000001*(i+1)
+        
         
     print(testNode2.getDataRec())
         
