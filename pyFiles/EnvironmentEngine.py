@@ -25,7 +25,6 @@ class EnvironmentEngine:
         else:
             print("The choice of energy mode is invalid! \n")
 
-
         self.rnd = 1  # Round number
         self.states = []
         self.nodesAlive = []  # Contains the amount of nodes that are alive after each round
@@ -72,8 +71,6 @@ class EnvironmentEngine:
             del self.plotDeadNodes[0]
             del self.meanEClist[0]
             del self.plotRnd[0]
-
-
 
     def updateEnv(self, deltaX, deltaY, packetRates):
         '''

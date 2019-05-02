@@ -1,6 +1,5 @@
 import gym
 import gym_WSN
-import random
 import numpy as np
 import math
 
@@ -17,7 +16,7 @@ class RLctrl():
         self.env = gym.make('WSN-v0')
 
         self.buckets = (101, 101, 5)  # Down-scaling feature space to discretize range
-        self.n_episodes = 750  # Number of training episodes
+        self.n_episodes = 200  # Number of training episodes
 
         self.min_alpha = 0.2  # Learning rate
         self.min_epsilon = 0.1  # Exploration rate
@@ -46,10 +45,13 @@ class RLctrl():
         return tuple(new_obs)
 
     def choose_action(self, state, epsilon):
-        if (np.random.random() <= epsilon):
+        if np.random.random() <= epsilon:
             return self.env.action_space.sample()
         else:
             return np.argmax(self.Q[state])  # returns the index of largest value
+
+    def expoit_model(self, state):
+        return np.argmax(self.Q[state])  # returns the index of largest value
 
     def update_q(self, state_old, action, reward, state_new, alpha):
         self.Q[state_old][action] = (1-alpha) * self.Q[state_old][action] + alpha \
@@ -81,7 +83,7 @@ class RLctrl():
                 self.update_q(current_state, action, reward, new_state, self.min_alpha)
                 current_state = new_state
 
-            # Development stuff
+            # Stuff for development purposes
             avrRnd.append(ii)
             if (i%100==0):
                 print(f"i = {i}")  # Amount of episodes
@@ -101,15 +103,13 @@ class RLctrl():
         done = False
         while not done:
             self.env.render()
-            action = self.choose_action(current_state, epsilon)
+            action = self.choose_action(current_state, self.min_epsilon)
             obs, reward, done, _ = self.env.step(action)
             new_state = self.discretize(obs)
-            self.update_q(current_state, action, reward, new_state, alpha)
+            self.update_q(current_state, action, reward, new_state, self.min_alpha)
             print(f"state_old: {current_state}")
             print(f"action: {action}")
             current_state = new_state
-
-
 
 
 

@@ -12,8 +12,8 @@ p = 0.05  # Suggested percentage of cluster head, a 5 percent of the total amoun
 ########################### Network Establishment Parameters ###############################
 ### Area of Operation ###
 # Field Dimensions in meters #
-xSize = 100
-ySize = 100
+xSize = 40
+ySize = 40
 x = 0  # Added for better display results of the plot
 y = 0  # Added for better display results of the plot
 

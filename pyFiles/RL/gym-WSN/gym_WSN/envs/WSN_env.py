@@ -1,18 +1,17 @@
+# Import the WSN RL env
 import gym
 from gym.utils import seeding
+# Import needed libraries
 import numpy as np
 from gym.envs.toy_text import discrete
 from random import *
 from gym import spaces
-
+# Import needed files
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from setParams import *
 from EnvironmentEngine import *
 from plotEnv import *
-
-
-
 
 # Continous WSN class
 class WSN(gym.Env):
@@ -22,7 +21,7 @@ class WSN(gym.Env):
     Observation         Min     Max
     X position          0       xSize
     Y position          0       ySize
-    (CHstatus           0       1)
+    (CHstatus           0       1) (Not implemented as of now)
     PR                  0       3
 
     # Actions:
@@ -34,116 +33,121 @@ class WSN(gym.Env):
     4 = Increase packet rate
     5 = Decrease Packet rate
     '''
-
     def __init__(self):
-
+        # Init the WSN env
         self.EE = EnvironmentEngine()
 
-
+        # Define size of WSN grid in meters
         self.xSize = xSize
         self.ySize = ySize
 
-        self.numNodes = numNodes
+        self.numNodes = numNodes  # Number of nodes
         self.PRamount = 4  # Amount of values PR can be
 
-        # By using a system grid size of 100x100 we get a step size of 2 m
+        # Define the high values of each state
         high = np.array([
             int(self.xSize),
             int(self.ySize),
             self.PRamount])
-        #high = np.array([
-              #int(self.xSize / 50),
-              #int(self.ySize / 50),
-              #6])
-
+        # Define the low values of each state
         low = np.array([
             0,
             0,
             0])
 
+        # Create action space (discrete) and observation space (Box/continuos)
         self.action_space = spaces.Discrete(6)
         self.observation_space = spaces.Box(low, high, dtype=np.float32)
 
+        # Set default values
         self.seed()
         self.done = False
         self.viewer = None
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
-        for i in range(numNodes):
+        for i in range(numNodes):  # Appends PA of all nodes into list
             self.state.append(self.EE.nodes[i].PA)
 
 
-    def seed(self, seed=None):
+    def seed(self, seed=None):  # Returns initial state of env
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
     def step(self, action):
-        assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
+        '''
+        This method steps through the entire WSN environment when a specific action is taken. This includes the reward,
+        clustering, communication etc.
+        :param action: The action that is performed at the specific step
+        :return:  Numpy array containing the current state, reward, bool for if episode is done and development info
+        '''
 
+        # Assert that chosen action is within action space
+        assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
+        # Get state of current time step
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
         for i in range(numNodes):
             self.state.append([self.EE.nodes[i].ID, self.EE.nodes[i].PA])
 
-        xPos, yPos, PR = self.state
-        PR = [PR]  # Convert to list
+        # Convert PR to list
+        _, _, PR = self.state
+        PR = [PR]
 
         # Default values, needs to be changed if there are more than one node
-        reward = - 2
-        reward -= (self.EE.nodes[0].getDistance(self.EE.sink) * 0.01)
-        reward += (self.EE.nodes[0].getEnergy() * 0.0011)
-
+        reward = -2
+        reward -= (self.EE.nodes[0].getDistance(self.EE.sink) * 0.005)
+        reward += (self.EE.nodes[0].getEnergy() * 0.00001)
         done = False
 
-        if len(self.EE.deadNodes) == numNodes:
+        if len(self.EE.deadNodes) == numNodes:  # Episode is done if all nodes have died
             done = True
 
-        if action == 0:
+        if action == 0:  # This action is yPos -= 1
             if self.state[1] > 0:
-                self.state[1] -= 1  # yPos -
+                self.state[1] -= 1
                 self.EE.updateEnv(0, -1, PR)
             else:
                 reward = -5
 
-        elif action == 1:
+        elif action == 1: # This action is yPos += 1
             if self.state[1] < ySize:
-                self.state[1] += 1  # yPos +
+                self.state[1] += 1
                 self.EE.updateEnv(0, 1, PR)
             else:
                 reward = -5
 
-        elif action == 2:
+        elif action == 2:  # This action is xPos += 1
             if self.state[0] < xSize:
-                self.state[0] += 1  # xPos +
+                self.state[0] += 1
                 self.EE.updateEnv(1, 0, PR)
             else:
                 reward = -5
 
-        elif action == 3:
+        elif action == 3:  # This action is xPos -= 1
             if self.state[0] > 0:
-                self.state[0] -= 1  # xPos -
+                self.state[0] -= 1
                 self.EE.updateEnv(-1, 0, PR)
             else:
                 reward = -5
 
-        # PR is hard coded for one node
-        elif action == 4:
+        # PR is hard coded for one node as of now
+        elif action == 4:  # This action is PR += 1
             if self.EE.nodes[0].PA < self.PRamount:
                 reward += 10
                 PR = [[PR[0][0], PR[0][1]+1]]
-                self.state[2][1] = self.EE.nodes[0].PA  # PR +
+                self.state[2][1] = self.EE.nodes[0].PA
                 self.EE.updateEnv(0, 0, PR)
             else:
-                reward = -10
+                reward = -20
 
-        elif action == 5:
+        elif action == 5:  # This action is PR -= 1
             if self.EE.nodes[0].PA > 1:
                 reward += -10
                 PR = [[PR[0][0], PR[0][1]-1]]
-                self.state[2][1] = self.EE.nodes[0].PA  # PR -
+                self.state[2][1] = self.EE.nodes[0].PA
                 self.EE.updateEnv(0, 0, PR)
             else:
-                reward = -10
+                reward = -20
 
-
+        # Increment WSN env
         self.EE.cluster()
         self.EE.nodes[0].CHstatus = 1
         self.EE.communicate()
@@ -249,6 +253,10 @@ class WSN(gym.Env):
 
 
     def render(self, mode='human'):
+        '''
+        This method plots the WSN env
+        :return: None
+        '''
         plotEnv(self.EE)
 
 
