@@ -93,7 +93,7 @@ class WSN(gym.Env):
 
         # Default values, needs to be changed if there are more than one node
         reward = -2
-        reward -= (self.EE.nodes[0].getDistance(self.EE.sink) * 0.005)
+        reward -= (self.EE.nodes[0].getDistance(self.EE.sink) * 0.00085)
         reward += (self.EE.nodes[0].getEnergy() * 0.00001)
         done = False
 

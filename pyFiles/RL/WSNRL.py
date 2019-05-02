@@ -16,7 +16,7 @@ class RLctrl():
         self.env = gym.make('WSN-v0')
 
         self.buckets = (101, 101, 5)  # Down-scaling feature space to discretize range
-        self.n_episodes = 200  # Number of training episodes
+        self.n_episodes = 250  # Number of training episodes
 
         self.min_alpha = 0.2  # Learning rate
         self.min_epsilon = 0.1  # Exploration rate
