@@ -91,10 +91,10 @@ class WSN(gym.Env):
         _, _, PR = self.state
         PR = [PR]
 
-        # Default values, needs to be changed if there are more than one node
+        # Default values, needs to be changed if there are more than one node (for-loop)
         reward = -2
-        reward -= (self.EE.nodes[0].getDistance(self.EE.sink) * 0.00085)
-        reward += (self.EE.nodes[0].getEnergy() * 0.00001)
+        reward -= (self.EE.nodes[0].getDistance(self.EE.sink) * 0.00085)  # Shall be distance to every CH
+        reward += (self.EE.nodes[0].getEnergy() * 0.0001)
         done = False
 
         if len(self.EE.deadNodes) == numNodes:  # Episode is done if all nodes have died

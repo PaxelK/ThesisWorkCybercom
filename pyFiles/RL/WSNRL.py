@@ -16,11 +16,11 @@ class RLctrl():
         self.env = gym.make('WSN-v0')
 
         self.buckets = (101, 101, 5)  # Down-scaling feature space to discretize range
-        self.n_episodes = 250  # Number of training episodes
+        self.n_episodes = 200  # Number of training episodes
 
-        self.min_alpha = 0.2  # Learning rate
-        self.min_epsilon = 0.1  # Exploration rate
-        self.gamma = 0.6  # Discount factor
+        self.min_alpha = 0.35  # Learning rate
+        self.min_epsilon = 0.15  # Exploration rate
+        self.gamma = 0.65  # Discount factor
         self.ada_divisor = 25  # Used to decay learning parameters
 
         max_env_steps = None  # Maximum amount of steps in an episode
