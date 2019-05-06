@@ -9,13 +9,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from Node import Node
-from Sink import Sink
+from EnvironmentEngine import EnvironmentEngine
 from setParams import *
 
-class MPCnode(Node):
-    def __init__(self, id, x, y, nrj, ctrlHrz, ctrlRes):
-        super().__init__(id, x, y, nrj)  
+class MPC2ndLayer(EnvironmentEngine):
+    def __init__(self, ctrlHrz, ctrlRes):
+        super().__init__()  
         
         self.verbose = False
         
@@ -33,10 +32,17 @@ class MPCnode(Node):
         
         #Counter for plots
         self.nrplots = 1;
+    
+    
+
+
+    def controlEnv(self):
         
-        # define velocity profile
-        self.vp = np.zeros(self.ctrlRes)
-        self.v = self.m.Param(value=self.vp)
+        
+        
+        
+    
+"""    
 
         # define distance
         self.dist = self.m.Var(20)
@@ -131,14 +137,9 @@ class MPCnode(Node):
         plt.xlabel('Time')
         
         self.nrplots+=1
-
-    def getDeltaDist(self, sinkX, sinkY, sdeltaX, sdeltaY, deltaDist):        
-        distBefore = np.sqrt((sinkX**2)+(sinkY**2))
-        distAfter = np.sqrt(((sinkX+sdeltaX)**2)+((sinkY+sdeltaY)**2))
-        self.deltaDist = distAfter - distBefore
-        return self.deltaDist
+        
     
-    def controlPR(self, velocity):  
+    def controlSink(self, velocity):  
         temp = np.float64(velocity)
         
         self.vp[0:] = self.v.value[1]
@@ -163,20 +164,7 @@ class MPCnode(Node):
             #self.nrj_stored.value[0] = self.nrj_stored.value[1]
             #self.data.value[0] = self.data.value[1]
         
-        """
-        self.dtrp = np.zeros(self.ctrlRes)
-        self.dtrp[0] = self.dtr.value[1]
-        self.dtr.value = self.dtrp
-        
-        self.nrj_storedp = np.zeros(self.ctrlRes)
-        self.nrj_storedp[0] = self.nrj_stored.value[1]
-        self.nrj_stored.value = self.nrj_storedp
-        
-        self.datap = np.zeros(self.ctrlRes)
-        self.datap[0] = self.data.value[1]
-        self.data.value = self.datap
-        self.m.TIME_SHIFT = 1
-        """
+
         #self.data.value[0] = self.data.value[1]
         self.m.solve(disp=False) # solve optimization problem
         self.setPR(self.dtr.value[0])
@@ -184,78 +172,14 @@ class MPCnode(Node):
     def clearGEKKO(self):
         self.m.clear()
 
-
+"""
 if __name__ == "__main__":
     Hrz = 10
     Res = Hrz + 1
     
-    testNode = MPCnode(1,20,20,0.05,Hrz,Res)
-    testNode.CHstatus = 1
-    
-    testNode1 = MPCnode(2,20,60,0.05,Hrz,Res)
-    testNode1.CHstatus = 1
-    
-    testNode2 = Sink(100, 100)
-    
-    testNode.connect(testNode2)
-    testNode1.connect(testNode2)
-    #print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
-    testNode2.move(-30,-10)
-    #print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
-    #print('Distance to sink: {0}'.format(testNode.getDistance(testNode2)))
-    #print("Segment: {0}, PR: {1}, PS: {2}".format(0,testNode.PA, testNode.getPS()))
-    #print(testNode.data.value)
-    #testNode.sendMsg(testNode2)
-    
-    #testNode.plot()
-    #testNode.controlPR(0,0)
-    #testNode.m.time[Hrz-1] = testNode.m.time[Hrz]-0.0000000000001
-    for i in range(28):
-        testNode.updateEnergy(-testNode.Egen)
-        testNode1.updateEnergy(-testNode1.Egen)
-        """
-        if(i==1):
-            testNode.controlPR(20)
-            testNode.sendMsg(testNode2)
-            testNode2.move(0,20)
-        elif((i>=2) & (i<6)):        
-            testNode.controlPR(10)
-            testNode.sendMsg(testNode2)
-            testNode2.move(0,10) #May have to place this behind sendMsg()
-        """   
-        if(i<=int(np.floor(Hrz/2))):
-            testNode.controlPR(-5)
-            testNode.sendMsg(testNode2)
-            
-            testNode1.controlPR(5)
-            testNode1.sendMsg(testNode2)
-            
-            testNode2.move(0,-5)
-        else:
-            testNode.controlPR(0)
-            testNode.sendMsg(testNode2)
-            
-            testNode1.controlPR(0)
-            testNode1.sendMsg(testNode2)
-        
-        #testNode.controlPR(0)
-        #testNode.sendMsg(testNode2)    
-        
-        print("Segment: {0} | Node | PR  | PS\t\t|\n\t\t {1}   {2}   {3} \n\t\t {4}   {5}   {6}".format(i, testNode.ID, testNode.dtr.value[0], testNode.getPS(), testNode1.ID, testNode1.dtr.value[0], testNode1.getPS()))
-        print("Node {0} Data:\n{1}\nNode {2} Data:\n{3}".format(testNode.ID, testNode.data.value, testNode1.ID, testNode1.data.value))
-        
-     
-        
-        #print(sum(testNode.dtr.value))
-        #testNode.plot()
-        #testNode.m.time[Hrz-(i+1)] = testNode.m.time[Hrz]-0.00000000001*(i+1)
-        
-    #testNode.clearGEKKO()    
-    print(testNode2.getDataRec())
-        
-        
-        
-        
+    testEnv = MPC2ndLayer(Hrz,Res)
+    print(testEnv.sink.xPos)
+    print(testEnv.ctrlHrz)
         
         
         
