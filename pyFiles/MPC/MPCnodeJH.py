@@ -26,11 +26,12 @@ class MPCnode(Node):
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
         self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
         # constants
-        self.Egen = 1*10**-5
+        self.Egen = 1*10**-3
         self.const = 0.6
         self.packet = 1
         self.E = 1
         
+        #Counter for plots
         self.nrplots = 1;
         
         # define velocity profile
@@ -54,16 +55,11 @@ class MPCnode(Node):
         
         # energy to transmit
         self.e = self.m.Intermediate(((Eelec+EDA)*self.packet + self.dtr*self.pSize*(Eelec + Eamp * self.dist**2)) - self.Egen)
+        
         # equations
-        
-        # Set a deadline counter EXPERIMENTAL
-        #self.deadline = self.m.Var(value = 0, ub = self.ctrlRes)
-        #self.m.Equation(self.deadline.dt() == 1)
-        
         # track the position
         self.m.Equation(self.dist.dt() == self.v)
         self.m.Equation(self.nrj_stored.dt() == -self.e)
-        self.m.Equation(self.ps.dt() == self.dtr*self.pSize)
         # as data is transmitted, remaining data stored decreases
         self.m.Equation(self.data.dt() == -self.dtr*self.pSize)
         
@@ -75,6 +71,7 @@ class MPCnode(Node):
         
         # soft (objective constraint)
         self.final = self.m.Param(value=np.zeros(self.ctrlRes))
+        self.final.value[int(np.floor(self.ctrlRes/2)):-1] = 0.001
         self.final.value[-1] = 1
         #self.m.Equation(self.final*(self.data)<=0)
         
@@ -88,14 +85,15 @@ class MPCnode(Node):
         # hard constraint
         # this form may cause infeasibility if it can't achieve
         # data=0 at the end
-        self.m.fix(self.data,self.ctrlRes-1,0)
+        #self.m.fix(self.data,self.ctrlRes-1,0)
         # options
-        self.m.options.IMODE = 6  # optimal control
-        self.m.options.NODES = 3  # collocation nodes
-        self.m.options.SOLVER = 1 # solver (IPOPT)
-        self.m.solve(disp=False)
+        self.m.options.IMODE = 6                # optimal control
+        self.m.options.NODES = 3                # collocation nodes
+        self.m.options.SOLVER = 1               # solver (IPOPT), 1 is for when integers is used as MV
+        self.m.options.TIME_SHIFT = 1           # Setting for saving values from last solve()
         
-        self.setPR(self.dtr.value[0])
+        #self.m.solve(disp=False)
+        #self.setPR(self.dtr.value[0])
         
         
         
@@ -140,10 +138,8 @@ class MPCnode(Node):
         self.deltaDist = distAfter - distBefore
         return self.deltaDist
     
-    def controlPR(self, velocity, timepoint):        
-        # solve optimization problem
+    def controlPR(self, velocity):  
         temp = np.float64(velocity)
-        self.vp = np.zeros(self.ctrlRes) 
         self.vp[0:] = self.v.value[1]
         if(temp == self.vp[0]):
             if self.verbose:
@@ -155,19 +151,17 @@ class MPCnode(Node):
                 print('Therefore, vp[1:] was set as tempVel = {0}'.format(temp))
             self.vp[1:] = temp 
             #print(self.vp)
-            
+                
         self.v.value = self.vp
-        #print(np.shape(testNode.vp))        
+            #print(np.shape(testNode.vp))  
+        if(type(self.dtr.value.value) is not int):
+            self.dtrp = np.zeros(self.ctrlRes)
+            self.dtrp[0] = self.dtr.value[1]
+            self.dtr.value = self.dtrp
+            
+            #self.nrj_stored.value[0] = self.nrj_stored.value[1]
+            #self.data.value[0] = self.data.value[1]
         
-        self.dtrp = np.zeros(self.ctrlRes)
-        self.dtrp[0] = self.dtr.value[1]
-        self.dtr.value = self.dtrp
-        
-        self.nrj_stored.value[0] = self.nrj_stored.value[1]
-        
-        #self.deadlinep = np.zeros(self.ctrlRes)
-        #self.deadlinep[:timepoint] = self.deadline.value[timepoint]
-        #self.deadline.value = self.deadlinep
         """
         self.dtrp = np.zeros(self.ctrlRes)
         self.dtrp[0] = self.dtr.value[1]
@@ -182,18 +176,14 @@ class MPCnode(Node):
         self.data.value = self.datap
         self.m.TIME_SHIFT = 1
         """
-        self.data.value[0] = self.data.value[1]
-        self.m.solve(disp=False)
-        
-
+        #self.data.value[0] = self.data.value[1]
+        self.m.solve(disp=False) # solve optimization problem
         self.setPR(self.dtr.value[0])
-        #print(self.dtr.value[timepoint])
-        #print(self.PA)
 
 
 
 if __name__ == "__main__":
-    Hrz = 8
+    Hrz = 5
     Res = Hrz + 1
     
     testNode = MPCnode(1,20,20,0.05,Hrz,Res)
@@ -204,37 +194,36 @@ if __name__ == "__main__":
     testNode2.move(-30,-10)
     #print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
     #print('Distance to sink: {0}'.format(testNode.getDistance(testNode2)))
-    print("Segment: {0}, PR: {1}, PS: {2}".format(0,testNode.PA, testNode.getPS()))
-    print(testNode.data.value)
-    testNode.sendMsg(testNode2)
+    #print("Segment: {0}, PR: {1}, PS: {2}".format(0,testNode.PA, testNode.getPS()))
+    #print(testNode.data.value)
+    #testNode.sendMsg(testNode2)
     
-    testNode.plot()
+    #testNode.plot()
     #testNode.controlPR(0,0)
     #testNode.m.time[Hrz-1] = testNode.m.time[Hrz]-0.0000000000001
     for i in range(Hrz):
         """
         if(i==1):
-            testNode.controlPR(20,i+1)
+            testNode.controlPR(20)
             testNode.sendMsg(testNode2)
             testNode2.move(0,20)
         elif((i>=2) & (i<6)):        
-            testNode.controlPR(10,i+1)
+            testNode.controlPR(10)
             testNode.sendMsg(testNode2)
             testNode2.move(0,10) #May have to place this behind sendMsg()
-           
-        elif(i>=7):
-            testNode.controlPR(-15,i+1)
+        """   
+        if(i<=6):
+            testNode.controlPR(-5)
             testNode.sendMsg(testNode2)
             testNode2.move(0,-15)
         else:
-            testNode.controlPR(0,i+1)
+            testNode.controlPR(0)
             testNode.sendMsg(testNode2)
-        """
-        testNode.controlPR(0,i+1)
-        testNode.sendMsg(testNode2)    
-        #testNode.setPR(testNode.dtr.value[i])
         
-        print("Segment: {0}, PR: {1}, PS: {2}".format(i+1,testNode.PA, testNode.getPS()))
+        #testNode.controlPR(0)
+        #testNode.sendMsg(testNode2)    
+        
+        print("Segment: {0}, PR: {1}, PS: {2}".format(i,testNode.PA, testNode.getPS()))
         print(testNode.data.value)
         
      
