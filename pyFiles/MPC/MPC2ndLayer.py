@@ -26,20 +26,20 @@ class MPC2ndLayer(EnvironmentEngine):
         self.ctrlHrz = ctrlHrz                  # Control Horizon
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
         self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
+        
         # constants
         self.Egen = 1*10**-3
         self.const = 0.6
         self.packet = 1
         self.E = 1
-        self.pSize = ps
-        
+        self.pSize = ps        
         
         #Counter for plots
         self.nrplots = 1;
     
         # define distance 
         self.dist = self.m.Var(value = 20)
-        
+        self.dist1 = self.m.Var(value = 40)
         
         self.v = self.m.MV(lb=-2,ub=2) # Upper bound should be something like sqrt(100**2 + 100**2)
         self.v.STATUS = 1
@@ -48,8 +48,12 @@ class MPC2ndLayer(EnvironmentEngine):
         self.dtr = self.m.MV(integer = True, lb=0,ub=200)
         self.dtr.STATUS = 1
         
+        self.dtr1 = self.m.MV(integer = True, lb=0,ub=200)
+        self.dtr1.STATUS = 1
+        
          # energy to transmit
         self.e = self.m.Intermediate(self.dtr*self.pSize*(Eelec + Eamp * self.dist**2))
+        self.e1 = self.m.Intermediate(self.dtr1*self.pSize*(Eelec + Eamp * self.dist1**2))
         
         self.data= self.m.Var()
         
@@ -57,20 +61,22 @@ class MPC2ndLayer(EnvironmentEngine):
         # equations
         # track the position
         self.m.Equation(self.dist.dt() == self.v)
+        self.m.Equation(self.dist1.dt() == -self.v)
+        
         # as data is transmitted, remaining data stored decreases
-        self.m.Equation(self.data.dt() == -self.dtr*self.pSize)
+        self.m.Equation(self.data.dt() == self.dtr*self.pSize + self.dtr1*self.pSize)
         
          # soft (objective constraint)
         self.final = self.m.Param(value=np.zeros(self.ctrlRes))
         self.final.value[int(np.floor(self.ctrlRes/2)):-1] = 0.001
         self.final.value[-1] = 1
         
-        self.m.Equation(self.final*(self.data)<=0)
+        self.m.Equation(self.final*(self.data)>=0)
         
         # objective
-        self.m.Obj(self.e) # minimize energy
+        self.m.Obj(self.e + self.e1) # minimize energy
         
-        self.m.Obj(self.data*self.final)
+        self.m.Obj(-self.data*self.final)
         
         # options
         self.m.options.IMODE = 6                # optimal control
@@ -84,15 +90,20 @@ class MPC2ndLayer(EnvironmentEngine):
         
     def plot(self):
         plt.figure(self.nrplots)
-        plt.subplot(5,1,1)
+        plt.subplot(7,1,1)
         plt.plot(self.m.time,self.dist.value,'r-',label='Distance')
         plt.legend()
         
-        plt.subplot(5,1,2)
+        plt.figure(self.nrplots)
+        plt.subplot(7,1,2)
+        plt.plot(self.m.time,self.dist1.value,'r-',label='Distance')
+        plt.legend()
+        
+        plt.subplot(7,1,3)
         plt.plot(self.m.time,self.v.value,'k--',label='Velocity')
         plt.legend()
         
-        plt.subplot(5,1,3)
+        plt.subplot(7,1,4)
         plt.plot(self.m.time,self.e.value,'b-',label='Energy Consumption')
         plt.legend()
         
@@ -100,13 +111,17 @@ class MPC2ndLayer(EnvironmentEngine):
         #plt.plot(self.m.time,self.ps,'b-',label='Bits Sent')
         #plt.legend()
         
-        plt.subplot(5,1,4)
-        plt.plot(self.m.time, self.data.value,'k.-',label='Data Remaining')
+        plt.subplot(7,1,5)
+        plt.plot(self.m.time, self.data.value,'k.-',label='Data Sent')
         plt.legend()
         
         
-        plt.subplot(5,1,5)
-        plt.plot(self.m.time, self.dtr.value,'r-',label='Transmission Rate')
+        plt.subplot(7,1,6)
+        plt.plot(self.m.time, self.dtr.value,'r-',label='Transmission Rate, dtr')
+        plt.legend()
+        
+        plt.subplot(7,1,7)
+        plt.plot(self.m.time, self.dtr1.value,'r-',label='Transmission Rate1, dtr1')
         plt.legend()
         
         #plt.subplot(6,1,6)
