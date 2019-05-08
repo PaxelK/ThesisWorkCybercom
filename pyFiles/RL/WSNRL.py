@@ -15,12 +15,12 @@ class RLctrl():
     def __init__(self):
         self.env = gym.make('WSN-v0')
 
-        self.buckets = (101, 101, 5)  # Down-scaling feature space to discretize range
+        self.buckets = (51, 51, 5)  # Down-scaling feature space to discretize range
         self.n_episodes = 200  # Number of training episodes
 
         self.min_alpha = 0.35  # Learning rate
         self.min_epsilon = 0.15  # Exploration rate
-        self.gamma = 0.65  # Discount factor
+        self.gamma = 0.8  # Discount factor
         self.ada_divisor = 25  # Used to decay learning parameters
 
         max_env_steps = None  # Maximum amount of steps in an episode
@@ -35,7 +35,7 @@ class RLctrl():
 
     def discretize(self, obs):
         # This method discretizes each state into the sizes that are specified in self.buckets
-        # Needs to be updated to handle more than one node
+        # Needs to be updated to handle more than one node as of now
         upper_bounds = [self.env.observation_space.high[0], self.env.observation_space.high[1], self.env.observation_space.high[2]]
         lower_bounds = [self.env.observation_space.low[0], self.env.observation_space.low[1], self.env.observation_space.low[2]]
         ratios = [(obs[i] + abs(lower_bounds[i])) / (upper_bounds[i] - lower_bounds[i]) for i in range(len(obs)-1)]
@@ -69,9 +69,9 @@ class RLctrl():
 
         for i in range(self.n_episodes):
             current_state = self.discretize(self.env.reset())
-
             alpha = self.get_alpha(i)
             epsilon = self.get_epsilon(i)
+
             done = False
             ii = 0
             while not done:
@@ -107,7 +107,7 @@ class RLctrl():
             obs, reward, done, _ = self.env.step(action)
             new_state = self.discretize(obs)
             self.update_q(current_state, action, reward, new_state, self.min_alpha)
-            print(f"state_old: {current_state}")
+            print(f"current_state: {current_state}")
             print(f"action: {action}")
             current_state = new_state
 
@@ -116,11 +116,6 @@ class RLctrl():
 if __name__ == "__main__":
     solver = RLctrl()
     solver.run()
-
-
-
-
-
 
 
 

@@ -131,7 +131,7 @@ class WSN(gym.Env):
         # PR is hard coded for one node as of now
         elif action == 4:  # This action is PR += 1
             if self.EE.nodes[0].PA < self.PRamount:
-                reward += 10
+                reward += 3
                 PR = [[PR[0][0], PR[0][1]+1]]
                 self.state[2][1] = self.EE.nodes[0].PA
                 self.EE.updateEnv(0, 0, PR)
@@ -140,12 +140,24 @@ class WSN(gym.Env):
 
         elif action == 5:  # This action is PR -= 1
             if self.EE.nodes[0].PA > 1:
-                reward += -10
+                reward -= 3
                 PR = [[PR[0][0], PR[0][1]-1]]
                 self.state[2][1] = self.EE.nodes[0].PA
                 self.EE.updateEnv(0, 0, PR)
             else:
                 reward = -20
+
+        '''
+        # For one node as of now
+        if self.state[2] == 1:
+            reward += 1
+        elif self.state[2] == 2:
+            reward += 2
+        elif self.state[2] == 3:
+            reward += 3
+        elif self.state[2] == 4:
+            reward += 4
+        '''
 
         # Increment WSN env
         self.EE.cluster()
