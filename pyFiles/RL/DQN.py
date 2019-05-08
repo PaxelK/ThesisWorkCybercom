@@ -18,13 +18,13 @@ from EnvironmentEngine import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 1000
+EPISODES = 20
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
-        self.memory = deque(maxlen=2000)
+        self.memory = deque(maxlen=10000)
         self.gamma = 0.95    # discount rate
         self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.1
@@ -54,8 +54,7 @@ class DQNAgent:
         minibatch = random.sample(self.memory, batch_size)
         for state, action, reward, next_state, done in minibatch:
             target = reward
-            #next_state[0][2] = next_state[0][2][1]
-            #next_state = np.reshape(next_state, [1, 3])
+
             if not done:
                 target = (reward + self.gamma *
                           np.amax(self.model.predict(next_state)[0]))
@@ -77,11 +76,12 @@ if __name__ == "__main__":
     state_size = env.observation_space.shape[0]  # Get amount of states (3 states with 1 node)
     action_size = env.action_space.n
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
-    # agent.load("./save/cartpole-dqn.h5")
+    # agent.load("./save/wsn-dqn.h5")
     # Set default values
     done = False
     batch_size = 32
 
+    avrRnd = []
     # Train agent
     for e in range(EPISODES):
         done = False
@@ -104,11 +104,38 @@ if __name__ == "__main__":
 
 
             if done:
-                print("hej")
-                print(f"episode: {e}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd}")
+                print(f"episode: {e}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd} \n")
                 break
 
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
-        # if e % 10 == 0:
-        #     agent.save("./save/cartpole-dqn.h5")
+
+        avrRnd.append(rnd)
+        # if e % 10 == 0:  # Save weights for every 10th episode
+        #     agent.save("./save/wsn-dqn.h5")
+
+    print(f"avrRnd: {avrRnd}")
+
+    x = np.linspace(0, len(avrRnd), num=len(avrRnd), endpoint=True)
+    plt.plot(x, avrRnd)
+    plt.show()
+
+
+    done = False
+    rnd = 0
+    state = env.reset()  # Reset env to a random state
+    # Format state such that it can be used for training
+    state[2] = state[2][1]
+    state = np.reshape(state, [1, state_size])
+    while not done:
+        env.render()
+        rnd += 1
+        # env.render()
+        action = agent.act(state)
+        next_state, reward, done, _ = env.step(action)
+        # reward = reward if not done else -10
+        next_state[2] = next_state[2][1]
+        next_state = np.reshape(next_state, [1, state_size])
+        agent.remember(state, action, reward, next_state, done)
+        state = next_state
+        # print(next_state[0])

@@ -15,8 +15,8 @@ class RLctrl():
     def __init__(self):
         self.env = gym.make('WSN-v0')
 
-        self.buckets = (51, 51, 5)  # Down-scaling feature space to discretize range
-        self.n_episodes = 200  # Number of training episodes
+        self.buckets = (101, 101, 5)  # Down-scaling feature space to discretize range
+        self.n_episodes = 300  # Number of training episodes
 
         self.min_alpha = 0.35  # Learning rate
         self.min_epsilon = 0.15  # Exploration rate
