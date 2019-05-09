@@ -61,30 +61,20 @@ class MPC2ndLayer(EnvironmentEngine):
         
         self.CHLst = []
         self.CHdistLst = []
-        for i in range(self.CHLst):
+        for i in range(self.CHs):
             self.CHLst.append(self.m.Var(value = 3*i)) 
             self.CHdistLst.append(self.m.Var())
             self.m.Equation(self.CHdistLst(i) == self.sinkPos - self.CHLst(i))
             
         self.nonCHLst = []
         self.nonCHdistLst = []
-        for i in range(self.nonCHLst):
+        for i in range(self.nonCHs):
             self.nonCHLst.append(self.m.Var(value = 2*i))
             self.nonCHdistLst.append(self.m.Var())
             self.m.Equation(self.nonCHdistLst(i) == self.sinkPos - self.nonCHLst(i))
             
-        #for i in range(self.nds):    
-            
-        
-        #self.nodePos = self.m.Var(value = 20)
-        #self.nodePos1 = self.m.Var(value = 40)
-        
-        
-        
-        self.sinkd = self.m.Var()
-        self.sinkd1 = self.m.Var()
-        
-        self.m.Equation(self.sinkd1 == self.sinkPos - self.nodePos1)
+      
+
         
         self.dm = self.m.Intermediate((self.sinkd + self.sinkd1)/2)
         
