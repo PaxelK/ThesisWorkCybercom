@@ -44,19 +44,21 @@ class WSN(gym.Env):
         self.numNodes = numNodes  # Number of nodes
         self.PRamount = 4  # Amount of values PR can be
 
-        # Define the high values of each state
+        # Define the high values of each state (one node)
         high = np.array([
             int(self.xSize),
             int(self.ySize),
+            self.PRamount,
             self.PRamount])
         # Define the low values of each state
         low = np.array([
             0,
             0,
+            0,
             0])
 
         # Create action space (discrete) and observation space (Box/continuos)
-        self.action_space = spaces.Discrete(6)
+        self.action_space = spaces.Discrete(8)
         self.observation_space = spaces.Box(low, high, dtype=np.float32)
 
         # Set default values
@@ -79,21 +81,22 @@ class WSN(gym.Env):
         :param action: The action that is performed at the specific step
         :return:  Numpy array containing the current state, reward, bool for if episode is done and development info
         '''
-
         # Assert that chosen action is within action space
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
         # Get state of current time step
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
+        PRtemp  = []
         for i in range(numNodes):
-            self.state.append([self.EE.nodes[i].ID, self.EE.nodes[i].PA])
+                PRtemp.append([self.EE.nodes[i].ID, self.EE.nodes[i].PA])
 
-        # Convert PR to list
+        self.state.append(PRtemp)
+
         _, _, PR = self.state
-        PR = [PR]
 
         # Default values, needs to be changed if there are more than one node (for-loop)
         reward = -2
         reward -= (self.EE.nodes[0].getDistance(self.EE.sink) * 0.015)  # Shall be distance to every CH
+        reward -= (self.EE.nodes[1].getDistance(self.EE.sink) * 0.015)
         #reward += (self.EE.nodes[0].getEnergy() * 0.0001)
         done = False
 
@@ -105,50 +108,68 @@ class WSN(gym.Env):
                 self.state[1] -= 1
                 self.EE.updateEnv(0, -1, PR)
             else:
-                reward = -5
+                reward = -20
 
         elif action == 1: # This action is yPos += 1
             if self.state[1] < ySize:
                 self.state[1] += 1
                 self.EE.updateEnv(0, 1, PR)
             else:
-                reward = -5
+                reward = -20
 
         elif action == 2:  # This action is xPos += 1
             if self.state[0] < xSize:
                 self.state[0] += 1
                 self.EE.updateEnv(1, 0, PR)
             else:
-                reward = -5
+                reward = -20
 
         elif action == 3:  # This action is xPos -= 1
             if self.state[0] > 0:
                 self.state[0] -= 1
                 self.EE.updateEnv(-1, 0, PR)
             else:
-                reward = -5
+                reward = -20
 
         # PR is hard coded for one node as of now
         elif action == 4:  # This action is PR += 1
             if self.EE.nodes[0].PA < self.PRamount:
-                reward += 3
-                PR = [[PR[0][0], PR[0][1]+1]]
-                self.state[2][1] = self.EE.nodes[0].PA
+                reward += 5
+                PR[0][1] += 1
+                self.state[2][0][1] = self.EE.nodes[0].PA + 1
                 self.EE.updateEnv(0, 0, PR)
             else:
-                reward = -20
+                reward = -50
 
         elif action == 5:  # This action is PR -= 1
             if self.EE.nodes[0].PA > 1:
-                reward -= 3
-                PR = [[PR[0][0], PR[0][1]-1]]
-                self.state[2][1] = self.EE.nodes[0].PA
+                reward -= 5
+                PR[0][1] -= 1
+                self.state[2][0][1] = self.EE.nodes[0].PA - 1
                 self.EE.updateEnv(0, 0, PR)
             else:
-                reward = -20
+                reward = -50
+
+        elif action == 6:  # This action is PR += 1
+            if self.EE.nodes[1].PA < self.PRamount:
+                reward += 5
+                PR[1][1] += 1
+                self.state[2][1][1] = self.EE.nodes[1].PA + 1
+                self.EE.updateEnv(0, 0, PR)
+            else:
+                reward = -50
+
+        elif action == 7:  # This action is PR -= 1
+            if self.EE.nodes[1].PA > 1:
+                reward -= 5
+                PR[1][1] -= 1
+                self.state[2][1][1] = self.EE.nodes[1].PA - 1
+                self.EE.updateEnv(0, 0, PR)
+            else:
+                reward = -50
 
         '''
-        # For one node as of now
+        # For one node as of now (Not feasible to do this for many nodes)
         if self.state[2] == 1:
             reward += 1
         elif self.state[2] == 2:
@@ -162,6 +183,7 @@ class WSN(gym.Env):
         # Increment WSN env
         self.EE.cluster()
         self.EE.nodes[0].CHstatus = 1
+        self.EE.nodes[1].CHstatus = 1
         self.EE.communicate()
         self.EE.iterateRound()
 
@@ -195,11 +217,11 @@ class WSN(gym.Env):
             self.state.append([i, random.randint(0, self.PRamount)])
             self.EE.nodes[i].energy = maxNrj  #random.random() * maxNrj
             self.EE.nodes[i].SoC = self.EE.nodes[i].energy / self.EE.nodes[i].maxEnergy
-            self.EE.PS = 0  # Packages sent = amount of packages the node has sent
-            self.EE.nrjCons = 0  # Energy consumed [J] = Amount of energy the node has consumed
-            self.EE.CHflag = 0  # Determines if node has been CH during a LEACH episode
-            self.EE.conChildren = 0  # Number of connected children.
-            self.EE.tempDataRec = 0  # Temporary held data that are then going to the sink.
+            self.EE.nodes[i].PS = 0  # Packages sent = amount of packages the node has sent
+            self.EE.nodes[i].nrjCons = 0  # Energy consumed [J] = Amount of energy the node has consumed
+            self.EE.nodes[i].CHflag = 0  # Determines if node has been CH during a LEACH episode
+            self.EE.nodes[i].conChildren = 0  # Number of connected children.
+            self.EE.nodes[i].tempDataRec = 0  # Temporary held data that are then going to the sink.
 
             if self.EE.nodes[i].energy > 0:
                 self.EE.nodes[i].alive = True  # Boolean for if node is alive
@@ -214,6 +236,7 @@ class WSN(gym.Env):
         self.EE.meanEClist = []  # List that contains the mean energy consumed after each round
         self.EE.deadNodes = []  # Contains the amount of dead nodes after each round
         self.EE.posNodes = []  # The position of the nodes
+        self.EE.plotDeadNodes = []  # Used for plotting amount of dead nodes
 
 
         self.EE.sink.dataRec = 0
@@ -222,7 +245,6 @@ class WSN(gym.Env):
         self.EE.sink.yPos = int(ySize * random.random())
         self.EE.sink.SoC = self.EE.sink.energy / self.EE.sink.maxEnergy
 
-        self.EE.plotDeadNodes = []  # Used for plotting amount of dead nodes
 
         tempNRJ = 0
 
@@ -270,10 +292,6 @@ class WSN(gym.Env):
         :return: None
         '''
         plotEnv(self.EE)
-
-
-
-
 
 
 

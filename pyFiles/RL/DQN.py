@@ -18,14 +18,14 @@ from EnvironmentEngine import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 20
+EPISODES = 50
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=10000)
-        self.gamma = 0.95    # discount rate
+        self.gamma = 0.9    # discount rate
         self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.1
         self.epsilon_decay = 0.995
@@ -36,9 +36,10 @@ class DQNAgent:
         # Neural Net for Deep-Q learning Model
         model = Sequential()
         model.add(Dense(24, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(36, activation='relu'))
+        model.add(Dense(48, activation='relu'))
+        #model.add(Dense(36, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
-        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
+        model.compile(loss='mae', optimizer=Adam(lr=self.learning_rate))
         return model
 
     def remember(self, state, action, reward, next_state, done):
@@ -71,6 +72,7 @@ class DQNAgent:
         self.model.save_weights(name)
 
 
+
 if __name__ == "__main__":
     env = gym.make('WSN-v0')
     state_size = env.observation_space.shape[0]  # Get amount of states (3 states with 1 node)
@@ -87,31 +89,36 @@ if __name__ == "__main__":
         done = False
         rnd = 0
         state = env.reset()  # Reset env to a random state
-        # Format state such that it can be used for training
+        # Format state such that it can be used for training (One node as now)
         state[2] = state[2][1]
+        state[3] = state[3][1]
         state = np.reshape(state, [1, state_size])
         while not done:
             rnd += 1
             # env.render()
             action = agent.act(state)
-            next_state, reward, done, _ = env.step(action)
-            #reward = reward if not done else -10
-            next_state[2] = next_state[2][1]
+            next_state_temp, reward, done, _ = env.step(action)
+
+
+            next_state = [next_state_temp[0], next_state_temp[1]]
+            next_state.append(next_state_temp[2][0][1])  # One node
+            next_state.append(next_state_temp[2][1][1])
+            next_state = np.array(next_state)
             next_state = np.reshape(next_state, [1, state_size])
             agent.remember(state, action, reward, next_state, done)
             state = next_state
             #print(next_state[0])
 
-
             if done:
-                print(f"episode: {e}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd} \n")
+                print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd} \n")
                 break
 
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
 
         avrRnd.append(rnd)
-        # if e % 10 == 0:  # Save weights for every 10th episode
+
+        # if rnd > max(avrRnd):  # Save weights for every 10th episode
         #     agent.save("./save/wsn-dqn.h5")
 
     print(f"avrRnd: {avrRnd}")
@@ -126,16 +133,18 @@ if __name__ == "__main__":
     state = env.reset()  # Reset env to a random state
     # Format state such that it can be used for training
     state[2] = state[2][1]
+    state[3] = state[3][1]
     state = np.reshape(state, [1, state_size])
     while not done:
         env.render()
         rnd += 1
-        # env.render()
         action = agent.act(state)
-        next_state, reward, done, _ = env.step(action)
-        # reward = reward if not done else -10
-        next_state[2] = next_state[2][1]
+        next_state_temp, reward, done, _ = env.step(action)
+
+        next_state = [next_state_temp[0], next_state_temp[1]]
+        next_state.append(next_state_temp[2][0][1])  # One node
+        next_state.append(next_state_temp[2][1][1])
+        next_state = np.array(next_state)
         next_state = np.reshape(next_state, [1, state_size])
         agent.remember(state, action, reward, next_state, done)
         state = next_state
-        # print(next_state[0])

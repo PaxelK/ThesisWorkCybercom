@@ -47,7 +47,7 @@ while True:  # Run until all node dies
     # print(f"PackReclist Length = {len(EE.PackReclist)}")
     # print(f"deadnodes Length = {len(EE.deadNodes)}")
 
-    plotEnv(EE)
+    #plotEnv(EE)
     
     EE.updateEnv(1, 1, PRcontrl)
     EE.cluster()
