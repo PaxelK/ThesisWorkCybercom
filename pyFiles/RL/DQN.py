@@ -36,7 +36,7 @@ class DQNAgent:
         # Neural Net for Deep-Q learning Model
         model = Sequential()
         model.add(Dense(24, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(48, activation='relu'))
+        model.add(Dense(36, activation='relu'))
         #model.add(Dense(36, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mae', optimizer=Adam(lr=self.learning_rate))
