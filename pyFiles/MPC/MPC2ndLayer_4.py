@@ -36,7 +36,7 @@ class MPC2ndLayer(EnvironmentEngine):
         
         
         
-        self.PERC = 0.4
+        self.PERC = 0.10
         self.nds = 30                                   # ALL NODES
         self.CHs = int(self.nds*self.PERC)              # CLUSTER HEADS
         self.nonCHs = int(self.nds - self.CHs)          # NON-CHs
@@ -84,27 +84,40 @@ class MPC2ndLayer(EnvironmentEngine):
         #self.m.Equation(self.data.dt() == self.packs + self.packs1)
         
         # energy to transmit
+        #self.packs = self.m.Param()
         self.packs = 1
+        self.dtrLst = []
+        self.rnds = self.m.Var(lb = 1)
+        self.E_tot = self.m.Param(value = 3)
+        
         for i in range(self.CHs):
-            self.intermeds.append(self.m.Intermediate((Eelec+EDA)*self.packet + self.packs*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2)))  
-            self.m.Obj(self.intermeds[i])
+            #self.intermeds.append(self.m.Intermediate((Eelec+EDA)*self.packet + self.packs*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2)))  
+            self.dtrLst.append(self.m.Var(lb = 1, ub = 20))
+            
+            self.intermeds.append(self.m.Intermediate(self.E_tot/((Eelec+EDA)*self.packet + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2))))
+            
+            # FIX THIS! currently this cost function builds on mean distances of all nodes. Gotta make it so that i works for individual CHs 
+            #self.intermeds.append((self.E_tot - self.rnds*(self.PERC * self.E_tot * (Eelec + EDA)*self.packs - (1-self.PERC)*()))   ) F
+            
+            
+            self.m.Obj(-self.intermeds[-1])
         for i in range(self.nonCHs):
-            self.intermeds.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))  
-            self.m.Obj(self.intermeds[i])
+            #self.intermeds.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))  
+            self.intermeds.append(self.m.Intermediate(self.E_tot/(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2))))
+            self.m.Obj(-self.intermeds[-1])
         
         
-        self.dm1 = np.sum(self.CHdistLst)/len(testEnv.CHdistLst)            # Mean distance of CH to sink
-        self.dm2 = np.sum(self.nonCHdistLst)/len(testEnv.nonCHdistLst)      # Mean distance of nonCH to sink
+        self.dm1 = np.sum(self.CHdistLst)/len(self.CHdistLst)            # Mean distance of CH to sink
+        self.dm2 = np.sum(self.nonCHdistLst)/len(self.nonCHdistLst)      # Mean distance of nonCH to sink
         
-        self.e1 = self.m.Intermediate((Eelec+EDA)*self.packet + self.packs*self.pSize*(Eelec + Eamp * self.dm1**2)) # Mean energy consumption per round for CHs
-        self.e2 = self.m.Intermediate((Eelec+EDA)*self.packet + self.packs*self.pSize*(Eelec + Eamp * self.dm2**2)) # Mean energy consumption per round for CHs
+        self.e1 = self.m.Intermediate(((Eelec+EDA)*self.packet + self.packs*self.pSize*(Eelec + Eamp * self.dm1**2))*len(self.CHdistLst)) # Mean energy consumption per round for CHs
+        self.e2 = self.m.Intermediate((self.packs*self.pSize*(Eelec + Eamp * self.dm2**2))*len(self.nonCHdistLst)) # Mean energy consumption per round for CHs
         
-        self.E_tot = self.m.Var(value = 1)
-        self.round = self.m.Var()
+        
         
         self.rnd = self.m.Intermediate(self.E_tot/(self.PERC*self.E_tot*self.e1+(1-self.PERC)*self.e2))
+        #self.m.Obj(-self.rnd)
         
-        self.m.Obj(-self.rnd)
         
         """
         self.data = self.m.Var()
@@ -129,7 +142,7 @@ class MPC2ndLayer(EnvironmentEngine):
         
         
         # options
-        self.m.options.IMODE = 3                # optimal control
+        self.m.options.IMODE = 3                 # optimize a solid state
         #self.m.options.NODES = 3                # collocation nodes
         #self.m.options.SOLVER = 1               # solver (IPOPT), 1 is for when integers is used as MV
         #self.m.options.TIME_SHIFT = 1           # Setting for saving values from last solve()
@@ -142,6 +155,7 @@ class MPC2ndLayer(EnvironmentEngine):
         self.m.solve()
         print(self.sinkPos.value)
         print(self.rnd.value)
+        
         
     def plot(self):
         plt.figure(self.nrplots)
