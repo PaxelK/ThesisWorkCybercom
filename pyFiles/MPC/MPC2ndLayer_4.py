@@ -7,11 +7,13 @@ Created on Wed May  8 11:36:10 2019
 
 from gekko import GEKKO
 import numpy as np
-import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from EnvironmentEngine import EnvironmentEngine
 from setParams import *
+import matplotlib.pyplot as plt; plt.rcdefaults()
+import matplotlib.pyplot as plt
+
 
 class MPC2ndLayer(EnvironmentEngine):
     def __init__(self, ctrlHrz, ctrlRes):
@@ -26,7 +28,7 @@ class MPC2ndLayer(EnvironmentEngine):
         # time points
         self.ctrlHrz = ctrlHrz                  # Control Horizon
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
-        self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
+        #self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
         
         # constants
         self.Egen = 1*10**-3
@@ -53,58 +55,60 @@ class MPC2ndLayer(EnvironmentEngine):
         #Counter for plots
         self.nrplots = 1;
     
-        self.sinkPos = self.m.Var(lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
+        self.sinkPos = self.m.Var(value = 30, lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
         #self.sinkPos.STATUS = 1
         
         #self.sinkV = self.m.MV(lb=-3,ub=3)
         #self.sinkV.STATUS = 1
-    
+        
+        
         # define distance 
         for i in range(self.CHs):
             self.CHLst.append(self.m.Param(value = 4*i)) 
-            self.CHdistLst.append(self.m.Var(value = self.sinkPos - self.CHLst[i]))
+            self.CHdistLst.append(self.m.Var(value = self.sinkPos.value - self.CHLst[i].value))
             self.distIMCH.append(self.m.Intermediate(self.sinkPos - self.CHLst[i])) 
-            
             self.m.Equation(self.CHdistLst[i] == self.sinkPos - self.CHLst[i])
-            #self.m.Equation(self.CHdistLst[i].dt() == (self.m.abs(self.distIMCH[i])/self.distIMCH[i])*self.sinkV)
-        
+            
         for i in range(self.nonCHs):
             self.nonCHLst.append(self.m.Param(value = 2*i))
-            self.nonCHdistLst.append(self.m.Var(value = self.sinkPos - self.nonCHLst[i]))
+            self.nonCHdistLst.append(self.m.Var(value = self.sinkPos.value - self.nonCHLst[i].value))
             self.distIMnonCH.append(self.m.Intermediate(self.sinkPos - self.nonCHLst[i])) 
             
             self.m.Equation(self.nonCHdistLst[i] == self.sinkPos - self.nonCHLst[i])
-            #self.m.Equation(self.nonCHdistLst[i].dt() == (self.m.abs(self.distIMnonCH[i])/self.distIMnonCH[i])*self.sinkV)
-        
+            
         print(self.nonCHLst[1].value)
         print(self.sinkPos.value)
         
         
         # as data is transmitted, remaining data stored decreases
-        #self.m.Equation(self.data.dt() == self.packs + self.packs1)
+
         
         # energy to transmit
         #self.packs = self.m.Param()
         self.packs = 1
         self.dtrLst = []
         self.rnds = self.m.Var(lb = 1)
-        self.E_tot = self.m.Param(value = 3)
+        self.E_tot = self.m.Param(value = 0.005)
+        self.data = self.m.Var(value = 0)
+        self.e1Sum = []
+        self.e2Sum = []
+        
         
         for i in range(self.CHs):
             #self.intermeds.append(self.m.Intermediate((Eelec+EDA)*self.packet + self.packs*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2)))  
+            #self.intermeds.append(self.m.Intermediate(self.E_tot/((Eelec+EDA)*self.packet + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2))))
+            #self.m.Obj(-self.intermeds[-1])
             self.dtrLst.append(self.m.Var(lb = 1, ub = 20))
+            self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.packs + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2)))
             
-            self.intermeds.append(self.m.Intermediate(self.E_tot/((Eelec+EDA)*self.packet + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2))))
-            
-            # FIX THIS! currently this cost function builds on mean distances of all nodes. Gotta make it so that i works for individual CHs 
-            #self.intermeds.append((self.E_tot - self.rnds*(self.PERC * self.E_tot * (Eelec + EDA)*self.packs - (1-self.PERC)*()))   ) F
-            
-            
-            self.m.Obj(-self.intermeds[-1])
+
         for i in range(self.nonCHs):
             #self.intermeds.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))  
-            self.intermeds.append(self.m.Intermediate(self.E_tot/(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2))))
-            self.m.Obj(-self.intermeds[-1])
+            #self.intermeds.append(self.m.Intermediate(self.E_tot/(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2))))
+            #self.m.Obj(-self.intermeds[-1])
+            self.e2Sum.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))
+            
+        
         
         
         self.dm1 = np.sum(self.CHdistLst)/len(self.CHdistLst)            # Mean distance of CH to sink
@@ -116,36 +120,15 @@ class MPC2ndLayer(EnvironmentEngine):
         
         
         self.rnd = self.m.Intermediate(self.E_tot/(self.PERC*self.E_tot*self.e1+(1-self.PERC)*self.e2))
-        #self.m.Obj(-self.rnd)
+        #self.m.Equation(self.data == self.m.sum(self.dtrLst)*self.rnd)
+        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
+        self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*self.rnds)
+        self.m.Obj(-self.target)
         
-        
-        """
-        self.data = self.m.Var()
-        for i in range(self.intermeds):
-            self.
-        self.m.Equation(self.data.dt() == self.packs*self.pSize + self.dtr1*self.pSize)
-        
-        
-        
-         # soft (objective constraint)
-        self.final = self.m.Param(value=np.zeros(self.ctrlRes))
-        self.final.value[int(np.floor(self.ctrlRes/2)):-1] = 0.001
-        self.final.value[-1] = 1
-        
-        self.m.Equation(self.final*(self.data)>=0)
-        
-        # objective
-        self.m.Obj(self.e) # minimize energy
-        self.m.Obj(self.e1) # minimize energy
-        self.m.Obj(-self.data*self.final)
-        """
         
         
         # options
         self.m.options.IMODE = 3                 # optimize a solid state
-        #self.m.options.NODES = 3                # collocation nodes
-        #self.m.options.SOLVER = 1               # solver (IPOPT), 1 is for when integers is used as MV
-        #self.m.options.TIME_SHIFT = 1           # Setting for saving values from last solve()
 
         
         
@@ -155,9 +138,47 @@ class MPC2ndLayer(EnvironmentEngine):
         self.m.solve()
         print(self.sinkPos.value)
         print(self.rnd.value)
+        print(self.data.value)
         
         
     def plot(self):
+        
+        N = len(self.dtrLst)
+        
+        x = range(N)
+        
+        objects = np.linspace(1,len(self.CHLst),1)
+        #for i in range(self.CHLst):
+        #    objects.append(self.CHdistLst[i].)
+            
+        y_pos = np.arange(len(objects))
+        
+        CHDL = []
+        for i in range(len(self.CHdistLst)):
+            CHDL.append(self.CHdistLst.value.value[i])
+        
+        DTRL = []
+        for i in range(len(self.dtrLst)):
+            DTRL.append(self.dtrLst.value.value[i])
+        
+        plt.figure(self.nrplots)
+        plt.subplot(2,1,1)
+        plt.barh(y_pos, self.CHDL, align='center', alpha=0.5)
+        plt.yticks(y_pos, objects)
+        plt.xlabel('distance')
+        plt.title('Node#')
+        
+        
+        plt.figure(self.nrplots)
+        plt.subplot(2,1,2)
+        plt.barh(y_pos, self.DTRL, align='center', alpha=0.5)
+        plt.yticks(y_pos, objects)
+        plt.xlabel('packets desired')
+        plt.title('Node#')
+        
+        
+        plt.show()
+        """
         plt.figure(self.nrplots)
         plt.subplot(4,1,1)
         plt.plot(self.m.time,self.CHdistLst[6].value,'r-',label='Distance')
@@ -187,45 +208,11 @@ class MPC2ndLayer(EnvironmentEngine):
         
         self.nrplots+=1
         
-        
-        
-"""    
-             
-    
-    def controlPR(self, velocity):  
-        temp = np.float64(velocity)
-        
-        self.vp[0:] = self.v.value[1]
-        if(temp == self.vp[0]):
-            if self.verbose:
-                print('Velocity: {0} was equal to vVal0: {1}'.format(temp, self.vp[0]))
-                print('Therefore, velocity was set as vp[1:]')
-        else:
-            if self.verbose:
-                print('Velocity: {0} was not equal to vVal0: {1}'.format(temp, self.v.value[0]))
-                print('Therefore, vp[1:] was set as tempVel = {0}'.format(temp))
-            self.vp[1:] = temp 
-            #print(self.vp)
-                
-        self.v.value = self.vp
-            #print(np.shape(testNode.vp))  
-        if(type(self.dtr.value.value) is not int):
-            self.dtrp = np.zeros(self.ctrlRes)
-            self.dtrp[0] = self.dtr.value[1]
-            self.dtr.value = self.dtrp
-            
-            #self.nrj_stored.value[0] = self.nrj_stored.value[1]
-            #self.data.value[0] = self.data.value[1]
-        
-
-        #self.data.value[0] = self.data.value[1]
-        self.m.solve(disp=False) # solve optimization problem
-        self.setPR(self.dtr.value[0])
-        
+        """
     def clearGEKKO(self):
         self.m.clear()
 
-"""
+
 if __name__ == "__main__":
     Hrz = 8
     Res = Hrz + 1
@@ -238,5 +225,5 @@ if __name__ == "__main__":
         #print(node.energy)
         
     testEnv.controlEnv()
-    #testEnv.plot()
+    testEnv.plot()
     

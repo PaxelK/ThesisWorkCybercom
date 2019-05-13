@@ -34,6 +34,9 @@ class MPCnode(Node):
         #Counter for plots
         self.nrplots = 1;
         
+        #Threshold for when objective is seen as 0
+        self.limit = np.float64(1e-10)
+        
         # define velocity profile
         self.vp = np.zeros(self.ctrlRes)
         self.v = self.m.Param(value=self.vp)
@@ -154,11 +157,20 @@ class MPCnode(Node):
             #print(self.vp)
                 
         self.v.value = self.vp
+        
+        
+        if(type(self.data.value.value) is not int):
+            if(self.data.value.value[0] <= self.limit):
+                self.datap = np.zeros(self.ctrlRes)
+                self.data.value[0] = 0
+        #if(self.data.value[0] <= limit):
+        #    self.data.value[0] = 0
             #print(np.shape(testNode.vp))  
         if(type(self.dtr.value.value) is not int):
             self.dtrp = np.zeros(self.ctrlRes)
             self.dtrp[0] = self.dtr.value[1]
             self.dtr.value = self.dtrp
+            
             
             #self.nrj_stored.value[0] = self.nrj_stored.value[1]
             #self.data.value[0] = self.data.value[1]
