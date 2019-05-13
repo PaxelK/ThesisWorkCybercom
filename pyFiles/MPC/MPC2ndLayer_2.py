@@ -41,9 +41,14 @@ class MPC2ndLayer(EnvironmentEngine):
         self.nodePos = self.m.Var(value = 20)
         self.nodePos1 = self.m.Var(value = 40)
         
-        self.sinkPos = self.m.MV(lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
-        self.sinkPos.STATUS = 1
+        self.sinkPos = self.m.MV(value = 30, lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
+        #self.sinkPos.STATUS = 1
          
+        self.sinkV = self.m.MV(value = 0, lb=-2,ub=2)
+        self.sinkV.STATUS = 1
+        
+        self.m.Equation(self.sinkPos.dt() == self.sinkV)
+        
         self.sinkd = self.m.Var()
         self.sinkd1 = self.m.Var()
         self.m.Equation(self.sinkd == self.sinkPos - self.nodePos)
@@ -92,11 +97,11 @@ class MPC2ndLayer(EnvironmentEngine):
         self.j = self.m.Intermediate(-Q*self.nrj + R*self.e)
         self.j1 = self.m.Intermediate(-Q*self.nrj1 + R*self.e1)
         
-        self.jBalance = self.m.Intermediate(-self.nrj/self.e)
-        self.jBalance1 = self.m.Intermediate(-self.nrj1/self.e1)
+        #self.jBalance = self.m.Intermediate(-self.nrj/self.e)
+        #self.jBalance1 = self.m.Intermediate(-self.nrj1/self.e1)
         
         self.m.Obj(self.j + self.j1)
-        self.m.Obj(self.jBalance + self.jBalance1)
+        #self.m.Obj(self.jBalance + self.jBalance1)
         
         #self.m.Obj(self.nrj/self.e) # minimize energy
         #self.m.Obj(self.nrj1/self.e1) # minimize energy
@@ -109,7 +114,9 @@ class MPC2ndLayer(EnvironmentEngine):
         self.c = 0.03
         #self.m.Obj(-(self.E-self.c/0.05)*self.data)
         #self.m.Obj(-((self.j+self.j1-2)*self.data)
-                
+        
+   
+        
         # options
         self.m.options.IMODE = 6                # optimal control
         self.m.options.NODES = 3                # collocation nodes
@@ -136,20 +143,20 @@ class MPC2ndLayer(EnvironmentEngine):
         
     def plot(self):
         plt.figure(self.nrplots)
-        plt.subplot(6,1,1)
+        plt.subplot(7,1,1)
         plt.plot(self.m.time,self.sinkd.value,'r-',label='Distance')
         plt.legend()
         
         plt.figure(self.nrplots)
-        plt.subplot(6,1,2)
+        plt.subplot(7,1,2)
         plt.plot(self.m.time,self.sinkd1.value,'r-',label='Distance')
         plt.legend()
         
-        #plt.subplot(7,1,3)
-        #plt.plot(self.m.time,self.v.value,'k--',label='Velocity')
-        #plt.legend()
+        plt.subplot(7,1,3)
+        plt.plot(self.m.time,self.sinkV.value,'k--',label='Velocity')
+        plt.legend()
         
-        plt.subplot(6,1,3)
+        plt.subplot(7,1,3)
         plt.plot(self.m.time,self.e.value,'b-',label='Energy Consumption')
         plt.legend()
         
@@ -157,16 +164,16 @@ class MPC2ndLayer(EnvironmentEngine):
         #plt.plot(self.m.time,self.ps,'b-',label='Bits Sent')
         #plt.legend()
         
-        plt.subplot(6,1,4)
+        plt.subplot(7,1,4)
         plt.plot(self.m.time, self.data.value,'k.-',label='Data Sent')
         plt.legend()
         
         
-        plt.subplot(6,1,5)
+        plt.subplot(7,1,5)
         plt.plot(self.m.time, self.packs.value,'r-',label='Transmission Amount, packs')
         plt.legend()
         
-        plt.subplot(6,1,6)
+        plt.subplot(7,1,6)
         plt.plot(self.m.time, self.packs1.value,'r-',label='Transmission Amount1, packs1')
         plt.legend()
         
