@@ -48,9 +48,9 @@ while True:  # Run until all node dies
     # print(f"deadnodes Length = {len(EE.deadNodes)}")
 
     #plotEnv(EE)
-    
-    EE.updateEnv(1, 1, PRcontrl)
+
     EE.cluster()
+    EE.updateEnv(1, 1, PRcontrl)
     EE.communicate()
     EE.iterateRound()
 

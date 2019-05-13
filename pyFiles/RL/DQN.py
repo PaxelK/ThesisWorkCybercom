@@ -35,8 +35,9 @@ class DQNAgent:
     def _build_model(self):
         # Neural Net for Deep-Q learning Model
         model = Sequential()
+        # Add layers to NN model
         model.add(Dense(24, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(36, activation='relu'))
+        model.add(Dense(48, activation='relu'))
         #model.add(Dense(36, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mae', optimizer=Adam(lr=self.learning_rate))
@@ -89,9 +90,9 @@ if __name__ == "__main__":
         done = False
         rnd = 0
         state = env.reset()  # Reset env to a random state
-        # Format state such that it can be used for training (One node as now)
-        state[2] = state[2][1]
-        state[3] = state[3][1]
+        # Format state such that it can be used for training
+        for i in range(2, numNodes+2):
+            state[i] = state[i][1]
         state = np.reshape(state, [1, state_size])
         while not done:
             rnd += 1
@@ -101,8 +102,8 @@ if __name__ == "__main__":
 
 
             next_state = [next_state_temp[0], next_state_temp[1]]
-            next_state.append(next_state_temp[2][0][1])  # One node
-            next_state.append(next_state_temp[2][1][1])
+            for i in range(numNodes):
+                next_state.append(next_state_temp[2][i][1])
             next_state = np.array(next_state)
             next_state = np.reshape(next_state, [1, state_size])
             agent.remember(state, action, reward, next_state, done)
@@ -118,7 +119,7 @@ if __name__ == "__main__":
 
         avrRnd.append(rnd)
 
-        # if rnd > max(avrRnd):  # Save weights for every 10th episode
+        # if rnd > max(avrRnd):  # Save weights for max reward
         #     agent.save("./save/wsn-dqn.h5")
 
     print(f"avrRnd: {avrRnd}")
@@ -132,8 +133,8 @@ if __name__ == "__main__":
     rnd = 0
     state = env.reset()  # Reset env to a random state
     # Format state such that it can be used for training
-    state[2] = state[2][1]
-    state[3] = state[3][1]
+    for i in range(2, numNodes + 2):
+        state[i] = state[i][1]
     state = np.reshape(state, [1, state_size])
     while not done:
         env.render()
@@ -142,8 +143,8 @@ if __name__ == "__main__":
         next_state_temp, reward, done, _ = env.step(action)
 
         next_state = [next_state_temp[0], next_state_temp[1]]
-        next_state.append(next_state_temp[2][0][1])  # One node
-        next_state.append(next_state_temp[2][1][1])
+        for i in range(numNodes):
+            next_state.append(next_state_temp[2][i][1])
         next_state = np.array(next_state)
         next_state = np.reshape(next_state, [1, state_size])
         agent.remember(state, action, reward, next_state, done)
