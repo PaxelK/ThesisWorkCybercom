@@ -9,13 +9,13 @@ from gekko import GEKKO
 import numpy as np
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from EnvironmentEngine import EnvironmentEngine
-from setParams import *
+from EnvironmentEngineMPC import EnvironmentEngineMPC
+from setParamsMPC import *
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 
 
-class MPC2ndLayer(EnvironmentEngine):
+class MPC2ndLayer(EnvironmentEngineMPC):
     def __init__(self, ctrlHrz, ctrlRes):
         super().__init__()  
         
@@ -32,20 +32,23 @@ class MPC2ndLayer(EnvironmentEngine):
         
         # constants
         self.Egen = 1*10**-3
-        self.const = 0.6
-        self.packet = 1
         self.pSize = ps        
         
-        
-        
-        self.PERC = 0.10
-        self.nds = 30                                   # ALL NODES
+        self.PERC = p
+        self.nds = 40                                   # ALL NODES
         self.CHs = int(self.nds*self.PERC)              # CLUSTER HEADS
         self.nonCHs = int(self.nds - self.CHs)          # NON-CHs
         self.CHLst = []                                 # List of CH positions Param()
+        self.CHxPos = []                                 # List of CH x/y positions as a Param()
+        self.CHyPos = []
+        self.CHdstLst = []
         self.CHdistLst = []                             # List of CHs distances Var()
         
         self.nonCHLst = []                              # List of non-CH positions Param()
+        self.nonCHpos = []
+        self.nonCHxPos = []
+        self.nonCHyPos = []
+        self.nonCHdstLst = []
         self.nonCHdistLst = []                          # List of non-CHs distances Var()
         
         self.intermeds = []                             # List of intermediate equations for energy consumption of nodes
@@ -55,77 +58,21 @@ class MPC2ndLayer(EnvironmentEngine):
         #Counter for plots
         self.nrplots = 1;
     
-        self.sinkPos = self.m.Var(value = 30, lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
-        #self.sinkPos.STATUS = 1
         
-        #self.sinkV = self.m.MV(lb=-3,ub=3)
-        #self.sinkV.STATUS = 1
-        
-        
-        # define distance 
-        for i in range(self.CHs):
-            self.CHLst.append(self.m.Param(value = 4*i)) 
-            self.CHdistLst.append(self.m.Var(value = self.sinkPos.value - self.CHLst[i].value))
-            self.distIMCH.append(self.m.Intermediate(self.sinkPos - self.CHLst[i])) 
-            self.m.Equation(self.CHdistLst[i] == self.sinkPos - self.CHLst[i])
-            
-        for i in range(self.nonCHs):
-            self.nonCHLst.append(self.m.Param(value = 2*i))
-            self.nonCHdistLst.append(self.m.Var(value = self.sinkPos.value - self.nonCHLst[i].value))
-            self.distIMnonCH.append(self.m.Intermediate(self.sinkPos - self.nonCHLst[i])) 
-            
-            self.m.Equation(self.nonCHdistLst[i] == self.sinkPos - self.nonCHLst[i])
-            
-        print(self.nonCHLst[1].value)
-        print(self.sinkPos.value)
-        
-        
-        # as data is transmitted, remaining data stored decreases
 
         
-        # energy to transmit
-        #self.packs = self.m.Param()
-        self.packs = 1
-        self.dtrLst = []
-        self.rnds = self.m.Var(lb = 1)
-        self.E_tot = self.m.Param(value = 0.005)
-        self.data = self.m.Var(value = 0)
-        self.e1Sum = []
-        self.e2Sum = []
-        
-        
-        for i in range(self.CHs):
-            #self.intermeds.append(self.m.Intermediate((Eelec+EDA)*self.packet + self.packs*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2)))  
-            #self.intermeds.append(self.m.Intermediate(self.E_tot/((Eelec+EDA)*self.packet + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2))))
-            #self.m.Obj(-self.intermeds[-1])
-            self.dtrLst.append(self.m.Var(lb = 1, ub = 20))
-            self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.packs + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2)))
-            
 
-        for i in range(self.nonCHs):
-            #self.intermeds.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))  
-            #self.intermeds.append(self.m.Intermediate(self.E_tot/(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2))))
-            #self.m.Obj(-self.intermeds[-1])
-            self.e2Sum.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))
-            
         
-        
-        
+        """
+        This part is in case the LEACH protocol is to be used in the model.
         self.dm1 = np.sum(self.CHdistLst)/len(self.CHdistLst)            # Mean distance of CH to sink
         self.dm2 = np.sum(self.nonCHdistLst)/len(self.nonCHdistLst)      # Mean distance of nonCH to sink
         
         self.e1 = self.m.Intermediate(((Eelec+EDA)*self.packet + self.packs*self.pSize*(Eelec + Eamp * self.dm1**2))*len(self.CHdistLst)) # Mean energy consumption per round for CHs
         self.e2 = self.m.Intermediate((self.packs*self.pSize*(Eelec + Eamp * self.dm2**2))*len(self.nonCHdistLst)) # Mean energy consumption per round for CHs
         
-        
-        
         self.rnd = self.m.Intermediate(self.E_tot/(self.PERC*self.E_tot*self.e1+(1-self.PERC)*self.e2))
-        #self.m.Equation(self.data == self.m.sum(self.dtrLst)*self.rnd)
-        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
-        self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*self.rnds)
-        self.m.Obj(-self.target)
-        
-        
+        """
         
         # options
         self.m.options.IMODE = 3                 # optimize a solid state
@@ -135,79 +82,229 @@ class MPC2ndLayer(EnvironmentEngine):
         
 
     def controlEnv(self):
-        self.m.solve()
+        self.snkPos = [self.m.Var(value = self.sink.xPos), self.m.Var(value = self.sink.yPos)] 
+        
+        for i in range(len(self.CHds)):
+            #self.CHpos.append([self.m.Param(value = self.CHds[i].xPos), self.m.Param(value = self.CHds[i].yPos)])
+            self.CHxPos.append(self.m.Param(value = self.CHds[i].xPos))
+            self.CHyPos.append(self.m.Param(value = self.CHds[i].yPos))
+            
+            temp = np.sqrt((self.CHds[i].xPos)**2 + (self.CHds[i].yPos)**2)
+            self.CHdstLst.append(self.m.Var(value = temp))
+            
+            self.m.Equation(self.CHdstLst[i] == self.m.sqrt((self.snkPos[0] - self.CHxPos[i])**2 + (self.snkPos[1] - self.CHyPos[i])**2))
+        
+        print('CHxPos:\n {0}'.format(self.CHxPos))
+        print('CHyPos:\n {0}'.format(self.CHyPos))
+        print('CHdstLst:\n {0}'.format(self.CHdstLst))
+        
+        for i in range(len(self.nonCHds)):
+            #self.nonCHpos.append([self.m.Param(value = self.nonCHds[i].xPos), self.m.Param(value = self.nonCHds[i].yPos)])
+            self.nonCHxPos.append(self.m.Param(value = self.nonCHds[i].xPos))
+            self.nonCHyPos.append(self.m.Param(value = self.nonCHds[i].yPos))
+            
+            temp = np.sqrt((self.nonCHds[i].xPos)**2 + (self.nonCHds[i].yPos)**2)
+            
+            self.nonCHdstLst.append(self.m.Var(value = temp))
+            self.m.Equation(self.nonCHdstLst[i] == self.m.sqrt((self.snkPos[0] - self.nonCHxPos[i])**2 + (self.snkPos[1] - self.nonCHyPos[i])**2))
+        
+        print('nonCHxPos:\n {0}'.format(self.nonCHxPos))
+        print('nonCHyPos:\n {0}'.format(self.nonCHyPos))
+        print('nonCHdstLst:\n {0}'.format(self.nonCHdstLst))
+        
+        self.packs = 1
+        self.dtrLst = []
+        self.rnds = self.m.Var(integer = True, lb = 1)
+        self.ECH_sum = []
+        self.EnonCH_sum = []
+        
+        for i in range(len(self.CHds)):
+            self.ECH_sum.append(self.m.Param(value = self.CHds[i].energy))
+        for i in range(len(self.nonCHds)):
+            self.EnonCH_sum.append(self.m.Param(value = self.nonCHds[i].energy))
+        
+        print('ECH_sum:\n {0}'.format(self.ECH_sum))
+        print('EnonCH_sum:\n {0}'.format(self.EnonCH_sum))
+        
+        self.E_tot = self.m.Param(value = 50)
+        self.e1Sum = []
+        self.e2Sum = []
+        
+        
+        for i in range(len(self.CHds)):
+            self.dtrLst.append(self.m.Var(lb = 1, ub = 20))
+            self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.packs + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdstLst[i]**2)))
+            
+
+        for i in range(len(self.nonCHds)):
+            self.e2Sum.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdstLst[i]**2)))
+                
+        print('dtrLst:\n {0}'.format(self.dtrLst))
+        print('e1Sum:\n {0}'.format(self.e1Sum))
+        print('e2Sum:\n {0}'.format(self.e2Sum))
+        
+        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
+        
+        print('E_tot:\n {0}'.format(self.E_tot.value))
+        self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*self.rnds)
+        self.m.Obj(-self.target)        
+        
+        
+        
+        
+        
+        
+        
+        self.m.solve(disp=True)
+        print('Sink X: {0}'.format(self.snkPos[0].value))
+        print('Sink Y: {0}'.format(self.snkPos[1].value))
+        print(self.rnds.value)
+        
+        
+        
+        """
+        #WORKING SCRIPT FOR ONE DIMENSION
+        
+        self.sinkPos = self.m.Var(value = 30, lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
+
+        #self.sinkV = self.m.MV(lb=-3,ub=3)
+        #self.sinkV.STATUS = 1
+
+        # as data is transmitted, remaining data stored decreases
+        
+        for i in range(self.CHs):
+            self.CHLst.append(self.m.Param(value = 4*i)) 
+            self.CHdistLst.append(self.m.Var(value = self.sinkPos.value - self.CHLst[i].value))
+            #self.distIMCH.append(self.m.Intermediate(self.sinkPos - self.CHLst[i])) 
+            self.m.Equation(self.CHdistLst[i] == self.sinkPos - self.CHLst[i])
+        
+        for i in range(self.nonCHs):
+            self.nonCHLst.append(self.m.Param(value = 2*i))
+            self.nonCHdistLst.append(self.m.Var(value = self.sinkPos.value - self.nonCHLst[i].value))
+            #self.distIMnonCH.append(self.m.Intermediate(self.sinkPos - self.nonCHLst[i])) 
+            
+            self.m.Equation(self.nonCHdistLst[i] == self.sinkPos - self.nonCHLst[i])
+
+        
+        self.packs = 1
+        self.dtrLst = []
+        self.rnds = self.m.Var(integer = True, lb = 1)
+        self.E_tot = self.m.Param(value = 3)
+        self.e1Sum = []
+        self.e2Sum = []
+        
+        
+        for i in range(self.CHs):
+            self.dtrLst.append(self.m.Var(lb = 1, ub = 20))
+            self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.packs + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2)))
+            
+
+        for i in range(self.nonCHs):
+            self.e2Sum.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))
+                
+        
+        
+        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
+        self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*self.rnds)
+        self.m.Obj(-self.target)
+        
+        
+        
+        
+        
+        
+        
+        self.m.solve(disp=False)
         print(self.sinkPos.value)
-        print(self.rnd.value)
-        print(self.data.value)
+        print(self.rnds.value)
+        """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
         
     def plot(self):
-        
-        N = len(self.dtrLst)
-        
-        x = range(N)
-        
-        objects = np.linspace(1,len(self.CHLst),1)
+        objects = np.linspace(1,len(self.CHdstLst),len(self.CHdstLst))
         #for i in range(self.CHLst):
         #    objects.append(self.CHdistLst[i].)
             
         y_pos = np.arange(len(objects))
+        ydtr = np.linspace(0,20,11)
+        
+        ydist = np.linspace(-50,50,11)
         
         CHDL = []
-        for i in range(len(self.CHdistLst)):
-            CHDL.append(self.CHdistLst.value.value[i])
+        for i in range(len(self.CHdstLst)):
+            CHDL.append(self.CHdstLst[i][0])
         
         DTRL = []
         for i in range(len(self.dtrLst)):
-            DTRL.append(self.dtrLst.value.value[i])
+            DTRL.append(self.dtrLst[i][0])
         
         plt.figure(self.nrplots)
         plt.subplot(2,1,1)
-        plt.barh(y_pos, self.CHDL, align='center', alpha=0.5)
-        plt.yticks(y_pos, objects)
-        plt.xlabel('distance')
-        plt.title('Node#')
+        plt.bar(y_pos, CHDL, align='center', alpha=0.5)
+        plt.yticks(ydist, ydist)
+        plt.ylabel('distance')
         
         
-        plt.figure(self.nrplots)
         plt.subplot(2,1,2)
-        plt.barh(y_pos, self.DTRL, align='center', alpha=0.5)
-        plt.yticks(y_pos, objects)
-        plt.xlabel('packets desired')
-        plt.title('Node#')
-        
+        plt.bar(y_pos, DTRL, align='center', alpha=0.5)
+        plt.yticks(ydtr, ydtr)
+        plt.ylabel('Packets Desired')
+        plt.xlabel('Node#')
         
         plt.show()
+        
         """
-        plt.figure(self.nrplots)
-        plt.subplot(4,1,1)
-        plt.plot(self.m.time,self.CHdistLst[6].value,'r-',label='Distance')
-        plt.legend()
+        #WORKING CODE
+        objects = np.linspace(1,len(self.CHLst),len(self.CHLst))
+        #for i in range(self.CHLst):
+        #    objects.append(self.CHdistLst[i].)
+            
+        y_pos = np.arange(len(objects))
+        ydtr = np.linspace(0,20,11)
+        
+        ydist = np.linspace(-50,50,11)
+        
+        CHDL = []
+        for i in range(len(self.CHdistLst)):
+            CHDL.append(self.CHdistLst[i][0])
+        
+        DTRL = []
+        for i in range(len(self.dtrLst)):
+            DTRL.append(self.dtrLst[i][0])
         
         plt.figure(self.nrplots)
-        plt.subplot(4,1,2)
-        plt.plot(self.m.time,self.CHdistLst[7].value,'r-',label='Distance')
-        plt.legend()
-        
-        #plt.subplot(7,1,3)
-        #plt.plot(self.m.time,self.v.value,'k--',label='Velocity')
-        #plt.legend()
-        
-        plt.subplot(4,1,3)
-        plt.plot(self.m.time,self.intermeds[0].value,'b-',label='Energy Consumption')
-        plt.legend()
-        
-        #plt.subplot(6,1,3)
-        #plt.plot(self.m.time,self.ps,'b-',label='Bits Sent')
-        #plt.legend()
-        
-        plt.subplot(4,1,4)
-        plt.plot(self.m.time, self.sinkV.value,'k.-',label='Sink Vel')
-        plt.legend()
+        plt.subplot(2,1,1)
+        plt.bar(y_pos, CHDL, align='center', alpha=0.5)
+        plt.yticks(ydist, ydist)
+        plt.ylabel('distance')
         
         
-        self.nrplots+=1
+        plt.subplot(2,1,2)
+        plt.bar(y_pos, DTRL, align='center', alpha=0.5)
+        plt.yticks(ydtr, ydtr)
+        plt.ylabel('Packets Desired')
+        plt.xlabel('Node#')
         
+        plt.show()
         """
     def clearGEKKO(self):
         self.m.clear()
@@ -218,12 +315,10 @@ if __name__ == "__main__":
     Res = Hrz + 1
     
     testEnv = MPC2ndLayer(Hrz,Res)
-   # print(testEnv.sink.xPos)
-    #print(testEnv.ctrlHrz)
-    testEnv.nodes[0].energy = 0.05
-    #for node in testEnv.nodes:
-        #print(node.energy)
-        
+    testEnv.cluster()
+    print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
+
+    
     testEnv.controlEnv()
-    testEnv.plot()
+    #testEnv.plot()
     
