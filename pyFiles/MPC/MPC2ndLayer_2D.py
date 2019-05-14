@@ -59,21 +59,6 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.nrplots = 1;
     
         
-
-        
-
-        
-        """
-        This part is in case the LEACH protocol is to be used in the model.
-        self.dm1 = np.sum(self.CHdistLst)/len(self.CHdistLst)            # Mean distance of CH to sink
-        self.dm2 = np.sum(self.nonCHdistLst)/len(self.nonCHdistLst)      # Mean distance of nonCH to sink
-        
-        self.e1 = self.m.Intermediate(((Eelec+EDA)*self.packet + self.packs*self.pSize*(Eelec + Eamp * self.dm1**2))*len(self.CHdistLst)) # Mean energy consumption per round for CHs
-        self.e2 = self.m.Intermediate((self.packs*self.pSize*(Eelec + Eamp * self.dm2**2))*len(self.nonCHdistLst)) # Mean energy consumption per round for CHs
-        
-        self.rnd = self.m.Intermediate(self.E_tot/(self.PERC*self.E_tot*self.e1+(1-self.PERC)*self.e2))
-        """
-        
         # options
         self.m.options.IMODE = 3                 # optimize a solid state
 
@@ -124,10 +109,14 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         print('ECH_sum:\n {0}'.format(self.ECH_sum))
         print('ECH_sum:\n {0}'.format(self.m.sum(self.ECH_sum).value))
         print('EnonCH_sum:\n {0}'.format(self.EnonCH_sum))
-        #self.E_tot = self.m.Param(value = 50)
-        #(self.m.sum(self.ECH_sum) + self.m.sum(self.EnonCH_sum))
+
+
         self.E_total = self.m.Intermediate(self.m.sum(self.ECH_sum) + self.m.sum(self.EnonCH_sum))
-        self.E_tot = self.m.Param(value = 50)
+        
+        E_temp = 0
+        for node in self.nodes:
+            E_temp += node.energy
+        self.E_tot = self.m.Param(value = E_temp)
         self.e1Sum = []
         self.e2Sum = []
         
@@ -147,6 +136,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         print('e2Sum:\n {0}'.format(self.e2Sum))
         
         self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
+        #self.m.Equation(self.E_total >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
         
         print('E_tot:\n {0}'.format(self.E_tot.value))
         self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*self.rnds)
@@ -161,85 +151,8 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.m.solve(disp=False)
         print('Sink X: {0}'.format(self.snkPos[0].value))
         print('Sink Y: {0}'.format(self.snkPos[1].value))
-        print(self.rnds.value)
+        print('Number of rounds for optimal amount of data sent: {0}'.format(self.rnds.value))
         
-        
-        
-        """
-        #WORKING SCRIPT FOR ONE DIMENSION
-        
-        self.sinkPos = self.m.Var(value = 30, lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
-
-        #self.sinkV = self.m.MV(lb=-3,ub=3)
-        #self.sinkV.STATUS = 1
-
-        # as data is transmitted, remaining data stored decreases
-        
-        for i in range(self.CHs):
-            self.CHLst.append(self.m.Param(value = 4*i)) 
-            self.CHdistLst.append(self.m.Var(value = self.sinkPos.value - self.CHLst[i].value))
-            #self.distIMCH.append(self.m.Intermediate(self.sinkPos - self.CHLst[i])) 
-            self.m.Equation(self.CHdistLst[i] == self.sinkPos - self.CHLst[i])
-        
-        for i in range(self.nonCHs):
-            self.nonCHLst.append(self.m.Param(value = 2*i))
-            self.nonCHdistLst.append(self.m.Var(value = self.sinkPos.value - self.nonCHLst[i].value))
-            #self.distIMnonCH.append(self.m.Intermediate(self.sinkPos - self.nonCHLst[i])) 
-            
-            self.m.Equation(self.nonCHdistLst[i] == self.sinkPos - self.nonCHLst[i])
-
-        
-        self.packs = 1
-        self.dtrLst = []
-        self.rnds = self.m.Var(integer = True, lb = 1)
-        self.E_tot = self.m.Param(value = 3)
-        self.e1Sum = []
-        self.e2Sum = []
-        
-        
-        for i in range(self.CHs):
-            self.dtrLst.append(self.m.Var(lb = 1, ub = 20))
-            self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.packs + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2)))
-            
-
-        for i in range(self.nonCHs):
-            self.e2Sum.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))
-                
-        
-        
-        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
-        self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*self.rnds)
-        self.m.Obj(-self.target)
-        
-        
-        
-        
-        
-        
-        
-        self.m.solve(disp=False)
-        print(self.sinkPos.value)
-        print(self.rnds.value)
-        """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         
         
     def plot(self):
@@ -276,40 +189,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         
         plt.show()
         
-        """
-        #WORKING CODE
-        objects = np.linspace(1,len(self.CHLst),len(self.CHLst))
-        #for i in range(self.CHLst):
-        #    objects.append(self.CHdistLst[i].)
-            
-        y_pos = np.arange(len(objects))
-        ydtr = np.linspace(0,20,11)
         
-        ydist = np.linspace(-50,50,11)
-        
-        CHDL = []
-        for i in range(len(self.CHdistLst)):
-            CHDL.append(self.CHdistLst[i][0])
-        
-        DTRL = []
-        for i in range(len(self.dtrLst)):
-            DTRL.append(self.dtrLst[i][0])
-        
-        plt.figure(self.nrplots)
-        plt.subplot(2,1,1)
-        plt.bar(y_pos, CHDL, align='center', alpha=0.5)
-        plt.yticks(ydist, ydist)
-        plt.ylabel('distance')
-        
-        
-        plt.subplot(2,1,2)
-        plt.bar(y_pos, DTRL, align='center', alpha=0.5)
-        plt.yticks(ydtr, ydtr)
-        plt.ylabel('Packets Desired')
-        plt.xlabel('Node#')
-        
-        plt.show()
-        """
     def clearGEKKO(self):
         self.m.clear()
 
