@@ -20,11 +20,8 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         super().__init__()  
         
         self.verbose = False
-        self.nrplots = 0
-         
-         
-        self.m = GEKKO(remote=False)
-        
+    
+        self.resetGEKKO()
         # time points
         self.ctrlHrz = ctrlHrz                  # Control Horizon
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
@@ -35,23 +32,10 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.pSize = ps        
         
         self.PERC = p
-        self.CHxPos = []                                 # List of CH x/y positions as a Param()
-        self.CHyPos = []
-        self.CHdstLst = []
-        
-        self.nonCHxPos = []
-        self.nonCHyPos = []
-        self.nonCHdstLst = []
         
         #Counter for plots
         self.nrplots = 1;
-    
-        
-        # options
-        self.m.options.IMODE = 3                 # optimize a solid state
 
-        
-        
         
 
     def controlEnv(self):
@@ -85,10 +69,9 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             print('nonCHyPos:\n {0}'.format(self.nonCHyPos))
             print('nonCHdstLst:\n {0}'.format(self.nonCHdstLst))
         
-        self.dtrLst = []
+
         self.rnds = self.m.Var(integer = True, lb = 0)
-        self.ECH_sum = []
-        self.EnonCH_sum = []
+
         
         for i in range(len(self.CHds)):
             self.ECH_sum.append(self.m.Var(value = self.CHds[i].energy))
@@ -107,8 +90,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         for node in self.nodes:
             E_temp += node.energy
         self.E_tot = self.m.Param(value = E_temp)
-        self.e1Sum = []
-        self.e2Sum = []
+
         
         
         for i in range(len(self.CHds)):
@@ -137,47 +119,40 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         print('Sink X: {0}'.format(self.snkPos[0].value))
         print('Sink Y: {0}'.format(self.snkPos[1].value))
         print('Number of rounds for optimal amount of data sent: {0}'.format(self.rnds.value))
-    
+        
+        ################################################################
+        #   This part executes the control input on the nodes and sink #
+        
+        
+        
     def resetGEKKO(self):
         self.m = GEKKO(remote = False)
-    
-    """
-    def largest_prime_factor(self, n):
-        i = 2
-        while i * i <= n:
-            if n % i:
-                i += 1
-            else:
-                n //= i
-        return n    
-    
-    def prime_factors(self, n):
-        i = 2
-        factors = []
-        while i * i <= n:
-            if n % i:
-                i += 1
-            else:
-                n //= i
-                factors.append(i)
-        if n > 1:
-            factors.append(n)
-        return factors
-    """    
+        # time points
+
+        self.CHxPos = []                                 # List of CH x/y positions as a Param()
+        self.CHyPos = []
+        self.CHdstLst = []
+        
+        self.nonCHxPos = []
+        self.nonCHyPos = []
+        self.nonCHdstLst = []
+        
+        self.e1Sum = []
+        self.e2Sum = []
+
+        self.dtrLst = []
+        self.ECH_sum = []
+        self.EnonCH_sum = []
+        
+        # options
+        self.m.options.IMODE = 3                 # optimize a solid state
+
     def plot(self):
-        objects = np.linspace(0,len(self.CHdstLst)-1,len(self.CHdstLst))
-        objects1 = []
+        IDs = []
         for ch in self.CHds:
-            objects1.append(ch.ID)
-        objectNames = []
-        for objID in objects1:
-            print(objID)
-            objectNames.append(str(objID))
-        
-        y_pos = np.arange(len(objects))
-        
-        #y_pos1 = np.arange(len(objects1))
-        
+            IDs.append(str(ch.ID))
+
+
         ydtr = np.linspace(0,20,11)
         
         #maxDist = np.floor(np.sqrt(xSize**2 + ySize**2))
@@ -194,18 +169,18 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         
         plt.figure(self.nrplots)
         plt.subplot(2,1,1)
-        plt.bar(objectNames, CHDL, align='center', alpha=0.5)
+        plt.bar(IDs, CHDL, align='center', alpha=0.5)
         plt.yticks(ydist, ydist)
         plt.ylabel('distance')
         
-        #plt.xticks(objectNames, objectNames)
+
         
         plt.subplot(2,1,2)
-        plt.bar(objectNames, DTRL, align='center', alpha=0.5)
+        plt.bar(IDs, DTRL, align='center', alpha=0.5)
         plt.yticks(ydtr, ydtr)
         plt.ylabel('Packets Desired')
         plt.xlabel('Node ID')
-        plt.xticks(objectNames, objectNames)
+        plt.xticks(IDs, IDs)
         plt.show()
         
         plt.figure(self.nrplots+1)
@@ -215,9 +190,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         for nonch in self.nonCHds:
             plt.plot(nonch.xPos, nonch.yPos, 'go')  # plot x and y using blue circle markers
         plt.plot(self.snkPos[0].value, self.snkPos[1].value, 'ro', markersize=12)
-    def clearGEKKO(self):
-        self.m.clear()
-
+    
 
 if __name__ == "__main__":
     Hrz = 8
@@ -226,8 +199,17 @@ if __name__ == "__main__":
     testEnv = MPC2ndLayer(Hrz,Res)
     testEnv.cluster()
     print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
-
-    
     testEnv.controlEnv()
     testEnv.plot()
     
+    testEnv.cluster()
+    print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
+    testEnv.resetGEKKO()
+    testEnv.controlEnv()
+    testEnv.plot()
+    
+    testEnv.cluster()
+    print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
+    testEnv.resetGEKKO()
+    testEnv.controlEnv()
+    testEnv.plot()
