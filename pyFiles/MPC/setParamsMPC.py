@@ -5,9 +5,9 @@ This function sets all the parameters that are needed in the simulation
 '''
 ### Bleach Parameters
 
-f = 0.5   # Weight coefficient between old LEACH and new SoC term
+f = 1.5   # Weight coefficient between old LEACH and new SoC term. For regular Leach, set f>1
 k = 4000  # Size of data package, units in bits
-p = 0.2  # Suggested percentage of cluster head, a 5 percent of the total amount of nodes used in the network is proposed to give good results
+p = 0.1  # Suggested percentage of cluster head, a 5 percent of the total amount of nodes used in the network is proposed to give good results
 
 ########################### Network Establishment Parameters ###############################
 ### Area of Operation ###
@@ -17,7 +17,7 @@ ySize = 100
 x = 0  # Added for better display results of the plot
 y = 0  # Added for better display results of the plot
 
-numNodes = 10  # Number of Nodes in the field
+numNodes = 50  # Number of Nodes in the field
 dead_nodes = 0 # Number of Dead Nodes in the beginning
 
 #### Data Packet Info ###
@@ -26,7 +26,7 @@ maxPR = 20				# Maximum amount of packages that can be sent during one transmiss
 
 ### Energy Values ###
 energyMode = "rand"  	# Energy mode can be "rand"=random or "distr"=distributed
-maxNrj = 2
+maxNrj = 0.0005
 Eelec = 50*10**(-9)   	# Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 ETx = 50*10**(-9)     	# Units in Joules/bit
 ERx = 50*10**(-9)     	# Units in Joules/bit

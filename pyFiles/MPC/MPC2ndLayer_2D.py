@@ -13,7 +13,7 @@ from EnvironmentEngineMPC import EnvironmentEngineMPC
 from setParamsMPC import *
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
-
+import pylab as pl
 
 class MPC2ndLayer(EnvironmentEngineMPC):
     def __init__(self, ctrlHrz, ctrlRes):
@@ -35,25 +35,13 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.pSize = ps        
         
         self.PERC = p
-        self.nds = 40                                   # ALL NODES
-        self.CHs = int(self.nds*self.PERC)              # CLUSTER HEADS
-        self.nonCHs = int(self.nds - self.CHs)          # NON-CHs
-        self.CHLst = []                                 # List of CH positions Param()
         self.CHxPos = []                                 # List of CH x/y positions as a Param()
         self.CHyPos = []
         self.CHdstLst = []
-        self.CHdistLst = []                             # List of CHs distances Var()
         
-        self.nonCHLst = []                              # List of non-CH positions Param()
-        self.nonCHpos = []
         self.nonCHxPos = []
         self.nonCHyPos = []
         self.nonCHdstLst = []
-        self.nonCHdistLst = []                          # List of non-CHs distances Var()
-        
-        self.intermeds = []                             # List of intermediate equations for energy consumption of nodes
-        self.distIMCH = []                              # List of intermediate equations for distance between sink and CH
-        self.distIMnonCH = []                           # List of intermediate equations for distance between sink and non-CH
         
         #Counter for plots
         self.nrplots = 1;
@@ -78,9 +66,10 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             
             self.m.Equation(self.CHdstLst[i] == self.m.sqrt((self.snkPos[0] - self.CHxPos[i])**2 + (self.snkPos[1] - self.CHyPos[i])**2))
         
-        print('CHxPos:\n {0}'.format(self.CHxPos))
-        print('CHyPos:\n {0}'.format(self.CHyPos))
-        print('CHdstLst:\n {0}'.format(self.CHdstLst))
+        if self.verbose:
+            print('CHxPos:\n {0}'.format(self.CHxPos))
+            print('CHyPos:\n {0}'.format(self.CHyPos))
+            print('CHdstLst:\n {0}'.format(self.CHdstLst))
         
         for i in range(len(self.nonCHds)):
             self.nonCHxPos.append(self.m.Param(value = self.nonCHds[i].xPos))
@@ -91,13 +80,13 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             self.nonCHdstLst.append(self.m.Var(value = temp))
             self.m.Equation(self.nonCHdstLst[i] == self.m.sqrt((self.snkPos[0] - self.nonCHxPos[i])**2 + (self.snkPos[1] - self.nonCHyPos[i])**2))
         
-        print('nonCHxPos:\n {0}'.format(self.nonCHxPos))
-        print('nonCHyPos:\n {0}'.format(self.nonCHyPos))
-        print('nonCHdstLst:\n {0}'.format(self.nonCHdstLst))
+        if self.verbose:
+            print('nonCHxPos:\n {0}'.format(self.nonCHxPos))
+            print('nonCHyPos:\n {0}'.format(self.nonCHyPos))
+            print('nonCHdstLst:\n {0}'.format(self.nonCHdstLst))
         
-        self.packs = 1
         self.dtrLst = []
-        self.rnds = self.m.Var(integer = True, lb = 1)
+        self.rnds = self.m.Var(integer = True, lb = 0)
         self.ECH_sum = []
         self.EnonCH_sum = []
         
@@ -106,9 +95,10 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         for i in range(len(self.nonCHds)):
             self.EnonCH_sum.append(self.m.Var(value = self.nonCHds[i].energy))
         
-        print('ECH_sum:\n {0}'.format(self.ECH_sum))
-        print('ECH_sum:\n {0}'.format(self.m.sum(self.ECH_sum).value))
-        print('EnonCH_sum:\n {0}'.format(self.EnonCH_sum))
+        if self.verbose:
+            print('ECH_sum:\n {0}'.format(self.ECH_sum))
+            print('ECH_sum:\n {0}'.format(self.m.sum(self.ECH_sum).value))
+            print('EnonCH_sum:\n {0}'.format(self.EnonCH_sum))
 
 
         self.E_total = self.m.Intermediate(self.m.sum(self.ECH_sum) + self.m.sum(self.EnonCH_sum))
@@ -130,41 +120,69 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             self.e2Sum.append(self.m.Intermediate(self.nonCHds[i].PA*self.pSize*(Eelec + Eamp * self.nonCHdstLst[i]**2)))
             self.m.Equation(self.EnonCH_sum[i] >= self.e2Sum[i])
             
+        if self.verbose:
+            print('dtrLst:\n {0}'.format(self.dtrLst))
+            print('e1Sum:\n {0}'.format(self.e1Sum))
+            print('e2Sum:\n {0}'.format(self.e2Sum))
+            print('E_tot:\n {0}'.format(self.E_tot.value))
             
-        print('dtrLst:\n {0}'.format(self.dtrLst))
-        print('e1Sum:\n {0}'.format(self.e1Sum))
-        print('e2Sum:\n {0}'.format(self.e2Sum))
-        
         self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
         #self.m.Equation(self.E_total >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
         
-        print('E_tot:\n {0}'.format(self.E_tot.value))
-        self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*self.rnds)
+        
+        self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*(self.rnds-1))
         self.m.Obj(-self.target)        
-        
-        
-        
-        
-        
-        
         
         self.m.solve(disp=False)
         print('Sink X: {0}'.format(self.snkPos[0].value))
         print('Sink Y: {0}'.format(self.snkPos[1].value))
         print('Number of rounds for optimal amount of data sent: {0}'.format(self.rnds.value))
-        
-        
-        
+    
+    def resetGEKKO(self):
+        self.m = GEKKO(remote = False)
+    
+    """
+    def largest_prime_factor(self, n):
+        i = 2
+        while i * i <= n:
+            if n % i:
+                i += 1
+            else:
+                n //= i
+        return n    
+    
+    def prime_factors(self, n):
+        i = 2
+        factors = []
+        while i * i <= n:
+            if n % i:
+                i += 1
+            else:
+                n //= i
+                factors.append(i)
+        if n > 1:
+            factors.append(n)
+        return factors
+    """    
     def plot(self):
-        objects = np.linspace(1,len(self.CHdstLst),len(self.CHdstLst))
-        print('OBJECTS: {0}'.format(objects))
-        #for i in range(self.CHLst):
-        #    objects.append(self.CHdistLst[i].)
-            
+        objects = np.linspace(0,len(self.CHdstLst)-1,len(self.CHdstLst))
+        objects1 = []
+        for ch in self.CHds:
+            objects1.append(ch.ID)
+        objectNames = []
+        for objID in objects1:
+            print(objID)
+            objectNames.append(str(objID))
+        
         y_pos = np.arange(len(objects))
+        
+        #y_pos1 = np.arange(len(objects1))
+        
         ydtr = np.linspace(0,20,11)
         
-        ydist = np.linspace(-50,50,11)
+        #maxDist = np.floor(np.sqrt(xSize**2 + ySize**2))
+        maxDist = 150
+        ydist = np.linspace(0, maxDist,16)
         
         CHDL = []
         for i in range(len(self.CHdstLst)):
@@ -176,20 +194,27 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         
         plt.figure(self.nrplots)
         plt.subplot(2,1,1)
-        plt.bar(y_pos, CHDL, align='center', alpha=0.5)
+        plt.bar(objectNames, CHDL, align='center', alpha=0.5)
         plt.yticks(ydist, ydist)
         plt.ylabel('distance')
         
+        #plt.xticks(objectNames, objectNames)
         
         plt.subplot(2,1,2)
-        plt.bar(y_pos, DTRL, align='center', alpha=0.5)
+        plt.bar(objectNames, DTRL, align='center', alpha=0.5)
         plt.yticks(ydtr, ydtr)
         plt.ylabel('Packets Desired')
-        plt.xlabel('Node#')
-        
+        plt.xlabel('Node ID')
+        plt.xticks(objectNames, objectNames)
         plt.show()
         
-        
+        plt.figure(self.nrplots+1)
+        for ch in self.CHds:
+            plt.plot(ch.xPos, ch.yPos, 'bo')  # plot x and y using blue circle markers
+            pl.text(ch.xPos, ch.yPos, str(ch.ID), color="teal", fontsize=10)
+        for nonch in self.nonCHds:
+            plt.plot(nonch.xPos, nonch.yPos, 'go')  # plot x and y using blue circle markers
+        plt.plot(self.snkPos[0].value, self.snkPos[1].value, 'ro', markersize=12)
     def clearGEKKO(self):
         self.m.clear()
 
