@@ -76,6 +76,17 @@ class MPCnode(Node):
 
 
 
+
+
+    def resetGEKKO(self):
+        self.m = GEKKO(remote=False)
+        self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
+        
+        self.pr = self.m.MV(value=self.PA, integer = True,lb=1,ub=20)
+        self.pr.STATUS = 1
+        self.pr.DCOST = 0
+        
+
     def getDeltaDist(self, sinkX, sinkY, sdeltaX, sdeltaY, deltaDist):        
         distBefore = np.sqrt((sinkX**2)+(sinkY**2))
         distAfter = np.sqrt(((sinkX+sdeltaX)**2)+((sinkY+sdeltaY)**2))
