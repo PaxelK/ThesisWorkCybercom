@@ -17,12 +17,12 @@ from plotEnv import *
 class WSN(gym.Env):
     '''
     # Observations:
-    Type: Box(4)
-    Observation         Min     Max
+    Type: Box
+    Observation         Min     Max         Notes
     X position          0       xSize
     Y position          0       ySize
-    (CHstatus           0       1) (Not implemented as of now)
-    PR                  0       3
+    CHstatus            0       1           The same amount as amount of nodes
+    PR                  0       3           Amount is amount of nodes multiplied with self.PRamount
 
     # Actions:
     Type: Discrete(6)
@@ -30,8 +30,8 @@ class WSN(gym.Env):
     1 = Move north
     2 = Move east
     3 = Move west
-    4 = Increase packet rate
-    5 = Decrease Packet rate
+    4 = Increase packet rate  (One for each node)
+    5 = Decrease Packet rate  (One for each node)
     '''
     def __init__(self):
         # Init the WSN env
@@ -48,15 +48,18 @@ class WSN(gym.Env):
         high = [int(self.xSize), int(self.ySize)]
         for i in range(numNodes):
             high.append(self.PRamount)
+        for ii in range(numNodes):
+            high.append(1)  # CH status
         high = np.array(high)
+
         # Define the low values of each state
         low = []
-        for i in range(2+numNodes):
+        for i in range(2+(2*numNodes)):
             low.append(0)
         low = np.array(low)
 
         # Create action space (discrete) and observation space (Box/continuos)
-        self.action_space = spaces.Discrete(8)
+        self.action_space = spaces.Discrete(4+(2*numNodes))
         self.observation_space = spaces.Box(low, high, dtype=np.float32)
 
         # Set default values
@@ -66,6 +69,8 @@ class WSN(gym.Env):
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
         for i in range(numNodes):  # Appends PA of all nodes into list
             self.state.append(self.EE.nodes[i].PA)
+        for ii in range(numNodes):
+            self.state.append(self.EE.nodes[ii].getCHstatus())
 
 
     def seed(self, seed=None):  # Returns initial state of env
@@ -85,10 +90,13 @@ class WSN(gym.Env):
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
         # Get PR of every node
         PRtemp  = []
+        CHtemp = []
         for i in range(numNodes):
                 PRtemp.append([self.EE.nodes[i].ID, self.EE.nodes[i].PA])
+                CHtemp.append(self.EE.nodes[i].getCHstatus())
         self.state.append(PRtemp)
-        _, _, PR = self.state
+        self.state.append(CHtemp)
+        _, _, PR, _ = self.state
 
         # Cluster nodes in WSN env
         self.EE.cluster()
@@ -99,7 +107,7 @@ class WSN(gym.Env):
         reward = -2
         for i in range(numNodes):
             if self.EE.nodes[i].CHstatus == 1:
-                reward -= (self.EE.nodes[i].getDistance(self.EE.sink) * 0.015)  # Distance to each CH
+                reward -= (self.EE.nodes[i].getDistance(self.EE.sink))# * 0.05)  # Distance to each CH
         #reward += (self.EE.nodes[0].getEnergy() * 0.0001)
         done = False
 
@@ -158,17 +166,6 @@ class WSN(gym.Env):
                     break
                 act_temp += 1
 
-        '''
-        # For one node as of now (Not feasible to do this for many nodes)
-        if self.state[2] == 1:
-            reward += 1
-        elif self.state[2] == 2:
-            reward += 2
-        elif self.state[2] == 3:
-            reward += 3
-        elif self.state[2] == 4:
-            reward += 4
-        '''
 
         # Increment WSN env
         self.EE.communicate()
@@ -196,6 +193,8 @@ class WSN(gym.Env):
                 self.EE.nodes[i].alive = True  # Boolean for if node is alive
             else:
                 self.EE.nodes[i].alive = False
+        for ii in range(numNodes):
+            self.state.append(self.EE.nodes[ii].getCHstatus())
 
 
         self.EE.rnd = 1  # Round number
@@ -262,67 +261,4 @@ class WSN(gym.Env):
         '''
         plotEnv(self.EE)
 
-
-
-
-
-
-    '''
-        def step(self, action):
-        assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
-        self.rnd += 1
-
-        self.state = EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
-        for i in range(numNodes):
-            self.state.append([EE.nodes[i].ID, EE.nodes[i].PA])
-
-        xPos, yPos, PR = self.state
-        PR = [PR]  # Convert to list
-
-        # Default values
-        reward = 0
-        done = False
-
-        if len(EE.deadNodes) == numNodes:
-            done = True
-
-        if action == 0:
-            self.state[1] -= 1  # yPos -
-            EE.updateEnv(0, -1, PR)
-
-
-        elif action == 1:
-            self.state[1] += 1  # yPos +
-            EE.updateEnv(0, 1, PR)
-
-        elif action == 2:
-            self.state[0] += 1  # xPos +
-            EE.updateEnv(1, 0, PR)
-
-        elif action == 3:
-            self.state[0] -= 1  # xPos -
-            EE.updateEnv(-1, 0, PR)
-
-        # PR is hard coded for one node
-        elif action == 4:
-            reward = 10
-            EE.nodes[0].PA = min(self.PRamount - 1, EE.nodes[0].PA + 1)
-            self.state[2][1] = EE.nodes[0].PA  # PR +
-            EE.updateEnv(0, 0, PR)
-
-        elif action == 5:
-            reward = -10
-            EE.nodes[0].PA = max(0, EE.nodes[0].PA - 1)
-            self.state[2][1] = EE.nodes[0].PA  # PR -
-            EE.updateEnv(0, 0, PR)
-
-        EE.cluster()
-        EE.communicate()
-        EE.iterateRound()
-
-        row, col, PR = self.state[0], self.state[1], self.state[2][1]
-        #print(self.state)
-        #print("---------------------")
-        return np.array(self.encode(row, col, PR)), reward, done, {}
-    '''
 
