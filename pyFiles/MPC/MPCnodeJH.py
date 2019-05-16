@@ -95,7 +95,15 @@ class MPCnode(Node):
         self.m.options.NODES = 3                # collocation nodes
         self.m.options.SOLVER = 1               # solver (IPOPT), 1 is for when integers is used as MV
         self.m.options.TIME_SHIFT = 1           # Setting for saving values from last solve()
-        
+    
+    def produce_vVector(self, xVec, yVec):
+        vVec = np.zeros(len(xVec))
+        for i in range(len(xVec)-1):
+            dist_Before = np.float64(np.sqrt((xVec[i]-self.xPos)**2 + (yVec[i]-self.yPos)**2))   
+            dist_After = np.float64(np.sqrt((xVec[i+1]-self.xPos)**2 + (yVec[i+1]-self.yPos)**2))       
+            vVec[i] = np.float64((dist_After - dist_Before)/(self.ctrlHrz/(self.ctrlRes-1)))  
+        return vVec
+    
     def setDesData(self, dat):
         if(type(self.data.value.value) is list):
             self.data.value[0] = dat
@@ -170,7 +178,68 @@ class MPCnode(Node):
         #self.data.value[0] = self.data.value[1]
         self.m.solve(disp=False) # solve optimization problem
         self.setPR(self.dtr.value[0])
+    
+    
+    def controlPR1(self, sink): 
+        lel = self.produce_vVector(sink.xP.value, sink.yP.value)
+        print('LELELELELEL')
+        print(type(lel))
+        self.v.value = self.produce_vVector(sink.xP.value, sink.yP.value)
         
+        tempNrj = np.float64(self.energy)
+        tempDist = np.float64(self.getDistance(self.CHparent))     
+        
+        if(type(self.data.value.value) is list):
+            if(self.data.value.value[0] <= self.limit):
+                self.data.value[0] = 0
+        
+        #SETTING THE CURRENT ENERGY LEVEL
+        if(type(self.nrj_stored.value.value) is list):
+            #print('NRJ STORED WAS NOT FLOAT. IT WAS: {0}'.format(type(self.nrj_stored.value.value)))
+            self.nrj_stored.value[0] = tempNrj
+        else:
+            self.nrj_stored.value = tempNrj
+        
+        # define distance
+        if(type(self.dist.value.value) is list):
+            #print('DIST WAS NOT INT, IT WAS: {0}'.format(type(self.dist.value.value)))
+            self.dist.value[0] = tempDist
+        else:
+            self.dist.value = tempDist
+        
+        
+        #if(self.data.value[0] <= limit):
+        #    self.data.value[0] = 0
+            #print(np.shape(testNode.vp))  
+        if(type(self.dtr.value.value) is list):
+            self.dtrp = np.zeros(self.ctrlRes)
+            self.dtrp[0] = self.dtr.value[1]
+            self.dtr.value = self.dtrp
+            
+            
+            #self.nrj_stored.value[0] = self.nrj_stored.value[1]
+            #self.data.value[0] = self.data.value[1]
+        
+        """
+        self.dtrp = np.zeros(self.ctrlRes)
+        self.dtrp[0] = self.dtr.value[1]
+        self.dtr.value = self.dtrp
+        
+        self.nrj_storedp = np.zeros(self.ctrlRes)
+        self.nrj_storedp[0] = self.nrj_stored.value[1]
+        self.nrj_stored.value = self.nrj_storedp
+        
+        self.datap = np.zeros(self.ctrlRes)
+        self.datap[0] = self.data.value[1]
+        self.data.value = self.datap
+        self.m.TIME_SHIFT = 1
+        """
+        #self.data.value[0] = self.data.value[1]
+        self.m.solve(disp=False) # solve optimization problem
+        self.setPR(self.dtr.value[0])
+    
+    
+    
     def plot(self):
         plt.figure(self.nrplots)
         plt.subplot(6,1,1)
@@ -178,24 +247,23 @@ class MPCnode(Node):
         plt.legend()
         
         plt.subplot(6,1,2)
-        plt.plot(self.m.time,self.v.value,'k--',label='Velocity')
+        #plt.plot(self.m.time,self.v.value,'k--',label='Velocity')
+        plt.step(self.m.time,self.v.value,'k--',label='Velocity')
         plt.legend()
         
         plt.subplot(6,1,3)
         plt.plot(self.m.time,self.e.value,'b-',label='Energy Consumption')
         plt.legend()
         
-        #plt.subplot(6,1,3)
-        #plt.plot(self.m.time,self.ps,'b-',label='Bits Sent')
-        #plt.legend()
-        
         plt.subplot(6,1,4)
         plt.plot(self.m.time, self.data.value,'k.-',label='Data Remaining')
+        #plt.bar(self.m.time, self.data.value, align='center', alpha=0.5)
         plt.legend()
         
         
         plt.subplot(6,1,5)
-        plt.plot(self.m.time, self.dtr.value,'r-',label='Transmission Rate')
+        #plt.plot(self.m.time, self.dtr.value,'r-',label='Transmission Rate')
+        plt.step(self.m.time, self.dtr.value,'r-',label='Transmission Rate')
         plt.legend()
         
         plt.subplot(6,1,6)
@@ -273,7 +341,7 @@ if __name__ == "__main__":
                 
                 testNode1.controlPR(0)
                 testNode1.sendMsg(testNode2)
-            
+            testNode.plot()
             #testNode.controlPR(0)
             #testNode.sendMsg(testNode2)    
             
@@ -282,7 +350,7 @@ if __name__ == "__main__":
             
      
         
-        #testNode.plot()
+        
           
     print(testNode2.getDataRec())
         
