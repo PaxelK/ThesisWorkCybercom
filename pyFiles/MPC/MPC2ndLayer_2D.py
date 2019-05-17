@@ -17,7 +17,7 @@ import pylab as pl
 
 class MPC2ndLayer(EnvironmentEngineMPC):
     def __init__(self, ctrlHrz, ctrlRes):
-        super().__init__()  
+        super().__init__(ctrlHrz, ctrlRes)  
         
         self.verbose = False
     
@@ -35,7 +35,6 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         
         #Counter for plots
         self.nrplots = 1;
-
         
 
     def controlEnv(self):
@@ -122,9 +121,21 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         
         ################################################################
         #   This part executes the control input on the nodes and sink #
-        
-        
-        
+        i = 0
+        for CH in self.CHds:
+            CH.setDesData(int(self.dtrLst[i][0]))
+            i+=1
+
+        optimalP = [int(self.snkPos[0][0]), int(self.snkPos[1][0])]
+        return optimalP
+    
+    def refreshSolvers(self):
+        self.resetGEKKO()
+        self.sink.resetGEKKO()
+        for node in self.nodes:
+            node.resetGEKKO()
+    
+    
     def resetGEKKO(self):
         self.m = GEKKO(remote = False)
         # time points
@@ -200,16 +211,24 @@ if __name__ == "__main__":
     testEnv.cluster()
     print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
     testEnv.controlEnv()
+    for element in testEnv.CHds:
+        print(element.PA)
+    testEnv.plot()
+    """
+    testEnv.cluster()
+    print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
+    testEnv.resetGEKKO()
+    testEnv.controlEnv()
+    for element in testEnv.CHds:
+        print(element.PA)
     testEnv.plot()
     
     testEnv.cluster()
     print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
     testEnv.resetGEKKO()
     testEnv.controlEnv()
+    for element in testEnv.CHds:
+        print(element.PA)
     testEnv.plot()
+    """
     
-    testEnv.cluster()
-    print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
-    testEnv.resetGEKKO()
-    testEnv.controlEnv()
-    testEnv.plot()

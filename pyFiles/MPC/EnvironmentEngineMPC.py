@@ -1,27 +1,32 @@
 import numpy as np
 import random
+import sys
+sys.path.append("..")  # Adds higher directory to python modules path.
 from setParamsMPC import *
-from Sink import *
-from Node import *
+from MPCsink import MPCsink
+from MPCnodeJH_2 import MPCnode
 
 class EnvironmentEngineMPC:
     '''
     EnvironmentEngine acts as an interactive environment where input signals controlling the sink position and
     packet rate of each cluster head node.
     '''
-    def __init__(self):
+    def __init__(self, ctrlHrz, ctrlRes):
         '''
         The __init__ method is the class constructor and initializes the variables
         '''
-        self.sink = Sink(xSize, ySize)  # Creates an instance of sink class
+        self.hrz = ctrlHrz
+        self.Res = ctrlRes
+        self.sink = MPCsink(xSize, ySize, self.hrz,self.Res)  # Creates an instance of sink class
         self.nodes = []  # Create an empty list to hold the nodes
         # Initializes a node for each node in WSN
+        
         if energyMode == "rand":
             for i in range(numNodes):
-                self.nodes.append(Node(i, random.random() * xSize, random.random() * ySize, maxNrj * random.random()))
+                self.nodes.append(MPCnode(i, random.random() * xSize, random.random() * ySize, maxNrj * random.random(), self.hrz,self.Res))
         elif energyMode == "distr":
             for i in range(numNodes):
-                self.nodes.append(Node(i, random.random() * xSize, random.random() * ySize, maxNrj))
+                self.nodes.append(MPCnode(i, random.random() * xSize, random.random() * ySize, maxNrj, self.hrz,self.Res))
         else:
             print("The choice of energy mode is invalid! \n")
 
@@ -93,6 +98,8 @@ class EnvironmentEngineMPC:
             for j in range(len(self.nodes)):
                 if self.nodes[j].ID == packetRates[i][0]:
                     self.nodes[j].setPR(packetRates[i][1])
+
+
 
     def sinkStatus(self):
         '''

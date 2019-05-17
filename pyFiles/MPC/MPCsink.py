@@ -69,9 +69,9 @@ class MPCsink(Sink):
     def setTarPoint(self, x, y):
         self.xTar.value = x
         self.yTar.value = y
-    
+        
+        
     def produce_MoveVector(self):
-        print('LELELELELELELELELELELELELEL')
         if(type(self.xDist.value.value) is not list):
             self.xDist.value = self.xP.value - self.xTar.value
             self.yDist.value = self.yP.value - self.yTar.value 
@@ -80,14 +80,16 @@ class MPCsink(Sink):
             self.yMove[0] = self.yMove.NXTVAL
             self.xP[0] = self.xPos
             self.yP[0] = self.yPos
-            print('yTar[0]: {0}'.format(self.yTar.value))
-            print('yTar[0]: {0}'.format(type(self.yTar.value)))
-            self.xDist.value[0] = self.xP.value[0] - self.xTar.value
-            self.yDist.value[0] = self.yP.value[0] - self.yTar.value
-        
-        ### IMPLEMENT RANDOM CHOSER OF CONTROL INPUT AND UPDATE STATES FOR NEXT STEP
-        ### MAKE SURE TO PLACE "IF TARGET REACHED, DONT CHOOSE THIS CONTROL SIGNAL"
-
+            
+            if(type(self.xTar.value.value) is list):
+                self.xTar.value = self.xTar.value.value[0]
+                self.yTar.value = self.yTar.value.value[0]
+                self.xDist.value = self.xP.value[0] - self.xTar.value.value
+                self.yDist.value = self.yP.value[0] - self.yTar.value.value
+            else:
+                self.xDist.value[0] = self.xP.value[0] - self.xTar.value.value
+                self.yDist.value[0] = self.yP.value[0] - self.yTar.value.value
+                
         #print('xTar: {0}\n yTar: {1}\n xDst: {2}\n yDst: {3}\n'.format(self.xTar.value,self.yTar.value,self.xDist.value,self.yDist.value))
         self.m.solve(disp = False)
         #print('SECOND PRINT')

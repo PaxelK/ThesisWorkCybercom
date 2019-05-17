@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from MPCnodeJH import MPCnode
+from MPCnodeJH_2 import MPCnode
 from MPCsink import MPCsink
 from setParams import *
 
@@ -37,19 +37,18 @@ node1.connect(sink)
 
 
 #node.setDesData(100000)
-node1.setDesData(100000)
+node1.setDesData(5000)
 
 #node.controlPR(-5)
 
 
-for i in range(20):
+for i in range(10):
     sink.setTarPoint(20,40)
     sink.produce_MoveVector()
     node1.controlPR1(sink)
     node1.sendMsg(sink)
     sink.move(sink.xMove.value[1], sink.yMove.value[1])
     node1.plot()
-
 
 
 
