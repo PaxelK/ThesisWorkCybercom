@@ -11,28 +11,21 @@ import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from MPCnodeJH_2 import MPCnode
 from MPCsink import MPCsink
-from setParamsMPC import *
 from MPC2ndLayer_2D import MPC2ndLayer
 from plotEnv import *
-
+from setParamsMPC import *
 ctrlHrz = 10
 ctrlRes = ctrlHrz + 1
 EE = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
 
 x, y = EE.sink.getPos()  # Get position/coordinates of sink
 
-# Get PR for all nodes (PR should be zero for dead nodes)
-#PRcontrl = []
-#for i in range(numNodes):
-#    PRcontrl.append([i, 10])  # [Node ID, PR of node]
-
 
 #EE.nodes[0].energy = 0.10
 #print(EE.nodes[0].energy)
 
-
-
-while True:  # Run until all node dies
+#while True:  # Run until all node dies
+for i in range(5):
     print(f"Round = {EE.rnd}")
 
     # print(f"plotRnd Length = {len(EE.plotRnd)}")
@@ -49,11 +42,27 @@ while True:  # Run until all node dies
     EE.refreshSolvers()
     optimalP = EE.controlEnv()
     EE.sink.setTarPoint(optimalP[0], optimalP[1])
+    print('Expected lifetime in rounds: {0}'.format(EE.expLifetime))
+    print('Packages received by sink: {0}'.format(EE.sink.dataRec))
+    print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE.nodesAlive), len(EE.deadNodes)))
+    print('Number of nodes alive: {0}'.format(len(EE.nodesAlive)))
+    
+    if(len(EE.CHds)>0):
+        print(EE.CHds[0].data.value)
     for i in range(time_segments):
         print('TIME SEGMENT: {0}'.format(i))
         EE.sink.produce_MoveVector()
-        EE.sink.move(EE.sink.xMove.value[1], EE.sink.yMove.value[1])
+        for c in EE.CHds:
+            c.controlPR1(EE.sink)
+            print(c.data.value)
+            #print(c.data.value)
         EE.communicate()
+        EE.sink.move(EE.sink.xMove.value[1], EE.sink.yMove.value[1])
+        
+        
+        
+        
+        
         #print('ENERGY AT TIME SEGMENT {0}: {1}'.format(i, EE.nodes[0].energy))
     #print('ENERGY AT END OF ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
     
@@ -64,4 +73,3 @@ while True:  # Run until all node dies
     if len(EE.deadNodes) == numNodes:  # Break when all nodes have died
         print('ENERGY AT BREAKPOINT, ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
         break
-

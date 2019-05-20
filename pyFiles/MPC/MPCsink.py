@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from Node import Node
 from Sink import Sink
-from setParams import *
+from setParamsMPC import *
 
 class MPCsink(Sink):
     def __init__(self, sizex, sizey, ctrlHrz, ctrlRes):

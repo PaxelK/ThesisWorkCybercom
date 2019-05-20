@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from Node import Node
 from Sink import Sink
-from setParams import *
+from setParamsMPC import *
 
 class MPCnode(Node):
     def __init__(self, id, x, y, nrj, ctrlHrz, ctrlRes):
@@ -111,9 +111,9 @@ class MPCnode(Node):
     
     def setDesData(self, dat):
         if(type(self.data.value.value) is list):
-            self.data.value[0] = dat
+            self.data.value[0] = dat*self.pSize
         else:
-            self.data.value = dat
+            self.data.value = dat*self.pSize
         
     def controlPR(self, velocity):  
         tempVel = np.float64(velocity)
@@ -308,8 +308,8 @@ if __name__ == "__main__":
     #testNode.plot()
     #testNode.controlPR(0,0)
     #testNode.m.time[Hrz-1] = testNode.m.time[Hrz]-0.0000000000001
-    testNode.setDesData(5000)
-    testNode1.setDesData(5000)
+    testNode.setDesData(50000)
+    testNode1.setDesData(50000)
     testNode.energy = 0.005
     testNode1.energy = 0.05
     for j in range(1):
@@ -318,7 +318,7 @@ if __name__ == "__main__":
             testNode1.PS = 0
             testNode.resetGEKKO()
             testNode1.resetGEKKO()
-        for i in range(20):
+        for i in range(10):
             testNode.updateEnergy(-testNode.Egen)
             testNode1.updateEnergy(-testNode1.Egen)
             """        
