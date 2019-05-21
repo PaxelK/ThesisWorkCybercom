@@ -18,7 +18,7 @@ class MPCnode(Node):
         super().__init__(id, x, y, nrj)  
         
         self.verbose = False
-        
+        self.errorFlag = False
         self.m = GEKKO(remote=False)
         
         # time points
@@ -26,7 +26,7 @@ class MPCnode(Node):
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
         self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
         # constants
-        self.Egen = 1*10**-3
+        self.Egen = 1*10**-5
         
         #Counter for plots
         self.nrplots = 1;
@@ -37,6 +37,7 @@ class MPCnode(Node):
         self.resetGEKKO()
         
     def resetGEKKO(self):
+        self.errorFlag = False
         self.m = GEKKO(remote=False)
         self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
         
@@ -96,6 +97,9 @@ class MPCnode(Node):
         # data=0 at the end
         #self.m.fix(self.data,self.ctrlRes-1,0)
         # options
+        # Solutions forced to terminate early by the MAX_TIME 
+        # constraint do not satisfy the Karush Kuhn Tucker conditions for optimality.
+        self.m.options.MAX_TIME = 10 
         self.m.options.IMODE = 6                # optimal control
         self.m.options.NODES = 3                # collocation nodes
         self.m.options.SOLVER = 1               # solver (IPOPT), 1 is for when integers is used as MV
@@ -161,35 +165,27 @@ class MPCnode(Node):
             
             #self.nrj_stored.value[0] = self.nrj_stored.value[1]
             #self.data.value[0] = self.data.value[1]
+
+        try:
+            self.m.solve(disp=False)
+            self.setPR(self.dtr.value[1])
+        except:
+            print('EXCEPTION CAUGHT')
+            self.setPR(1)
+            self.errorFlag = True
+            
         
-        """
-        self.dtrp = np.zeros(self.ctrlRes)
-        self.dtrp[0] = self.dtr.value[1]
-        self.dtr.value = self.dtrp
-        
-        self.nrj_storedp = np.zeros(self.ctrlRes)
-        self.nrj_storedp[0] = self.nrj_stored.value[1]
-        self.nrj_stored.value = self.nrj_storedp
-        
-        self.datap = np.zeros(self.ctrlRes)
-        self.datap[0] = self.data.value[1]
-        self.data.value = self.datap
-        self.m.TIME_SHIFT = 1
-        """
-        #self.data.value[0] = self.data.value[1]
-        self.m.solve(disp=False) # solve optimization problem
-        self.setPR(self.dtr.value[1])
     
     
     def controlPR1(self, sink): 
         self.v.value = self.produce_vVector(sink.xP.value, sink.yP.value)
         
         tempNrj = np.float64(self.energy)
-        tempDist = np.float64(self.getDistance(self.CHparent))     
+        tempDist = np.float64(np.abs(self.getDistance(self.CHparent)))     
         
-        if(type(self.data.value.value) is list):
-            if(self.data.value.value[0] <= self.limit):
-                self.data.value[0] = 0
+        #if(type(self.data.value.value) is list):
+        #    if(self.data.value.value[0] <= self.limit):
+        #        self.data.value[0] = 0
         
         #SETTING THE CURRENT ENERGY LEVEL
         if(type(self.nrj_stored.value.value) is list):
@@ -210,14 +206,13 @@ class MPCnode(Node):
         #    self.data.value[0] = 0
             #print(np.shape(testNode.vp))  
         if(type(self.dtr.value.value) is list):
-            self.dtrp = np.zeros(self.ctrlRes)
-            self.dtrp[0] = np.float64(self.PA)
-            self.dtr.value = self.dtrp
-            
+            #self.dtrp = np.zeros(self.ctrlRes)
+            #self.dtrp[0] = np.float64(self.PA)
+            #self.dtr.value = self.dtrp
+            self.dtr.value = self.dtr.NXTVAL
             
             #self.nrj_stored.value[0] = self.nrj_stored.value[1]
             #self.data.value[0] = self.data.value[1]
-        
         """
         self.dtrp = np.zeros(self.ctrlRes)
         self.dtrp[0] = self.dtr.value[1]
@@ -233,8 +228,13 @@ class MPCnode(Node):
         self.m.TIME_SHIFT = 1
         """
         #self.data.value[0] = self.data.value[1]
-        self.m.solve(disp=False) # solve optimization problem
-        self.setPR(self.dtr.value[1])
+        try:
+            self.m.solve(disp=False)
+            self.setPR(self.dtr.value[1])
+        except:
+            print('EXCEPTION CAUGHT')
+            self.setPR(1)
+            self.errorFlag = True
     
     
     
@@ -276,11 +276,6 @@ class MPCnode(Node):
         distAfter = np.sqrt(((sinkX+sdeltaX)**2)+((sinkY+sdeltaY)**2))
         self.deltaDist = distAfter - distBefore
         return self.deltaDist
-    
-    
-        
-    def clearGEKKO(self):
-        self.m.clear()
 
 
 if __name__ == "__main__":
@@ -308,8 +303,8 @@ if __name__ == "__main__":
     #testNode.plot()
     #testNode.controlPR(0,0)
     #testNode.m.time[Hrz-1] = testNode.m.time[Hrz]-0.0000000000001
-    testNode.setDesData(50000)
-    testNode1.setDesData(50000)
+    testNode.setDesData(20)
+    testNode1.setDesData(20)
     testNode.energy = 0.005
     testNode1.energy = 0.05
     for j in range(1):

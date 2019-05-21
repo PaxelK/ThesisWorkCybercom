@@ -25,7 +25,7 @@ x, y = EE.sink.getPos()  # Get position/coordinates of sink
 #print(EE.nodes[0].energy)
 
 #while True:  # Run until all node dies
-for i in range(5):
+for i in range(2):
     print(f"Round = {EE.rnd}")
 
     # print(f"plotRnd Length = {len(EE.plotRnd)}")
