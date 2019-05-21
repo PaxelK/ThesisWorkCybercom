@@ -62,7 +62,7 @@ class MPC2ndLayer(EnvironmentEngine):
         self.m.Equation(self.nrj1.dt() == -self.dtr1*self.pSize*(Eelec + Eamp * self.dist1**2))
         
         
-        self.data= self.m.Var()
+        self.data= self.m.Var(value = 1000000)
         
         
         # equations
@@ -71,13 +71,13 @@ class MPC2ndLayer(EnvironmentEngine):
         self.m.Equation(self.dist1.dt() == -self.v)
         
         # as data is transmitted, remaining data stored decreases
-        self.m.Equation(self.data.dt() == self.dtr*self.pSize + self.dtr1*self.pSize)
+        self.m.Equation(self.data.dt() == -self.dtr*self.pSize - self.dtr1*self.pSize)
         
         
         
          # soft (objective constraint)
         self.final = self.m.Param(value=np.zeros(self.ctrlRes))
-        self.final.value[int(np.floor(self.ctrlRes/2)):-1] = 0.001
+        self.final.value[self.ctrlRes//2:-1] = 0.001
         self.final.value[-1] = 1
         
         self.m.Equation(self.final*(self.data)>=0)
@@ -85,7 +85,7 @@ class MPC2ndLayer(EnvironmentEngine):
         # objective
         self.m.Obj(self.e) # minimize energy
         self.m.Obj(self.e1) # minimize energy
-        self.m.Obj(-self.data*self.final)
+        self.m.Obj((0-self.data*self.final)**2)
         
         #self.j = self.m.Intermediate(self.nrj/self.e)
         #self.j1 = self.m.Intermediate(self.nrj1/self.e1)
@@ -117,7 +117,7 @@ class MPC2ndLayer(EnvironmentEngine):
         """
 
     def controlEnv(self):
-        self.m.solve()
+        self.m.solve(disp = False)
         
     def plot(self):
         plt.figure(self.nrplots)
@@ -134,8 +134,12 @@ class MPC2ndLayer(EnvironmentEngine):
         plt.plot(self.m.time,self.v.value,'k--',label='Velocity')
         plt.legend()
         
+        e_0 = np.array(self.e.value)
+        e_1 = np.array(self.e1.value)
+        e_sum = e_0 + e_1
+        
         plt.subplot(7,1,4)
-        plt.plot(self.m.time,self.e.value,'b-',label='Energy Consumption')
+        plt.plot(self.m.time,e_sum,'b-',label='Energy Consumption')
         plt.legend()
         
         #plt.subplot(6,1,3)
@@ -202,15 +206,15 @@ class MPC2ndLayer(EnvironmentEngine):
 
 """
 if __name__ == "__main__":
-    Hrz = 8
+    Hrz = 10
     Res = Hrz + 1
     
     testEnv = MPC2ndLayer(Hrz,Res)
    # print(testEnv.sink.xPos)
     #print(testEnv.ctrlHrz)
     testEnv.nodes[0].energy = 0.05
-    for node in testEnv.nodes:
-        print(node.energy)
+    #for node in testEnv.nodes:
+        #print(node.energy)
         
     testEnv.controlEnv()
     testEnv.plot()

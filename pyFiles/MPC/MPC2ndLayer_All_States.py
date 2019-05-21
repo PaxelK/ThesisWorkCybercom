@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May  8 11:36:10 2019
+Created on Fri Apr 26 10:25:41 2019
 
 @author: axkar1
 """
-
 from gekko import GEKKO
 import numpy as np
 import matplotlib.pyplot as plt
@@ -34,113 +33,59 @@ class MPC2ndLayer(EnvironmentEngine):
         self.packet = 1
         self.pSize = ps        
         
-        self.PERC = 0.05
-        self.PERCREV = 1 - self.PERC
-        
         #Counter for plots
         self.nrplots = 1;
     
-        
-        self.nds = 20                          # ALL NODES
-        self.CHs = self.nds*self.PERC           # CLUSTER HEADS
-        self.nonCHs = self.nds*self.PERCREV     # NON-CHs
-        
-    
-    
-        # define total energy
-        totnrj = 1
-        self.Etot = self.m.Var(value = totnrj)
-        
         # define distance 
+        self.dist = self.m.Var(value = 20)
+        self.dist1 = self.m.Var(value = 40)
         
+        self.v = self.m.MV(lb=-2,ub=2) # Upper bound should be something like sqrt(100**2 + 100**2)
+        self.v.STATUS = 1
          
-        # Define node positions
-        self.sinkPos = self.m.MV(lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
-        self.sinkPos.STATUS = 1 
-        
-        
-        self.CHLst = []
-        self.CHdistLst = []
-        for i in range(self.CHs):
-            self.CHLst.append(self.m.Var(value = 3*i)) 
-            self.CHdistLst.append(self.m.Var())
-            self.m.Equation(self.CHdistLst(i) == self.sinkPos - self.CHLst(i))
-            
-        self.nonCHLst = []
-        self.nonCHdistLst = []
-        for i in range(self.nonCHs):
-            self.nonCHLst.append(self.m.Var(value = 2*i))
-            self.nonCHdistLst.append(self.m.Var())
-            self.m.Equation(self.nonCHdistLst(i) == self.sinkPos - self.nonCHLst(i))
-            
-      
-
-        
-        self.dm = self.m.Intermediate((self.sinkd + self.sinkd1)/2)
-        
-        
-        #define energyloss for CHs and nodes
-        self.e = self.m.Intermediate(((Eelec+EDA)*self.packs + self.packs*self.pSize*(Eelec + Eamp * self.dist**2)) - self.Egen)
-        self.es = self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.sinkd**2))
-        
-       
-        
-        
-         
-        
-        
         # define data transmission rate
-        self.packs = self.m.MV(integer = True, lb=0,ub=200)
-        self.packs.STATUS = 1
+        self.dtr = self.m.MV(integer = True, lb=0,ub=200)
+        self.dtr.STATUS = 1
         
-        self.packs1 = self.m.MV(integer = True, lb=0,ub=200)
-        self.packs1.STATUS = 1
+        self.dtr1 = self.m.MV(integer = True, lb=0,ub=200)
+        self.dtr1.STATUS = 1
         
          # energy to transmit
-        self.e = self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.sinkd**2))
-        self.e1 = self.m.Intermediate(self.packs1*self.pSize*(Eelec + Eamp * self.sinkd1**2))
+        self.e = self.m.Intermediate(self.dtr*self.pSize*(Eelec + Eamp * self.dist**2))
+        self.e1 = self.m.Intermediate(self.dtr1*self.pSize*(Eelec + Eamp * self.dist1**2))
         
         # energy dissipation
         self.nrj = self.m.Var(value = 0.05, lb = 0)
         self.nrj1 = self.m.Var(value = 0.035, lb = 0)
         
-        self.m.Equation(self.nrj.dt() == -self.packs1*self.pSize*(Eelec + Eamp * self.sinkd**2))
-        self.m.Equation(self.nrj1.dt() == -self.packs1*self.pSize*(Eelec + Eamp * self.sinkd1**2))
+        self.m.Equation(self.nrj.dt() == -self.dtr*self.pSize*(Eelec + Eamp * self.dist**2))
+        self.m.Equation(self.nrj1.dt() == -self.dtr1*self.pSize*(Eelec + Eamp * self.dist1**2))
         
         
-        self.data= self.m.Var()
+        self.data= self.m.Var(value = 1000000)
         
         
         # equations
-        
+        # track the position
+        self.m.Equation(self.dist.dt() == self.v)
+        self.m.Equation(self.dist1.dt() == -self.v)
         
         # as data is transmitted, remaining data stored decreases
-        self.m.Equation(self.data.dt() == self.packs + self.packs1)
+        self.m.Equation(self.data.dt() == -self.dtr*self.pSize - self.dtr1*self.pSize)
         
         
         
          # soft (objective constraint)
         self.final = self.m.Param(value=np.zeros(self.ctrlRes))
-        self.final.value[int(np.floor(self.ctrlRes/2)):-1] = 0.001
+        self.final.value[self.ctrlRes//2:-1] = 0.001
         self.final.value[-1] = 1
         
         self.m.Equation(self.final*(self.data)>=0)
         
         # objective
-        Q = 1
-        R = 1
-        self.j = self.m.Intermediate(-Q*self.nrj + R*self.e)
-        self.j1 = self.m.Intermediate(-Q*self.nrj1 + R*self.e1)
-        
-        self.jBalance = self.m.Intermediate(-self.nrj/self.e)
-        self.jBalance1 = self.m.Intermediate(-self.nrj1/self.e1)
-        
-        self.m.Obj(self.j + self.j1)
-        self.m.Obj(self.jBalance + self.jBalance1)
-        
-        #self.m.Obj(self.nrj/self.e) # minimize energy
-        #self.m.Obj(self.nrj1/self.e1) # minimize energy
-        self.m.Obj(-self.data*self.final)
+        self.m.Obj(self.e) # minimize energy
+        self.m.Obj(self.e1) # minimize energy
+        self.m.Obj((0-self.data*self.final)**2)
         
         #self.j = self.m.Intermediate(self.nrj/self.e)
         #self.j1 = self.m.Intermediate(self.nrj1/self.e1)
@@ -172,42 +117,46 @@ class MPC2ndLayer(EnvironmentEngine):
         """
 
     def controlEnv(self):
-        self.m.solve()
+        self.m.solve(disp = False)
         
     def plot(self):
         plt.figure(self.nrplots)
-        plt.subplot(6,1,1)
-        plt.plot(self.m.time,self.sinkd.value,'r-',label='Distance')
+        plt.subplot(7,1,1)
+        plt.plot(self.m.time,self.dist.value,'r-',label='Distance')
         plt.legend()
         
         plt.figure(self.nrplots)
-        plt.subplot(6,1,2)
-        plt.plot(self.m.time,self.sinkd1.value,'r-',label='Distance')
+        plt.subplot(7,1,2)
+        plt.plot(self.m.time,self.dist1.value,'r-',label='Distance')
         plt.legend()
         
-        #plt.subplot(7,1,3)
-        #plt.plot(self.m.time,self.v.value,'k--',label='Velocity')
-        #plt.legend()
+        plt.subplot(7,1,3)
+        plt.plot(self.m.time,self.v.value,'k--',label='Velocity')
+        plt.legend()
         
-        plt.subplot(6,1,3)
-        plt.plot(self.m.time,self.e.value,'b-',label='Energy Consumption')
+        e_0 = np.array(self.e.value)
+        e_1 = np.array(self.e1.value)
+        e_sum = e_0 + e_1
+        
+        plt.subplot(7,1,4)
+        plt.plot(self.m.time,e_sum,'b-',label='Energy Consumption')
         plt.legend()
         
         #plt.subplot(6,1,3)
         #plt.plot(self.m.time,self.ps,'b-',label='Bits Sent')
         #plt.legend()
         
-        plt.subplot(6,1,4)
+        plt.subplot(7,1,5)
         plt.plot(self.m.time, self.data.value,'k.-',label='Data Sent')
         plt.legend()
         
         
-        plt.subplot(6,1,5)
-        plt.plot(self.m.time, self.packs.value,'r-',label='Transmission Amount, packs')
+        plt.subplot(7,1,6)
+        plt.plot(self.m.time, self.dtr.value,'r-',label='Transmission Rate, dtr')
         plt.legend()
         
-        plt.subplot(6,1,6)
-        plt.plot(self.m.time, self.packs1.value,'r-',label='Transmission Amount1, packs1')
+        plt.subplot(7,1,7)
+        plt.plot(self.m.time, self.dtr1.value,'r-',label='Transmission Rate1, dtr1')
         plt.legend()
         
         #plt.subplot(6,1,6)
@@ -257,15 +206,15 @@ class MPC2ndLayer(EnvironmentEngine):
 
 """
 if __name__ == "__main__":
-    Hrz = 8
+    Hrz = 10
     Res = Hrz + 1
     
     testEnv = MPC2ndLayer(Hrz,Res)
    # print(testEnv.sink.xPos)
     #print(testEnv.ctrlHrz)
     testEnv.nodes[0].energy = 0.05
-    for node in testEnv.nodes:
-        print(node.energy)
+    #for node in testEnv.nodes:
+        #print(node.energy)
         
     testEnv.controlEnv()
     testEnv.plot()

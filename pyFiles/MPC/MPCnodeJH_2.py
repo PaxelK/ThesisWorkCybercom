@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from Node import Node
 from Sink import Sink
-from setParams import *
+from setParamsMPC import *
 
 class MPCnode(Node):
     def __init__(self, id, x, y, nrj, ctrlHrz, ctrlRes):
@@ -27,8 +27,6 @@ class MPCnode(Node):
         self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
         # constants
         self.Egen = 1*10**-3
-        self.const = 0.6
-        self.E = 1
         
         #Counter for plots
         self.nrplots = 1;
@@ -49,21 +47,25 @@ class MPCnode(Node):
 
         self.dist = self.m.Var()
 
-        self.dtr = self.m.MV(value=1, integer = True, lb=0,ub=20)
+        self.dtr = self.m.MV(value=0, integer = True, lb=0,ub=20)
         self.dtr.STATUS = 1
         
         # define energy level
         self.nrj_stored = self.m.Var(value = self.energy, lb = 0)
         
         self.data = self.m.Var()
-          
+        #self.data = self.m.CV() 
+        #self.data.STATUS = 1
+        #self.m.options.CV_TYPE = 2 
         # energy to transmit
         self.e = self.m.Intermediate(((Eelec+EDA)*self.conChildren + self.dtr*self.pSize*(Eelec + Eamp * self.dist**2)) - self.Egen)
-        
+        #self.e = self.m.Var()
+        #self.m.Equation(self.e == ((Eelec+EDA)*self.conChildren + self.dtr*self.pSize*(Eelec + Eamp * self.dist**2)) - self.Egen)
         # equations
         # track the position
         self.m.Equation(self.dist.dt() == self.v)
         self.m.Equation(self.nrj_stored.dt() == -self.e)
+        self.m.Equation(self.nrj_stored >= self.e)
         # as data is transmitted, remaining data stored decreases
         self.m.Equation(self.data.dt() == -self.dtr*self.pSize)
         
@@ -71,19 +73,22 @@ class MPCnode(Node):
         # self.m.Equation(self.energy >= self.e)
         
         # objective
-        self.m.Obj(self.e) # minimize energy
+        
+        #self.data.SP = 0
         
         # soft (objective constraint)
         self.final = self.m.Param(value=np.zeros(self.ctrlRes))
-        self.final.value[int(np.floor(self.ctrlRes/2)):-1] = 0.001
+        #self.final.value[self.ctrlRes//2:-1] = 0.001
         self.final.value[-1] = 1
         #self.m.Equation(self.final*(self.data)<=0)
         
+        #self.m.Obj(self.e) # minimize energy
         #self.m.Obj(self.data*self.final)
         
-        self.target = self.m.Intermediate(self.m.sqrt((self.data*self.final)**2))
-        self.m.Obj(self.target) # transmit data by the end
         
+        self.target = self.m.Intermediate((self.final*(0-self.data)**2))
+        self.m.Obj(self.target) # transmit data by the end
+        self.m.Obj(self.e)
         
         
         # hard constraint
@@ -106,9 +111,9 @@ class MPCnode(Node):
     
     def setDesData(self, dat):
         if(type(self.data.value.value) is list):
-            self.data.value[0] = dat
+            self.data.value[0] = dat*self.pSize
         else:
-            self.data.value = dat
+            self.data.value = dat*self.pSize
         
     def controlPR(self, velocity):  
         tempVel = np.float64(velocity)
@@ -136,26 +141,22 @@ class MPCnode(Node):
         
         #SETTING THE CURRENT ENERGY LEVEL
         if(type(self.nrj_stored.value.value) is list):
-            #print('NRJ STORED WAS NOT FLOAT. IT WAS: {0}'.format(type(self.nrj_stored.value.value)))
             self.nrj_stored.value[0] = tempNrj
         else:
             self.nrj_stored.value = tempNrj
         
         # define distance
         if(type(self.dist.value.value) is list):
-            #print('DIST WAS NOT INT, IT WAS: {0}'.format(type(self.dist.value.value)))
             self.dist.value[0] = tempDist
         else:
             self.dist.value = tempDist
         
         
-        #if(self.data.value[0] <= limit):
-        #    self.data.value[0] = 0
-            #print(np.shape(testNode.vp))  
         if(type(self.dtr.value.value) is list):
             self.dtrp = np.zeros(self.ctrlRes)
-            self.dtrp[0] = self.dtr.value[1]
+            self.dtrp[0] = np.float64(self.PA)
             self.dtr.value = self.dtrp
+            #self.dtr.value.value[0] = np.float64(self.PA)
             
             
             #self.nrj_stored.value[0] = self.nrj_stored.value[1]
@@ -177,7 +178,7 @@ class MPCnode(Node):
         """
         #self.data.value[0] = self.data.value[1]
         self.m.solve(disp=False) # solve optimization problem
-        self.setPR(self.dtr.value[0])
+        self.setPR(self.dtr.value[1])
     
     
     def controlPR1(self, sink): 
@@ -210,7 +211,7 @@ class MPCnode(Node):
             #print(np.shape(testNode.vp))  
         if(type(self.dtr.value.value) is list):
             self.dtrp = np.zeros(self.ctrlRes)
-            self.dtrp[0] = self.dtr.value[1]
+            self.dtrp[0] = np.float64(self.PA)
             self.dtr.value = self.dtrp
             
             
@@ -233,7 +234,7 @@ class MPCnode(Node):
         """
         #self.data.value[0] = self.data.value[1]
         self.m.solve(disp=False) # solve optimization problem
-        self.setPR(self.dtr.value[0])
+        self.setPR(self.dtr.value[1])
     
     
     
@@ -283,7 +284,7 @@ class MPCnode(Node):
 
 
 if __name__ == "__main__":
-    Hrz = 4
+    Hrz = 10
     Res = Hrz + 1
     
     testNode = MPCnode(1,20,20,0.05,Hrz,Res)
@@ -307,8 +308,10 @@ if __name__ == "__main__":
     #testNode.plot()
     #testNode.controlPR(0,0)
     #testNode.m.time[Hrz-1] = testNode.m.time[Hrz]-0.0000000000001
-    testNode.setDesData(100000)
-    testNode1.setDesData(100000)
+    testNode.setDesData(50000)
+    testNode1.setDesData(50000)
+    testNode.energy = 0.005
+    testNode1.energy = 0.05
     for j in range(1):
         if(j > 0):
             testNode.PS = 0
@@ -328,6 +331,7 @@ if __name__ == "__main__":
                 testNode.sendMsg(testNode2)
                 
                 testNode1.controlPR(5)
+                
                 testNode1.sendMsg(testNode2)
                 
                 testNode2.move(0,-5)
