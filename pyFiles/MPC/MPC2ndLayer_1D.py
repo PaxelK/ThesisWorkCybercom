@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 class MPC2ndLayer(EnvironmentEngineMPC):
     def __init__(self, ctrlHrz, ctrlRes):
-        super().__init__()  
+        super().__init__(ctrlHrz, ctrlRes)  
         
         self.verbose = False
         self.nrplots = 0
@@ -27,11 +27,11 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         #self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
         
         # constants
-        self.Egen = 1*10**-3
+        self.Egen = 1*10**-5
         self.pSize = ps        
         
-        self.PERC = p
-        self.nds = 40                                   # ALL NODES
+        self.PERC = 0.4
+        self.nds = 50                                   # ALL NODES
         self.CHs = int(self.nds*self.PERC)              # CLUSTER HEADS
         self.nonCHs = int(self.nds - self.CHs)          # NON-CHs
         self.CHLst = []                                 # List of CH positions Param()
@@ -73,7 +73,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
 
         #WORKING SCRIPT FOR ONE DIMENSION
         
-        self.sinkPos = self.m.Var(value = 30, lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
+        self.sinkPos = self.m.Var(lb=0,ub=100) # Upper bound should be something like sqrt(100**2 + 100**2)
 
         #self.sinkV = self.m.MV(lb=-3,ub=3)
         #self.sinkV.STATUS = 1
@@ -91,28 +91,32 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             
             self.m.Equation(self.nonCHdistLst[i] == self.sinkPos - self.nonCHLst[i])
 
-        
         self.packs = 1
         self.dtrLst = []
         self.rnds = self.m.Var(integer = True, lb = 1)
         self.E_tot = self.m.Param(value = 3)
         self.e1Sum = []
+        self.e1Vars = []
         self.e2Sum = []
-        
+        self.e2Vars = []
         
         for i in range(self.CHs):
             self.dtrLst.append(self.m.Var(lb = 1, ub = 20))
             self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.packs + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2)))
+            self.e1Vars.append(self.m.Var(lb = 0))
+            self.m.Equation(self.e1Vars[-1] == (Eelec+EDA)*self.packs + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdistLst[i]**2))
             
 
         for i in range(self.nonCHs):
             self.e2Sum.append(self.m.Intermediate(self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))
-                
+            self.e2Vars.append(self.m.Var(lb = 0))
+            self.m.Equation(self.e2Vars[-1] == (self.packs*self.pSize*(Eelec + Eamp * self.nonCHdistLst[i]**2)))
         
         
-        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
-        self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*self.rnds)
-        self.m.Obj(-self.target)
+        #self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
+        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Vars)+ self.m.sum(self.e2Vars))*self.rnds)
+        self.target = self.m.Intermediate(self.m.sum(self.dtrLst))
+        self.m.Obj(-self.target*self.rnds)
 
         
         self.m.solve(disp=False)
@@ -163,8 +167,8 @@ class MPC2ndLayer(EnvironmentEngineMPC):
 
 
 if __name__ == "__main__":
-    Hrz = 8
-    Res = Hrz + 1
+    Hrz = 10
+    Res = Hrz+1
     testEnv = MPC2ndLayer(Hrz,Res) 
     testEnv.controlEnv()
     testEnv.plot()
