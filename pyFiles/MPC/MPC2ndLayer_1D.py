@@ -90,7 +90,7 @@ class MPC2ndLayer():
         self.packs = 1
         self.dtrLst = []
         self.rnds = self.m.Var(integer = True, lb = 1)
-        self.E_tot = self.m.Param(value = 3)
+        self.E_tot = self.m.Param(value = 0.010)
         self.e1Sum = []
         self.e1Vars = []
         self.e2Sum = []

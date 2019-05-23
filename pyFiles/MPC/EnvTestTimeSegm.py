@@ -25,7 +25,7 @@ x, y = EE.sink.getPos()  # Get position/coordinates of sink
 #print(EE.nodes[0].energy)
 
 #while True:  # Run until all node dies
-for i in range(2):
+for i in range(1):
     print(f"Round = {EE.rnd}")
 
     # print(f"plotRnd Length = {len(EE.plotRnd)}")
@@ -49,12 +49,13 @@ for i in range(2):
     
     if(len(EE.CHds)>0):
         print(EE.CHds[0].data.value)
-    for i in range(time_segments):
+    for i in range(6): #time_segments
         print('TIME SEGMENT: {0}'.format(i))
         EE.sink.produce_MoveVector()
         for c in EE.CHds:
             c.controlPR1(EE.sink)
             print(c.data.value)
+            c.plot()
             #print(c.data.value)
         EE.communicate()
         EE.sink.move(EE.sink.xMove.value[1], EE.sink.yMove.value[1])

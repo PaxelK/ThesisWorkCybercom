@@ -12,6 +12,10 @@ sys.path.append("..")  # Adds higher directory to python modules path.
 from Node import Node
 from Sink import Sink
 from setParamsMPC import *
+from collections import OrderedDict
+import random as rand
+import warnings
+
 
 class MPCnode(Node):
     def __init__(self, id, x, y, nrj, ctrlHrz, ctrlRes):
@@ -30,6 +34,10 @@ class MPCnode(Node):
         
         #Counter for plots
         self.nrplots = 1;
+        self.pltColors = ['r-', 'k-', 'b-', 'g-', 'y-', 'c-', 'm-']
+        warnings.filterwarnings("ignore", module="matplotlib")
+        colorNr = rand.randrange(0, len(self.pltColors),1)
+        self.lineColor = self.pltColors[colorNr]
         
         #Threshold for when objective is seen as 0
         self.limit = np.float64(1e-10)
@@ -78,9 +86,11 @@ class MPCnode(Node):
         #self.data.SP = 0
         
         # soft (objective constraint)
-        self.final = self.m.Param(value=np.zeros(self.ctrlRes))
+        self.recedingDeadline = np.zeros(self.ctrlRes)
+        self.recedingDeadline[-1] = 1
+        self.final = self.m.Param(value=self.recedingDeadline)
         #self.final.value[self.ctrlRes//2:-1] = 0.001
-        self.final.value[-1] = 1
+        #self.final.value[-1] = 1
         #self.m.Equation(self.final*(self.data)<=0)
         
         #self.m.Obj(self.e) # minimize energy
@@ -169,6 +179,8 @@ class MPCnode(Node):
         try:
             self.m.solve(disp=False)
             self.setPR(self.dtr.value[1])
+            self.recedingDeadline = np.roll(self.recedingDeadline,-1)
+            self.final.value = self.recedingDeadline
         except:
             print('EXCEPTION CAUGHT')
             self.setPR(1)
@@ -231,6 +243,7 @@ class MPCnode(Node):
         try:
             self.m.solve(disp=False)
             self.setPR(self.dtr.value[1])
+            
         except:
             print('EXCEPTION CAUGHT')
             self.setPR(1)
@@ -239,35 +252,57 @@ class MPCnode(Node):
     
     
     def plot(self):
+        #plt.cla()   # Clear axis
+        #plt.clf()   # Clear figure
+        #plt.close() # Close a figure window
+        
+        self.handles, self.labels = plt.gca().get_legend_handles_labels()
+        
+        print(self.handles)
+        
+        if not self.handles:
+            self.labels = ["Distance", "Velocity","Energy Consumption", "Data Remaining", "Transmission Rate", "Battery"]
+        else:
+            self.labels =["","","","","",""]
+            
+        
+        #by_label = OrderedDict(zip(labels, handles))
+        #plt.legend(by_label.values(), by_label.keys())
+        
         plt.figure(self.nrplots)
         plt.subplot(6,1,1)
-        plt.plot(self.m.time,self.dist.value,'r-',label='Distance')
-        plt.legend()
+        dist_line = plt.plot(self.m.time,self.dist.value,self.lineColor,label=self.labels[0])
+        distance_legend = plt.legend(handles=dist_line )
         
         plt.subplot(6,1,2)
-        #plt.plot(self.m.time,self.v.value,'k--',label='Velocity')
-        plt.step(self.m.time,self.v.value,'k--',label='Velocity')
-        plt.legend()
+        #plt.plot(self.m.time,self.v.value,self.lineColor,label=self.labels[1])
+        vel_line = plt.step(self.m.time,self.v.value, self.lineColor,label=self.labels[1], where = 'post')
+        vel_legend = plt.legend(handles=vel_line)
         
         plt.subplot(6,1,3)
-        plt.plot(self.m.time,self.e.value,'b-',label='Energy Consumption')
-        plt.legend()
+        #plt.plot(self.m.time,self.e.value,self.lineColor,label=self.labels[2])
+        energyCons_line = plt.step(self.m.time,self.e.value,self.lineColor,label=self.labels[2], where = 'post')
+        nrjcons_legend = plt.legend(handles=energyCons_line)
+        
         
         plt.subplot(6,1,4)
-        plt.plot(self.m.time, self.data.value,'k.-',label='Data Remaining')
+        dataRem_line = plt.plot(self.m.time, self.data.value,self.lineColor,label=self.labels[3])
         #plt.bar(self.m.time, self.data.value, align='center', alpha=0.5)
-        plt.legend()
+        dataRem_legend = plt.legend(handles=dataRem_line)
         
         
         plt.subplot(6,1,5)
         #plt.plot(self.m.time, self.dtr.value,'r-',label='Transmission Rate')
-        plt.step(self.m.time, self.dtr.value,'r-',label='Transmission Rate')
-        plt.legend()
+        transmRate_line = plt.step(self.m.time, self.dtr.value,self.lineColor,label=self.labels[4], where = 'post')
+        tr_legend = plt.legend(handles=transmRate_line)
         
         plt.subplot(6,1,6)
-        plt.plot(self.m.time,self.nrj_stored,'b-',label='Battery')
-        plt.legend()
+        battery_line = plt.plot(self.m.time,self.nrj_stored,self.lineColor,label=self.labels[5])
+        battery_legend = plt.legend(handles=battery_line)
+
         plt.xlabel('Time')
+        
+        #plt.show()
         
         self.nrplots+=1
 
@@ -293,7 +328,7 @@ if __name__ == "__main__":
     testNode.connect(testNode2)
     testNode1.connect(testNode2)
     #print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
-    testNode2.move(-30,-10)
+    testNode2.move(-30,40)
     #print('x: {0}, y: {1}'.format(testNode2.xPos,testNode2.yPos))
     #print('Distance to sink: {0}'.format(testNode.getDistance(testNode2)))
     #print("Segment: {0}, PR: {1}, PS: {2}".format(0,testNode.PA, testNode.getPS()))
@@ -342,7 +377,7 @@ if __name__ == "__main__":
             
             print("Segment: {0} | Node | PR  | PS\t\t|\n\t\t {1}   {2}   {3} \n\t\t {4}   {5}   {6}".format(i, testNode.ID, testNode.dtr.value[0], testNode.getPS(), testNode1.ID, testNode1.dtr.value[0], testNode1.getPS()))
             print("Node {0} Data:\n{1}\nNode {2} Data:\n{3}".format(testNode.ID, testNode.data.value, testNode1.ID, testNode1.data.value))
-            
+            print(testNode.final.value.value)
      
         
         

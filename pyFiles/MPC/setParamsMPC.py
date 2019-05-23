@@ -17,7 +17,7 @@ ySize = 100
 x = 0  # Added for better display results of the plot
 y = 0  # Added for better display results of the plot
 
-numNodes = 100  # Number of Nodes in the field
+numNodes = 50  # Number of Nodes in the field
 dead_nodes = 0 # Number of Dead Nodes in the beginning
 
 #### Data Packet Info ###
