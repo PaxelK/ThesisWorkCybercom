@@ -15,16 +15,13 @@ import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 
 
-class MPC2ndLayer(EnvironmentEngineMPC):
-    def __init__(self, ctrlHrz, ctrlRes):
-        super().__init__(ctrlHrz, ctrlRes)  
-        
+class MPC2ndLayer():
+    def __init__(self):        
         self.verbose = False
         self.nrplots = 0
          
          
         self.m = GEKKO(remote=False)
-        #self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
         
         # constants
         self.Egen = 1*10**-5
@@ -38,7 +35,6 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.CHdistLst = []                             # List of CHs distances Var()
         
         self.nonCHLst = []                              # List of non-CH positions Param()
-        self.nonCHpos = []
         self.nonCHdistLst = []                          # List of non-CHs distances Var()
         
         self.intermeds = []                             # List of intermediate equations for energy consumption of nodes
@@ -94,7 +90,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.packs = 1
         self.dtrLst = []
         self.rnds = self.m.Var(integer = True, lb = 1)
-        self.E_tot = self.m.Param(value = 3)
+        self.E_tot = self.m.Param(value = 0.010)
         self.e1Sum = []
         self.e1Vars = []
         self.e2Sum = []
@@ -167,9 +163,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
 
 
 if __name__ == "__main__":
-    Hrz = 10
-    Res = Hrz+1
-    testEnv = MPC2ndLayer(Hrz,Res) 
+    testEnv = MPC2ndLayer() 
     testEnv.controlEnv()
     testEnv.plot()
     
