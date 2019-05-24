@@ -55,6 +55,7 @@ for i in range(1):
         for c in EE.CHds:
             c.controlPR1(EE.sink)
             print(c.data.value)
+            print('\n')
             c.plot()
             #print(c.data.value)
         EE.communicate()

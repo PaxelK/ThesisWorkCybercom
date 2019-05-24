@@ -14,7 +14,6 @@ from Sink import Sink
 from setParamsMPC import *
 from collections import OrderedDict
 import random as rand
-import warnings
 
 
 class MPCnode(Node):
@@ -35,7 +34,7 @@ class MPCnode(Node):
         #Counter for plots
         self.nrplots = 1;
         self.pltColors = ['r-', 'k-', 'b-', 'g-', 'y-', 'c-', 'm-']
-        warnings.filterwarnings("ignore", module="matplotlib")
+        self.labels = ["Distance", "Velocity","Energy Consumption", "Data Remaining", "Transmission Rate", "Battery"]
         colorNr = rand.randrange(0, len(self.pltColors),1)
         self.lineColor = self.pltColors[colorNr]
         
@@ -78,7 +77,9 @@ class MPCnode(Node):
         # as data is transmitted, remaining data stored decreases
         self.m.Equation(self.data.dt() == -self.dtr*self.pSize)
         
-        
+        self.deadline = self.m.Var(value=self.ctrlHrz)
+        self.dlCost = self.m.Var()
+        self.m.Equation(self.deadline.dt() == -1)
         # self.m.Equation(self.energy >= self.e)
         
         # objective
@@ -87,10 +88,10 @@ class MPCnode(Node):
         
         # soft (objective constraint)
         self.recedingDeadline = np.zeros(self.ctrlRes)
-        self.recedingDeadline[-1] = 1
-        self.final = self.m.Param(value=self.recedingDeadline)
-        #self.final.value[self.ctrlRes//2:-1] = 0.001
-        #self.final.value[-1] = 1
+        self.recedingDeadline[-1] = 100
+        self.final = self.m.Param(value=np.zeros(self.ctrlRes))
+        #self.final.value[self.ctrlRes//2:-1] = 0.001 
+        self.final.value[-1] = 1
         #self.m.Equation(self.final*(self.data)<=0)
         
         #self.m.Obj(self.e) # minimize energy
@@ -100,6 +101,7 @@ class MPCnode(Node):
         self.target = self.m.Intermediate((self.final*(0-self.data)**2))
         self.m.Obj(self.target) # transmit data by the end
         self.m.Obj(self.e)
+        #self.m.Obj(self.final*self.data)
         
         
         # hard constraint
@@ -179,10 +181,11 @@ class MPCnode(Node):
         try:
             self.m.solve(disp=False)
             self.setPR(self.dtr.value[1])
-            self.recedingDeadline = np.roll(self.recedingDeadline,-1)
-            self.final.value = self.recedingDeadline
+            #if (self.recedingDeadline[0] == 0):
+            #    self.recedingDeadline = np.roll(self.recedingDeadline,-1)
+            #self.final.value = self.recedingDeadline
         except:
-            print('EXCEPTION CAUGHT')
+            print('EXCEPTION CAUGHT FOR NODE: {0}'.format(self.ID))
             self.setPR(1)
             self.errorFlag = True
             
@@ -256,15 +259,8 @@ class MPCnode(Node):
         #plt.clf()   # Clear figure
         #plt.close() # Close a figure window
         
-        self.handles, self.labels = plt.gca().get_legend_handles_labels()
+   
         
-        print(self.handles)
-        
-        if not self.handles:
-            self.labels = ["Distance", "Velocity","Energy Consumption", "Data Remaining", "Transmission Rate", "Battery"]
-        else:
-            self.labels =["","","","","",""]
-            
         
         #by_label = OrderedDict(zip(labels, handles))
         #plt.legend(by_label.values(), by_label.keys())
@@ -348,9 +344,11 @@ if __name__ == "__main__":
             testNode1.PS = 0
             testNode.resetGEKKO()
             testNode1.resetGEKKO()
-        for i in range(10):
+        for i in range(20):
             testNode.updateEnergy(-testNode.Egen)
             testNode1.updateEnergy(-testNode1.Egen)
+            
+            print(testNode1.PS)
             """        
             if(i == 5):
                 testNode.setDesData(50000)
@@ -374,13 +372,13 @@ if __name__ == "__main__":
             testNode.plot()
             #testNode.controlPR(0)
             #testNode.sendMsg(testNode2)    
-            
+            print(testNode1.PS)
             print("Segment: {0} | Node | PR  | PS\t\t|\n\t\t {1}   {2}   {3} \n\t\t {4}   {5}   {6}".format(i, testNode.ID, testNode.dtr.value[0], testNode.getPS(), testNode1.ID, testNode1.dtr.value[0], testNode1.getPS()))
             print("Node {0} Data:\n{1}\nNode {2} Data:\n{3}".format(testNode.ID, testNode.data.value, testNode1.ID, testNode1.data.value))
             print(testNode.final.value.value)
      
-        
-        
+            print('\n')
+                
           
     print(testNode2.getDataRec())
         
