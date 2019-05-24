@@ -43,6 +43,7 @@ class WSN(gym.Env):
 
         self.numNodes = numNodes  # Number of nodes
         self.PRamount = 4  # Amount of values PR can be
+        self.rndCounter = 0
 
         # Define the high values of each state
         high = [int(self.xSize), int(self.ySize)]
@@ -86,6 +87,11 @@ class WSN(gym.Env):
         '''
         # Assert that chosen action is within action space
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
+
+        if self.rndCounter % time_segments == 0:  # How often nodes are clustered is determined by time_segment (setParams)
+            # Cluster nodes in WSN env
+            self.EE.cluster()
+
         # Get state of current time step
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
         # Get PR of every node
@@ -98,17 +104,8 @@ class WSN(gym.Env):
         self.state.append(CHtemp)
         _, _, PR, _ = self.state
 
-        # Cluster nodes in WSN env
-        self.EE.cluster()
-        #self.EE.nodes[0].CHstatus = 1
-        #self.EE.nodes[1].CHstatus = 1
-
         # Default values
         reward = -2
-        for i in range(numNodes):
-            if self.EE.nodes[i].CHstatus == 1:
-                reward -= (self.EE.nodes[i].getDistance(self.EE.sink))# * 0.05)  # Distance to each CH
-        #reward += (self.EE.nodes[0].getEnergy() * 0.0001)
         done = False
 
         if len(self.EE.deadNodes) == numNodes:  # Episode is done if all nodes have died
@@ -143,33 +140,51 @@ class WSN(gym.Env):
                 reward = -20
 
         if not (action == 0 or action == 1 or action == 2 or action == 3):
-            act_temp = 0
+            act_temp = 0  # Variable used to get the corresponding action pair for every node
             for i in range(numNodes):
                 if action == i + act_temp + 4:  # This action is PR += 1
                     if self.EE.nodes[i].PA < self.PRamount:
-                        reward += 5
+                        #reward += 5 # self.EE.nodes[i].PA
                         PR[i][1] += 1
                         self.state[2][i][1] = self.EE.nodes[i].PA + 1
                         self.EE.updateEnv(0, 0, PR)
                     else:
                         reward = -50
-                    break
+                    break  # Break from for-loop when the correct action is found
 
                 elif action == i + act_temp + 5:  # This action is PR -= 1
                     if self.EE.nodes[i].PA > 1:
-                        reward -= 5
+                        #reward -= 5 # 1/self.EE.nodes[i].PA
                         PR[i][1] -= 1
                         self.state[2][i][1] = self.EE.nodes[i].PA - 1
                         self.EE.updateEnv(0, 0, PR)
                     else:
                         reward = -50
-                    break
+                    break  # Break from for-loop when the correct action is found
                 act_temp += 1
 
+        for i in range(numNodes):
+            if self.EE.nodes[i].CHstatus == 1:  # If node is a CH
+                dist = self.EE.nodes[i].getDistance(self.EE.sink)
+                pacRate = self.EE.nodes[i].PA
+                if dist >= max(xSize, ySize) / 2:
+                    reward -= 10000 * dist
+                    reward += 0.1 * pacRate
+                elif dist < max(xSize, ySize) / 2 and pacRate >= self.PRamount / 2:
+                    reward -= 2500 * dist
+                    reward += 0.5 * pacRate
+                elif dist < max(xSize, ySize) / 2 and pacRate < self.PRamount / 2:
+                    reward -= 6000 * dist
+                    reward += 0.3 * pacRate
+                # reward -= (self.EE.nodes[i].getDistance(self.EE.sink) * 400) # * 0.05)  # Reward for distance to each CH
+            # reward += self.EE.nodes[i].energy * 0.05
+            # reward += self.EE.nodes[i].PA * 0.01
+        # reward += (self.EE.nodes[0].getEnergy() * 0.0001)
 
         # Increment WSN env
         self.EE.communicate()
         self.EE.iterateRound()
+        self.rndCounter += 1
 
         return np.array(self.state), reward, done, {}
 

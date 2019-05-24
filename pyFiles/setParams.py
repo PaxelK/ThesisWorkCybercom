@@ -34,7 +34,7 @@ Eamp = 100*10**(-12)  	# Transmit Amplifier Types, units in Joules/bit/m^2 (amou
 EDA = 5*10**(-9)      	# Data Aggregation Energy, units in Joules/bit
 nrjGenFac = 0.1      	# Energy factor for generated energy
 
-plotlen = 10            # Amount of rounds that are plotted at the same time
+plotlen = 50            # Amount of rounds that are plotted at the same time
 
 
 time_segments = 10      # Amount of time segments per transmission round
