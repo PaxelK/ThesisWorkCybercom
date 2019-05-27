@@ -4,7 +4,7 @@ import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from setParamsMPC import *
 from MPCsink import MPCsink
-from MPCnodeJH_2 import MPCnode
+from MPCnode_v3 import MPCnode
 
 class EnvironmentEngineMPC:
     '''

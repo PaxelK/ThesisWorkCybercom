@@ -120,7 +120,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         try:
             self.m.solve(disp=False)
         except:
-            print('EXCEPTION CAUGHT')
+            print('EXCEPTION CAUGHT IN 2ND LAYER')
             self.errorFlag = True
         print('Sink X: {0}'.format(self.snkPos[0].value))
         print('Sink Y: {0}'.format(self.snkPos[1].value))

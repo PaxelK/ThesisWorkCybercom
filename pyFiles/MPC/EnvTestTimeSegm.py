@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from MPCnodeJH_2 import MPCnode
+from MPCnode_v3 import MPCnode
 from MPCsink import MPCsink
 from MPC2ndLayer_2D import MPC2ndLayer
 from plotEnv import *
@@ -25,7 +25,7 @@ x, y = EE.sink.getPos()  # Get position/coordinates of sink
 #print(EE.nodes[0].energy)
 
 #while True:  # Run until all node dies
-for i in range(1):
+for i in range(10):
     print(f"Round = {EE.rnd}")
 
     # print(f"plotRnd Length = {len(EE.plotRnd)}")
@@ -53,10 +53,10 @@ for i in range(1):
         print('TIME SEGMENT: {0}'.format(i))
         EE.sink.produce_MoveVector()
         for c in EE.CHds:
-            c.controlPR1(EE.sink)
-            print(c.data.value)
+            c.controlPR(EE.sink)
+            #print(c.data.value)
             print('\n')
-            c.plot()
+            #c.plot()
             #print(c.data.value)
         EE.communicate()
         EE.sink.move(EE.sink.xMove.value[1], EE.sink.yMove.value[1])
