@@ -49,7 +49,7 @@ for i in range(1):
     
     if(len(EE.CHds)>0):
         print(EE.CHds[0].data.value)
-    for i in range(6): #time_segments
+    for i in range(10): #time_segments
         print('TIME SEGMENT: {0}'.format(i))
         EE.sink.produce_MoveVector()
         for c in EE.CHds:
