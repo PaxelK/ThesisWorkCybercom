@@ -84,8 +84,8 @@ if __name__ == "__main__":
     agent.load("./save/wsn-dqn.h5")  # Load "best" weights from file
     rnd = 0
     state = env.reset()  # Reset env to a random state
-    env.EE.sink.xPos = 150
-    env.EE.sink.yPos = 150
+    #env.EE.sink.xPos = int(xSize/2)
+    #env.EE.sink.yPos = int(ySize/2)
     # Format state such that it can be used for training
     for i in range(2, numNodes + 2):
         state[i] = state[i][1]
