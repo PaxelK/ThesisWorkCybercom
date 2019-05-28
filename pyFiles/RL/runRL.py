@@ -18,8 +18,6 @@ from EnvironmentEngine import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 175
-
 class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
@@ -69,8 +67,7 @@ class DQNAgent:
     def load(self, name):
         self.model.load_weights(name)
 
-    def save(self, name):
-        self.model.save_weights(name)
+
 
 
 
@@ -79,60 +76,16 @@ if __name__ == "__main__":
     state_size = env.observation_space.shape[0]  # Get amount of states (Amount of states = 2 + 2*numNodes)
     action_size = env.action_space.n
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
-    #agent.load("./save/wsn-dqn.h5")
     # Set default values
     done = False
     batch_size = 32
 
-    avrRnd = []
-    # Train agent on episodes
-    for e in range(EPISODES):
-        done = False
-        rnd = 0
-        state = env.reset()  # Reset env to a random state
-        # Format state such that it can be used for training
-        for i in range(2, numNodes+2):
-            state[i] = state[i][1]
-        state = np.reshape(state, [1, state_size])  # Reshape for NN
-        while not done:
-            rnd += 1
-            # env.render()
-            action = agent.act(state)
-            next_state_temp, reward, done, _ = env.step(action)
-
-            next_state = [next_state_temp[0], next_state_temp[1]]
-            for i in range(numNodes):
-                next_state.append(next_state_temp[2][i][1])
-            for ii in range(numNodes):
-                next_state.append(next_state_temp[3][ii])
-            next_state = np.array(next_state)
-            next_state = np.reshape(next_state, [1, state_size])
-            agent.remember(state, action, reward, next_state, done)
-            state = next_state
-
-            if done:
-                print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd} \n")
-                break
-
-            if len(agent.memory) > batch_size:
-                agent.replay(batch_size)
-
-        avrRnd.append(rnd)
-
-        #if rnd >= max(avrRnd):
-            #agent.save("./save/wsn-dqn.h5")
-
-    print(f"avrRnd: {avrRnd}")
-
-    x = np.linspace(0, len(avrRnd), num=len(avrRnd), endpoint=True)
-    plt.plot(x, avrRnd)
-    plt.show()
-
     # Run WSN env with plotting after training
-    #agent.load("./save/wsn-dqn.h5")  # Load "best" weights from file
-    done = False
+    agent.load("./save/wsn-dqn.h5")  # Load "best" weights from file
     rnd = 0
     state = env.reset()  # Reset env to a random state
+    env.EE.sink.xPos = 150
+    env.EE.sink.yPos = 150
     # Format state such that it can be used for training
     for i in range(2, numNodes + 2):
         state[i] = state[i][1]
@@ -152,3 +105,8 @@ if __name__ == "__main__":
         next_state = np.reshape(next_state, [1, state_size])
         agent.remember(state, action, reward, next_state, done)
         state = next_state
+
+        if len(agent.memory) > batch_size:
+            agent.replay(batch_size)
+        
+

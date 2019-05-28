@@ -22,7 +22,7 @@ dead_nodes = 0 # Number of Dead Nodes in the beginning
 
 #### Data Packet Info ###
 ps = 1000
-maxPR = 20				# Maximum amount of packages that can be sent during one transmission round
+maxPR = 4				# Maximum amount of packages that can be sent during one transmission round
 
 ### Energy Values ###
 energyMode = "distr"  	# Energy mode can be "rand"=random or "distr"=distributed

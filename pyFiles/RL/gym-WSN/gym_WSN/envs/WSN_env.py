@@ -22,7 +22,7 @@ class WSN(gym.Env):
     X position          0       xSize
     Y position          0       ySize
     CHstatus            0       1           The same amount as amount of nodes
-    PR                  0       3           Amount is amount of nodes multiplied with self.PRamount
+    PR                  0       3           Amount is amount of nodes multiplied with maxPR
 
     # Actions:
     Type: Discrete(6)
@@ -42,13 +42,12 @@ class WSN(gym.Env):
         self.ySize = ySize
 
         self.numNodes = numNodes  # Number of nodes
-        self.PRamount = 4  # Amount of values PR can be
         self.rndCounter = 0
 
         # Define the high values of each state
         high = [int(self.xSize), int(self.ySize)]
         for i in range(numNodes):
-            high.append(self.PRamount)
+            high.append(maxPR)
         for ii in range(numNodes):
             high.append(1)  # CH status
         high = np.array(high)
@@ -143,7 +142,7 @@ class WSN(gym.Env):
             act_temp = 0  # Variable used to get the corresponding action pair for every node
             for i in range(numNodes):
                 if action == i + act_temp + 4:  # This action is PR += 1
-                    if self.EE.nodes[i].PA < self.PRamount:
+                    if self.EE.nodes[i].PA < maxPR:
                         #reward += 5 # self.EE.nodes[i].PA
                         PR[i][1] += 1
                         self.state[2][i][1] = self.EE.nodes[i].PA + 1
@@ -168,14 +167,14 @@ class WSN(gym.Env):
                 dist = self.EE.nodes[i].getDistance(self.EE.sink)
                 pacRate = self.EE.nodes[i].PA
                 if dist >= max(xSize, ySize) / 2:
-                    reward -= 10000 * dist
-                    reward += 0.1 * pacRate
-                elif dist < max(xSize, ySize) / 2 and pacRate >= self.PRamount / 2:
-                    reward -= 2500 * dist
-                    reward += 0.5 * pacRate
-                elif dist < max(xSize, ySize) / 2 and pacRate < self.PRamount / 2:
-                    reward -= 6000 * dist
-                    reward += 0.3 * pacRate
+                    reward -= 1000 * dist
+                    reward += 0.01 * pacRate
+                elif dist < max(xSize, ySize) / 2 and pacRate >= maxPR / 2:
+                    reward -= 250 * dist
+                    reward += 0.05 * pacRate
+                elif dist < max(xSize, ySize) / 2 and pacRate < maxPR / 2:
+                    reward -= 600 * dist
+                    reward += 0.03 * pacRate
                 # reward -= (self.EE.nodes[i].getDistance(self.EE.sink) * 400) # * 0.05)  # Reward for distance to each CH
             # reward += self.EE.nodes[i].energy * 0.05
             # reward += self.EE.nodes[i].PA * 0.01
@@ -195,7 +194,7 @@ class WSN(gym.Env):
 
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
-            self.state.append([i, random.randint(0, self.PRamount)])
+            self.state.append([i, random.randint(0, maxPR)])
             self.EE.nodes[i].energy = maxNrj  #random.random() * maxNrj
             self.EE.nodes[i].SoC = self.EE.nodes[i].energy / self.EE.nodes[i].maxEnergy
             self.EE.nodes[i].PS = 0  # Packages sent = amount of packages the node has sent
