@@ -14,12 +14,12 @@ from MPCsink import MPCsink
 from MPC2ndLayer_2D_v2 import MPC2ndLayer
 from plotEnv import *
 from setParamsMPC import *
-
+import copy
 
 ctrlHrz = 10
 ctrlRes = ctrlHrz + 1
 EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
-EE_leach = EE_MPC
+EE_leach = copy.deepcopy(EE_MPC)
 
 kill = False #Variable for exciting the greater loop
 
@@ -45,8 +45,8 @@ The greater loop. One loop represents a round. During this loop the following st
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
 
-#while True:  # Run until all nodes dies
-for i in range(2):
+while True:  # Run until all nodes dies
+#for i in range(50):
     print(f"Round = {EE_MPC.rnd}")
     plotEnv(EE_MPC)
     plotEnv(EE_leach)
@@ -71,7 +71,7 @@ for i in range(2):
         going with the same hierarchy roles.
         """
         EE_leach.nodes[i].CHstatus = EE_MPC.nodes[i].CHstatus
-        if (EE_leach.nodes[i].CHstatus == 1 and EE_leach.nodes[i].alive == False):
+        if (EE_leach.nodes[i].CHstatus == 1 and EE_leach.nodes[i].alive is False):
             kill = True
     
     if kill:
@@ -79,6 +79,9 @@ for i in range(2):
         #print('ENERGY AT BREAKPOINT, ROUND {0}: {1}'.format(EE_MPC.rnd, EE_MPC.nodes[0].energy))
         break
            
+    """
+    Connection phase for the LEACH network's nodes. Pretty much copied from the Cluster() method
+    """
     for i in range(len(EE_leach.nodes)):  # Non-CH nodes connect to nearest CH/sink and CHs connect to sink
             if EE_leach.nodes[i].getCHstatus() == 0:  # If node is a simple node (non-CH)
                 EE_leach.nonCHds.append(EE_leach.nodes[i]) # Add to list of current non-CHs
