@@ -115,28 +115,28 @@ class WSN(gym.Env):
                 self.state[1] -= 1
                 self.EE.updateEnv(0, -1, PR)
             else:
-                reward = -20
+                reward = -50
 
         elif action == 1: # This action is yPos += 1
             if self.state[1] < ySize:
                 self.state[1] += 1
                 self.EE.updateEnv(0, 1, PR)
             else:
-                reward = -20
+                reward = -50
 
         elif action == 2:  # This action is xPos += 1
             if self.state[0] < xSize:
                 self.state[0] += 1
                 self.EE.updateEnv(1, 0, PR)
             else:
-                reward = -20
+                reward = -50
 
         elif action == 3:  # This action is xPos -= 1
             if self.state[0] > 0:
                 self.state[0] -= 1
                 self.EE.updateEnv(-1, 0, PR)
             else:
-                reward = -20
+                reward = -50
 
         if not (action == 0 or action == 1 or action == 2 or action == 3):
             act_temp = 0  # Variable used to get the corresponding action pair for every node
@@ -167,14 +167,14 @@ class WSN(gym.Env):
                 dist = self.EE.nodes[i].getDistance(self.EE.sink)
                 pacRate = self.EE.nodes[i].PA
                 if dist >= max(xSize, ySize) / 2:
-                    reward -= 10000 * dist
-                    reward += 0.01 * pacRate
+                    reward -= 0.01 * dist
+                    reward += 0.001 * pacRate
                 elif dist < max(xSize, ySize) / 2 and pacRate >= maxPR / 2:
-                    reward -= 2500 * dist
-                    reward += 0.05 * pacRate
+                    reward -= 0.0025 * dist
+                    reward += 0.005 * pacRate
                 elif dist < max(xSize, ySize) / 2 and pacRate < maxPR / 2:
-                    reward -= 6000 * dist
-                    reward += 0.03 * pacRate
+                    reward -= 0.006 * dist
+                    reward += 0.003 * pacRate
                 # reward -= (self.EE.nodes[i].getDistance(self.EE.sink) * 400) # * 0.05)  # Reward for distance to each CH
             # reward += self.EE.nodes[i].energy * 0.05
             # reward += self.EE.nodes[i].PA * 0.01
@@ -192,6 +192,7 @@ class WSN(gym.Env):
         Resets the entire WSN by placing the sink in a random position and all nodes have a random PR
         '''
 
+        self.rndCounter = 0
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
             self.state.append([i, random.randint(0, maxPR)])

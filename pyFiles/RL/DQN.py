@@ -28,7 +28,7 @@ class DQNAgent:
         self.gamma = 0.8 #0.9    # discount rate
         self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.05
-        self.epsilon_decay = 0.9999
+        self.epsilon_decay = 0.9995
         self.learning_rate = 0.01
         self.model = self._build_model()
 
@@ -123,13 +123,14 @@ if __name__ == "__main__":
             #agent.save("./save/wsn-dqn.h5")
 
     print(f"avrRnd: {avrRnd}")
+    print(f"Mean Rounds: {sum(avrRnd)/len(avrRnd)}")
 
     x = np.linspace(0, len(avrRnd), num=len(avrRnd), endpoint=True)
     plt.plot(x, avrRnd)
     plt.show()
 
     # Run WSN env with plotting after training
-    #agent.load("./save/wsn-dqn.h5")  # Load "best" weights from file
+    agent.load("./save/wsn-dqn.h5")  # Load "best" weights from file
     done = False
     rnd = 0
     state = env.reset()  # Reset env to a random state
@@ -152,3 +153,6 @@ if __name__ == "__main__":
         next_state = np.reshape(next_state, [1, state_size])
         agent.remember(state, action, reward, next_state, done)
         state = next_state
+
+        if len(agent.memory) > batch_size:
+            agent.replay(batch_size)
