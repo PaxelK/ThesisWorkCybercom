@@ -4,7 +4,6 @@ Created on Fri Apr 26 10:25:41 2019
 
 @author: axkar1
 """
-from gekko import GEKKO
 import numpy as np
 import matplotlib.pyplot as plt
 import sys

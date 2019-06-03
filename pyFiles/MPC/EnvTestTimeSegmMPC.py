@@ -4,18 +4,20 @@ Created on Fri Apr 26 10:25:41 2019
 
 @author: axkar1
 """
-
+from gekko import GEKKO
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from Node import Node
-from Sink import Sink
-from EnvironmentEngine import EnvironmentEngine
+from MPCnode_v3 import MPCnode
+from MPCsink import MPCsink
+from MPC2ndLayer_2D_v2 import MPC2ndLayer
 from plotEnv import *
-from setParams import *
+from setParamsMPC import *
+ctrlHrz = 10
+ctrlRes = ctrlHrz + 1
+EE = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
 
-EE = EnvironmentEngine()
 x, y = EE.sink.getPos()  # Get position/coordinates of sink
 
 
@@ -46,10 +48,31 @@ for i in range(3):
     #print('ENERGY AT START OF ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
     
     EE.cluster()
+    EE.refreshSolvers()
+    optimalP = EE.controlEnv()
+    EE.sink.setTarPoint(optimalP[0], optimalP[1])
+    print('Expected lifetime in rounds: {0}'.format(EE.expLifetime))
+    print('Packages received by sink: {0}'.format(EE.sink.dataRec))
+    print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE.nodesAlive), len(EE.deadNodes)))
+    print('Number of nodes alive: {0}'.format(len(EE.nodesAlive)))
     
+    #if(len(EE.CHds)>0):
+    #    print(EE.CHds[0].desData)
     for i in range(10): #time_segments
         print('TIME SEGMENT: {0}'.format(i))
+        EE.sink.produce_MoveVector()
+        for c in EE.CHds:
+            c.controlPR(EE.sink)
+            #print(c.data.value)
+            print('\n')
+            #c.plot()
+            #print(c.data.value)
         EE.communicate()
+        EE.sink.move(EE.sink.xMove.value[1], EE.sink.yMove.value[1])
+        
+        
+    #print('ENERGY AT TIME SEGMENT {0}: {1}'.format(i, EE.nodes[0].energy))
+    #print('ENERGY AT END OF ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
     
     EE.iterateRound()
     
