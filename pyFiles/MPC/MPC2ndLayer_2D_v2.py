@@ -39,11 +39,12 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         #Counter for plots
         self.nrplots = 1;
         
-        self.freeNonCHds = []
+        
 
 
     def controlEnv(self):
-        self.snkPos = [self.m.Var(value = self.sink.xPos, lb = 0, ub = 100), self.m.Var(value = self.sink.yPos, lb = 0, ub = 100)] 
+        self.resetGEKKO()
+        self.snkPos = [self.m.Var(value = self.sink.xPos, lb = 0, ub = xSize), self.m.Var(value = self.sink.yPos, lb = 0, ub = ySize)] 
         
         
         for i in range(len(self.CHds)):
@@ -180,9 +181,10 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.ECH_sum = []
         self.EnonCH_sum = []
         
+        self.freeNonCHds = []
         # options
         self.m.options.IMODE = 3                 # optimize a solid state
-
+        self.m.options.MAX_TIME = 10
     def plot(self):
         IDs = []
         for ch in self.CHds:

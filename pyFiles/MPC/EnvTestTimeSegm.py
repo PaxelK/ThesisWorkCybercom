@@ -38,10 +38,10 @@ The greater loop. One loop represents a round. During this loop the following st
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
 
-#while True:  # Run until all node dies
-for i in range(3):
+while True:  # Run until all node dies
+#for i in range(3):
     print(f"Round = {EE.rnd}")
-    plotEnv(EE)
+    #plotEnv(EE)
 
     #print('ENERGY AT START OF ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
     
@@ -58,5 +58,5 @@ for i in range(3):
     dead and the loop ceases.
     """
     if len(EE.deadNodes) == numNodes:  # Break when all nodes have died
-        print('ENERGY AT BREAKPOINT, ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
+        print('ENERGY AT BREAKPOINT AT ROUND {0}'.format(EE.rnd))
         break
