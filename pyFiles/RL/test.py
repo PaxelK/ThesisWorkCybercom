@@ -82,13 +82,13 @@ if __name__ == "__main__":
     env.EE.nodes[0].yPos = 130
 
     env.EE.nodes[1].xPos = 170
-    EE.nodes[1].yPos = 130
+    env.EE.nodes[1].yPos = 130
 
-    EE.nodes[2].xPos = 130
-    EE.nodes[2].yPos = 170
+    env.EE.nodes[2].xPos = 130
+    env.EE.nodes[2].yPos = 170
 
-    EE.nodes[3].xPos = 170
-    EE.nodes[3].yPos = 170
+    env.EE.nodes[3].xPos = 170
+    env.EE.nodes[3].yPos = 170
 
     # Set default values
     done = False
@@ -130,8 +130,8 @@ if __name__ == "__main__":
         avrRnd.append(rnd)
 
         #if rnd >= max(avrRnd):
-        # if rnd % 5 == 0:
-            #agent.save("./save/wsn-dqn.h5")
+        if rnd % 5 == 0:
+            agent.save("./save/wsn-dqn.h5")
 
     print(f"avrRnd: {avrRnd}")
     print(f"Mean Rounds: {sum(avrRnd)/len(avrRnd)}")

@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
 
     # Run WSN env with plotting after training
-    agent.load("./save/wsn-dqn.h5")  # Load "best" weights from file
+    agent.load("./save/wsn-dqn.h5")  # Load weights from file
     rnd = 0
     state = env.reset()  # Reset env to a random state
     #env.EE.sink.xPos = int(xSize/2)

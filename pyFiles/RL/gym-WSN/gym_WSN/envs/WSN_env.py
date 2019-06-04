@@ -59,7 +59,7 @@ class WSN(gym.Env):
         low = np.array(low)
 
         # Create action space (discrete) and observation space (Box/continuos)
-        self.action_space = spaces.Discrete(4+(2*numNodes))
+        self.action_space = spaces.Discrete(8+(2*numNodes))
         self.observation_space = spaces.Box(low, high, dtype=np.float32)
 
         # Set default values
