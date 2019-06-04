@@ -129,7 +129,7 @@ if __name__ == "__main__":
     #testSink.produce_MoveVector(59,46)
     #testSink.plot()
     
-    for i in range(2):
+    for i in range(3):
         testSink.setTarPoint(59,46)
         testSink.produce_MoveVector()
         #print('xPos: {0} \n xVel: {1}'.format(testSink.xDist.value, testSink.xMove.value))

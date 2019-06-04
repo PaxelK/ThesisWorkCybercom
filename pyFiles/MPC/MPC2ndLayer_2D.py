@@ -120,7 +120,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         try:
             self.m.solve(disp=False)
         except:
-            print('EXCEPTION CAUGHT')
+            print('EXCEPTION CAUGHT IN 2ND LAYER')
             self.errorFlag = True
         print('Sink X: {0}'.format(self.snkPos[0].value))
         print('Sink Y: {0}'.format(self.snkPos[1].value))
@@ -136,7 +136,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         else:
             i = 0
             for CH in self.CHds:
-                CH.setDesData(int(self.dtrLst[i][0]))
+                CH.setDesData((self.dtrLst[i][0]))
                 i+=1
             optimalP = [int(self.snkPos[0][0]), int(self.snkPos[1][0])]
                 
@@ -148,8 +148,8 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.resetGEKKO()
         self.errorFlag = False
         self.sink.resetGEKKO()
-        for node in self.nodes:
-            node.resetGEKKO()
+        #for node in self.nodes:
+        #    node.resetGEKKO()
     
     
     def resetGEKKO(self):
@@ -193,7 +193,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         DTRL = []
         if(self.errorFlag):
             for chd in self.CHds:
-                DTRL.append(chd.data.value.value)
+                DTRL.append(chd.desData)
                 
         else:
             for i in range(len(self.dtrLst)):  
@@ -233,23 +233,7 @@ if __name__ == "__main__":
     print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
     testEnv.controlEnv()
     for element in testEnv.CHds:
-        print(element.data.value)
-    testEnv.plot()
-    """
-    testEnv.cluster()
-    print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
-    testEnv.resetGEKKO()
-    testEnv.controlEnv()
-    for element in testEnv.CHds:
-        print(element.PA)
+        print(element.desData)
     testEnv.plot()
     
-    testEnv.cluster()
-    print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
-    testEnv.resetGEKKO()
-    testEnv.controlEnv()
-    for element in testEnv.CHds:
-        print(element.PA)
-    testEnv.plot()
-    """
     
