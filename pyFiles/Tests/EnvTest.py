@@ -9,6 +9,18 @@ EE = EnvironmentEngine()  # Initiate environment
 
 x, y = EE.sink.getPos()  # Get position/coordinates of sink
 
+EE.nodes[0].xPos = 130
+EE.nodes[0].yPos = 130
+
+EE.nodes[1].xPos = 170
+EE.nodes[1].yPos = 130
+
+EE.nodes[2].xPos = 130
+EE.nodes[2].yPos = 170
+
+EE.nodes[3].xPos = 170
+EE.nodes[3].yPos = 170
+
 # Get PR for all nodes (PR should be zero for dead nodes)
 PRcontrl = []
 for i in range(numNodes):

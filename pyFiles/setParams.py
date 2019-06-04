@@ -17,12 +17,12 @@ ySize = 300
 x = 0  # Added for better display results of the plot
 y = 0  # Added for better display results of the plot
 
-numNodes = 10  # Number of Nodes in the field
+numNodes = 4  # Number of Nodes in the field
 dead_nodes = 0 # Number of Dead Nodes in the beginning
 
 #### Data Packet Info ###
 ps = 1000
-maxPR = 4				# Maximum amount of packages that can be sent during one transmission round
+maxPR = 20				# Maximum amount of packages that can be sent during one transmission round
 
 ### Energy Values ###
 energyMode = "distr"  	# Energy mode can be "rand"=random or "distr"=distributed

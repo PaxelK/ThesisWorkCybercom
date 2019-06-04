@@ -72,6 +72,10 @@ class WSN(gym.Env):
         for ii in range(numNodes):
             self.state.append(self.EE.nodes[ii].getCHstatus())
 
+        self.tempActList = [] #[0, 1, 2, 3]
+        for i in range(8):
+            self.tempActList.append(i)
+
 
     def seed(self, seed=None):  # Returns initial state of env
         self.np_random, seed = seeding.np_random(seed)
@@ -107,6 +111,7 @@ class WSN(gym.Env):
         reward = -2
         done = False
 
+
         if len(self.EE.deadNodes) == numNodes:  # Episode is done if all nodes have died
             done = True
 
@@ -138,7 +143,43 @@ class WSN(gym.Env):
             else:
                 reward = -50
 
-        if not (action == 0 or action == 1 or action == 2 or action == 3):
+        elif action == 4:  # This action is xPos -= 1 and yPos += 1
+            if self.state[0] > 0 and self.state[1] < ySize:
+                self.state[0] -= 1
+                self.EE.updateEnv(-1, 0, PR)
+                self.state[1] += 1
+                self.EE.updateEnv(0, 1, PR)
+            else:
+                reward = -50
+
+        elif action == 5:  # This action is xPos += 1 and yPos += 1
+            if self.state[0] < xSize and self.state[1] < ySize:
+                self.state[0] += 1
+                self.EE.updateEnv(1, 0, PR)
+                self.state[1] += 1
+                self.EE.updateEnv(0, 1, PR)
+            else:
+                reward = -50
+
+        elif action == 6:  # This action is xPos -= 1 and yPos -= 1
+            if self.state[0] > 0 and self.state[1] > 0:
+                self.state[0] -= 1
+                self.EE.updateEnv(-1, 0, PR)
+                self.state[1] -= 1
+                self.EE.updateEnv(0, -1, PR)
+            else:
+                reward = -50
+
+        elif action == 7:  # This action is xPos += 1 and yPos -= 1
+            if self.state[0] < xSize and self.state[1] > 0:
+                self.state[0] += 1
+                self.EE.updateEnv(1, 0, PR)
+                self.state[1] -= 1
+                self.EE.updateEnv(0, -1, PR)
+            else:
+                reward = -50
+
+        if not action in self.tempActList:
             act_temp = 0  # Variable used to get the corresponding action pair for every node
             for i in range(numNodes):
                 if action == i + act_temp + 4:  # This action is PR += 1
@@ -163,19 +204,19 @@ class WSN(gym.Env):
                 act_temp += 1
 
         for i in range(numNodes):
-            if self.EE.nodes[i].CHstatus == 1:  # If node is a CH
-                dist = self.EE.nodes[i].getDistance(self.EE.sink)
-                pacRate = self.EE.nodes[i].PA
-                if dist >= max(xSize, ySize) / 2:
-                    reward -= 0.01 * dist
-                    reward += 0.001 * pacRate
-                elif dist < max(xSize, ySize) / 2 and pacRate >= maxPR / 2:
-                    reward -= 0.0025 * dist
-                    reward += 0.005 * pacRate
-                elif dist < max(xSize, ySize) / 2 and pacRate < maxPR / 2:
-                    reward -= 0.006 * dist
-                    reward += 0.003 * pacRate
-                # reward -= (self.EE.nodes[i].getDistance(self.EE.sink) * 400) # * 0.05)  # Reward for distance to each CH
+            #if self.EE.nodes[i].CHstatus == 1:  # If node is a CH
+            dist = self.EE.nodes[i].getDistance(self.EE.sink)
+            pacRate = self.EE.nodes[i].PA
+            if dist >= max(xSize, ySize) / 2:
+                reward -= 1000 * dist
+                reward += 0.0001 * pacRate
+            elif dist < max(xSize, ySize) / 2 and pacRate >= maxPR / 2:
+                reward -= 250 * dist
+                reward += 0.0005 * pacRate
+            elif dist < max(xSize, ySize) / 2 and pacRate < maxPR / 2:
+                reward -= 600 * dist
+                reward += 0.0003 * pacRate
+            # reward -= (self.EE.nodes[i].getDistance(self.EE.sink) * 400) # * 0.05)  # Reward for distance to each CH
             # reward += self.EE.nodes[i].energy * 0.05
             # reward += self.EE.nodes[i].PA * 0.01
         # reward += (self.EE.nodes[0].getEnergy() * 0.0001)
@@ -195,7 +236,7 @@ class WSN(gym.Env):
         self.rndCounter = 0
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
-            self.state.append([i, random.randint(0, maxPR)])
+            self.state.append([i, random.randint(0, maxPR)])  # CH status is appended below
             self.EE.nodes[i].energy = maxNrj  #random.random() * maxNrj
             self.EE.nodes[i].SoC = self.EE.nodes[i].energy / self.EE.nodes[i].maxEnergy
             self.EE.nodes[i].PS = 0  # Packages sent = amount of packages the node has sent
@@ -224,8 +265,8 @@ class WSN(gym.Env):
 
         self.EE.sink.dataRec = 0
         self.EE.sink.nrjCons = 0
-        self.EE.sink.xPos = int(xSize * random.random())
-        self.EE.sink.yPos = int(ySize * random.random())
+        self.EE.sink.xPos =  int(xSize * random.random())
+        self.EE.sink.yPos =  int(ySize * random.random())
         self.EE.sink.SoC = self.EE.sink.energy / self.EE.sink.maxEnergy
 
 

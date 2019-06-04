@@ -80,6 +80,7 @@ if __name__ == "__main__":
     action_size = env.action_space.n
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
     #agent.load("./save/wsn-dqn.h5")
+
     # Set default values
     done = False
     batch_size = 32
@@ -130,7 +131,7 @@ if __name__ == "__main__":
     plt.show()
 
     # Run WSN env with plotting after training
-    agent.load("./save/wsn-dqn.h5")  # Load "best" weights from file
+    #agent.load("./save/wsn-dqn.h5")  # Load "best" weights from file
     done = False
     rnd = 0
     state = env.reset()  # Reset env to a random state
