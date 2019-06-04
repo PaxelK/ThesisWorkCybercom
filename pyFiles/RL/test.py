@@ -69,6 +69,9 @@ class DQNAgent:
     def load(self, name):
         self.model.load_weights(name)
 
+    def save(self, name):
+        self.model.save_weights(name)
+
 
 
 if __name__ == "__main__":
