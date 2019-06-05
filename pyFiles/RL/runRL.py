@@ -9,6 +9,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 
+
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from setParams import *
@@ -24,8 +25,8 @@ class DQNAgent:
         self.action_size = action_size
         self.memory = deque(maxlen=10000)
         self.gamma = 0.8 #0.9    # discount rate
-        self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.05
+        self.epsilon = 0.005 # exploration rate
         self.epsilon_decay = 0.9999
         self.learning_rate = 0.01
         self.model = self._build_model()
@@ -66,7 +67,6 @@ class DQNAgent:
 
     def load(self, name):
         self.model.load_weights(name)
-
 
 
 

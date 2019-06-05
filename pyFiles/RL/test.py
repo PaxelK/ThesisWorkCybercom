@@ -18,7 +18,7 @@ from EnvironmentEngine import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 5
+EPISODES = 100
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -70,7 +70,8 @@ class DQNAgent:
         self.model.load_weights(name)
 
     def save(self, name):
-        self.model.save_weights(name)
+        open(name, 'w').close() # Clear file contents before saving
+        self.model.save(name)
 
 
 
@@ -132,9 +133,9 @@ if __name__ == "__main__":
 
         avrRnd.append(rnd)
 
-        #if rnd >= max(avrRnd):
-        if rnd % 5 == 0:
-            agent.save("./save/wsn-dqn.h5")
+        #if rnd >= max(avrRnd):  # Save "best" run
+        #if rnd % 5 == 0: # Save every 5th rounds
+        agent.save("./save/wsn-dqn.h5")
 
     print(f"avrRnd: {avrRnd}")
     print(f"Mean Rounds: {sum(avrRnd)/len(avrRnd)}")
@@ -144,7 +145,7 @@ if __name__ == "__main__":
     plt.show()
 
     # Run WSN env with plotting after training
-    #agent.load("./save/wsn-dqn.h5")  # Load "best" weights from file
+    #agent.load("./save/wsn-dqn.h5")  # Load weights from file
     done = False
     rnd = 0
     state = env.reset()  # Reset env to a random state
