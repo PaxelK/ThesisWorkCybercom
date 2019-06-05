@@ -39,8 +39,7 @@ class DQNAgent:
         model.add(Dense(48, activation='relu'))
         #model.add(Dense(36, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
-        agent.load("./save/wsn-dqn.h5")  # Load weights from file
-        model.compile(loss='mae', optimizer=Adam(lr=self.learning_rate))
+        #model.compile(loss='mae', optimizer=Adam(lr=self.learning_rate))
         return model
 
     def remember(self, state, action, reward, next_state, done):
@@ -94,7 +93,9 @@ if __name__ == "__main__":
     env.EE.nodes[3].yPos = 180
 
 
-
+    # Run WSN env with plotting after training
+    agent.load("./save/wsn-dqn.h5")  # Load weights from file
+    agent.model.compile(loss='mae', optimizer=Adam(lr=agent.learning_rate))
     rnd = 0
     state = env.reset()  # Reset env to a random state
     #env.EE.sink.xPos = int(xSize/2)
