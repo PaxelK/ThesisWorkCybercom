@@ -9,13 +9,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from Node import Node
-from Sink import Sink
-from EnvironmentEngine import EnvironmentEngine
+from EnvironmentEngineMPC import EnvironmentEngineMPC
 from plotEnv import *
 from setParams import *
 
-EE = EnvironmentEngine()
+EE = EnvironmentEngineMPC(10,11)
 x, y = EE.sink.getPos()  # Get position/coordinates of sink
 
 
@@ -46,11 +44,12 @@ while True:  # Run until all node dies
     #print('ENERGY AT START OF ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
     
     EE.cluster()
-    
+    """
     for i in range(10): #time_segments
         print('TIME SEGMENT: {0}'.format(i))
         EE.communicate()
-    
+    """
+    EE.communicate()
     EE.iterateRound()
     
     """
