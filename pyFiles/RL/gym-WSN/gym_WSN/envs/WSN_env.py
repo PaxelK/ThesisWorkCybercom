@@ -265,8 +265,8 @@ class WSN(gym.Env):
 
         self.EE.sink.dataRec = 0
         self.EE.sink.nrjCons = 0
-        self.EE.sink.xPos =  int(xSize * random.random())
-        self.EE.sink.yPos =  int(ySize * random.random())
+        self.EE.sink.xPos =  self.state[0]
+        self.EE.sink.yPos =  self.state[1]
         self.EE.sink.SoC = self.EE.sink.energy / self.EE.sink.maxEnergy
 
 

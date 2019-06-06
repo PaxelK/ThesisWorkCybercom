@@ -80,18 +80,17 @@ if __name__ == "__main__":
     done = False
     batch_size = 32
 
-    env.EE.nodes[0].xPos = 120
-    env.EE.nodes[0].yPos = 120
+    env.EE.nodes[0].xPos = 130
+    env.EE.nodes[0].yPos = 130
 
-    env.EE.nodes[1].xPos = 180
-    env.EE.nodes[1].yPos = 120
+    env.EE.nodes[1].xPos = 170
+    env.EE.nodes[1].yPos = 130
 
-    env.EE.nodes[2].xPos = 120
-    env.EE.nodes[2].yPos = 180
+    env.EE.nodes[2].xPos = 130
+    env.EE.nodes[2].yPos = 170
 
-    env.EE.nodes[3].xPos = 180
-    env.EE.nodes[3].yPos = 180
-
+    env.EE.nodes[3].xPos = 170
+    env.EE.nodes[3].yPos = 170
 
     # Run WSN env with plotting after training
     agent.load("./save/wsn-dqn.h5")  # Load weights from file
@@ -105,7 +104,7 @@ if __name__ == "__main__":
         state[i] = state[i][1]
     state = np.reshape(state, [1, state_size])
     while not done:
-        #env.render()
+
         rnd += 1
         action = agent.act(state)
         next_state_temp, reward, done, _ = env.step(action)
@@ -123,4 +122,5 @@ if __name__ == "__main__":
         if len(agent.memory) > batch_size:
             agent.replay(batch_size)
 
+        env.render()
     print(f"Rounds survived: {rnd}")

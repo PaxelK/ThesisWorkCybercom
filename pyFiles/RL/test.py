@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th rounds
-        agent.save("./save/wsn-dqn.h5")
+        #agent.save("./save/wsn-dqn.h5")
 
     print(f"avrRnd: {avrRnd}")
     print(f"Mean Rounds: {sum(avrRnd)/len(avrRnd)}")
