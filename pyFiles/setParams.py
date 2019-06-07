@@ -12,12 +12,14 @@ p = 0.05  # Suggested percentage of cluster head, a 5 percent of the total amoun
 ########################### Network Establishment Parameters ###############################
 ### Area of Operation ###
 # Field Dimensions in meters #
-xSize = 100
-ySize = 100
+xSize = 300
+ySize = 300
 x = 0  # Added for better display results of the plot
 y = 0  # Added for better display results of the plot
 
+
 numNodes = 100  # Number of Nodes in the field
+
 dead_nodes = 0 # Number of Dead Nodes in the beginning
 
 #### Data Packet Info ###
@@ -34,7 +36,7 @@ Eamp = 100*10**(-12)  	# Transmit Amplifier Types, units in Joules/bit/m^2 (amou
 EDA = 5*10**(-9)      	# Data Aggregation Energy, units in Joules/bit
 nrjGenFac = 0.1      	# Energy factor for generated energy
 
-plotlen = 10            # Amount of rounds that are plotted at the same time
+plotlen = 50            # Amount of rounds that are plotted at the same time
 
 
 time_segments = 10      # Amount of time segments per transmission round

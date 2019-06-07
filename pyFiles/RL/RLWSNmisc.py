@@ -9,7 +9,7 @@ from random import *
 class WSNRL:
     def __init__(self, nodesList=np.zeros(numNodes)):
 
-        self.PRamount = 4  # Amount of different PRs, e.g PRamount = 4 implies PR can be 0, 1, 2 or 3
+        few = 4  # Amount of different PRs, e.g PRamount = 4 implies PR can be 0, 1, 2 or 3
         self.actionSpace = 6
 
         # Determine a step size of mobile sink
@@ -18,7 +18,7 @@ class WSNRL:
         maxRow = self.numRows - 1
         maxCol = self.numCols - 1
 
-        numStates = int(self.numRows * self.numCols * numNodes * (numNodes * self.PRamount))
+        numStates = int(self.numRows * self.numCols * numNodes * (numNodes * maxPR))
 
         # initialStateDist = np.zeros(numStates)
 
@@ -52,7 +52,7 @@ class WSNRL:
                         elif action == 3:  # Move sink west
                             newCol = max(col - 1, 0)
                         if action == 4:  # Increase PR of specific node
-                            packetRates[node] = min(self.PRamount - 1, packetRates[node] + 1)  # PR can be zero
+                            packetRates[node] = min(maxPR - 1, packetRates[node] + 1)  # PR can be zero
                             reward = 10
                         elif action == 5:  # Decrease PR of specific node
                             packetRates[node] = max(0, packetRates[node] - 1)
@@ -68,14 +68,14 @@ class WSNRL:
         i = sinkRow
         i *= self.numCols
         i += sinkCol
-        i *= self.PRamount * numNodes
+        i *= maxPR * numNodes
         i += packetRates
         return i
 
     def decode(self, i):
         out = []
-        out.append(i % self.PRamount * numNodes)
-        i = i // self.PRamount * numNodes
+        out.append(i % maxPR * numNodes)
+        i = i // maxPR * numNodes
         out.append(i % self.numCols)
         i = i // self.numCols
         out.append(i)
@@ -198,7 +198,7 @@ class WSN(gym.Env):
 
         self.rnd = 0
         self.numNodes = numNodes
-        self.PRamount = 4  # Amount of values PR can be
+        maxPR = 4  # Amount of values PR can be
 
         # By using a system grid size of 100x100 we get a step size of 2 m
         high = np.array([
@@ -265,7 +265,7 @@ class WSN(gym.Env):
         # PR is hard coded for one node
         elif action == 4:
             reward = 10
-            EE.nodes[0].PA = min(self.PRamount - 1, EE.nodes[0].PA + 1)
+            EE.nodes[0].PA = min(maxPR - 1, EE.nodes[0].PA + 1)
             self.state[2][1] = EE.nodes[0].PA  # PR +
             EE.updateEnv(0, 0, PR)
 
@@ -289,7 +289,7 @@ class WSN(gym.Env):
         '''
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
-            self.state.append([i, random.randint(0, self.PRamount - 1)])
+            self.state.append([i, random.randint(0, maxPR - 1)])
         return np.array(self.state)
 
     def render(self, mode='human'):
@@ -330,11 +330,11 @@ class WSN(discrete.DiscreteEnv):
         self.numRows = int(ySize/2)
         self.numCols = int(xSize/2)
 
-        self.PRamount = 4  # Amount of values PR can be, e.g. if PRamount is 4 the PR can be 0 1 2 and 3
+        maxPR = 4  # Amount of values PR can be, e.g. if PRamount is 4 the PR can be 0 1 2 and 3
 
         numActions = 6  # Number of actions
         numStates = 60000 # Hardcoded number of states to the amount of iterations there are in the following for loops
-        #numStates = int(self.numRows * self.numCols * (numNodes * self.PRamount) * (numNodes * 2)) # number of states
+        #numStates = int(self.numRows * self.numCols * (numNodes * maxPR) * (numNodes * 2)) # number of states
 
 
         P = {state: {action: []
@@ -344,7 +344,7 @@ class WSN(discrete.DiscreteEnv):
         for row in range(self.numRows):
             for col in range(self.numCols):
                 for node in range(len(self.EE.nodes)):
-                    for PR in range(self.PRamount):
+                    for PR in range(maxPR):
                         for action in range(numActions):
                             iterations += 1
 
@@ -370,7 +370,7 @@ class WSN(discrete.DiscreteEnv):
                                 newCol = max(col - 1, 0)
                             # PR is hard coded for one node
                             elif action == 4:  # Increase PR of specific node
-                                self.EE.nodes[node].PA = min(self.EE.nodes[node].PA + 1, self.PRamount - 1)
+                                self.EE.nodes[node].PA = min(self.EE.nodes[node].PA + 1, maxPR - 1)
                                 newPacketRates = self.EE.nodes[node].PA
                                 reward = 10
                             elif action == 5:  # Decrease PR of specific node
@@ -395,15 +395,15 @@ class WSN(discrete.DiscreteEnv):
         i = row
         i *= self.numCols
         i += col
-        i *= self.PRamount
+        i *= maxPR
         i += PR
 
         return i
 
     def decode(self, i):
         out = []
-        out.append(i % self.PRamount)
-        i = i // self.PRamount
+        out.append(i % maxPR)
+        i = i // maxPR
         out.append(i % self.numCols)
         i = i // self.numCols
         out.append(i)

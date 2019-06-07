@@ -1,6 +1,7 @@
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 
+from random import *
 from EnvironmentEngine import *
 from plotEnv import *
 
@@ -8,10 +9,22 @@ EE = EnvironmentEngine()  # Initiate environment
 
 x, y = EE.sink.getPos()  # Get position/coordinates of sink
 
+EE.nodes[0].xPos = 130
+EE.nodes[0].yPos = 130
+
+EE.nodes[1].xPos = 170
+EE.nodes[1].yPos = 130
+
+EE.nodes[2].xPos = 130
+EE.nodes[2].yPos = 170
+
+EE.nodes[3].xPos = 170
+EE.nodes[3].yPos = 170
+
 # Get PR for all nodes (PR should be zero for dead nodes)
 PRcontrl = []
 for i in range(numNodes):
-    PRcontrl.append([i, 10])  # [Node ID, PR of node]
+    PRcontrl.append([i, 4])  # [Node ID, PR of node]
 
 '''
 EE.updateEnv(20, 43, PRcontrl)  # [sinkx, sinky, PRlist]
@@ -47,10 +60,23 @@ while True:  # Run until all node dies
     # print(f"PackReclist Length = {len(EE.PackReclist)}")
     # print(f"deadnodes Length = {len(EE.deadNodes)}")
 
-    plotEnv(EE)
-    
-    EE.updateEnv(1, 1, PRcontrl)
+    #plotEnv(EE)
+    temp = random.random()
+    x = 0
+    y = 0
+
+    if temp < 0.25 and temp >= 0:
+        x = -1
+    elif temp < 0.5 and temp >= 0.25:
+        x = 1
+    elif temp < 0.75 and temp >= 0.5:
+        y = -1
+    elif temp < 1 and temp >= 0.75:
+        y = 1
+
+
     EE.cluster()
+    EE.updateEnv(0, 0, PRcontrl)
     EE.communicate()
     EE.iterateRound()
 

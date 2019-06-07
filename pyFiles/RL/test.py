@@ -81,6 +81,18 @@ if __name__ == "__main__":
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
     #agent.load("./save/wsn-dqn.h5")
 
+    env.EE.nodes[0].xPos = 130
+    env.EE.nodes[0].yPos = 130
+
+    env.EE.nodes[1].xPos = 170
+    env.EE.nodes[1].yPos = 130
+
+    env.EE.nodes[2].xPos = 130
+    env.EE.nodes[2].yPos = 170
+
+    env.EE.nodes[3].xPos = 170
+    env.EE.nodes[3].yPos = 170
+
     # Set default values
     done = False
     batch_size = 32
@@ -121,7 +133,8 @@ if __name__ == "__main__":
         avrRnd.append(rnd)
 
         #if rnd >= max(avrRnd):
-            #agent.save("./save/wsn-dqn.h5")
+        if rnd % 5 == 0:
+            agent.save("./save/wsn-dqn.h5")
 
     print(f"avrRnd: {avrRnd}")
     print(f"Mean Rounds: {sum(avrRnd)/len(avrRnd)}")
