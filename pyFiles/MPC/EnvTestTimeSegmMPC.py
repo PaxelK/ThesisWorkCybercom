@@ -14,6 +14,7 @@ from MPCsink import MPCsink
 from MPC2ndLayer_2D_v2 import MPC2ndLayer
 from plotEnv import *
 from setParamsMPC import *
+
 ctrlHrz = 10
 ctrlRes = ctrlHrz + 1
 EE = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
@@ -40,8 +41,8 @@ The greater loop. One loop represents a round. During this loop the following st
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
 
-while True:  # Run until all node dies
-#for i in range(3):
+#while True:  # Run until all node dies
+for i in range(3):
     print(f"Round = {EE.rnd}")
     plotEnv(EE)
 

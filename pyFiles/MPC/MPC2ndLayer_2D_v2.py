@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 import pylab as pl
 from MPCsink import MPCsink
+from shutil import rmtree
 
 class MPC2ndLayer(EnvironmentEngineMPC):
     def __init__(self, ctrlHrz, ctrlRes):
@@ -150,7 +151,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
                 i+=1
             optimalP = [int(self.snkPos[0][0]), int(self.snkPos[1][0])]
                 
-
+        rmtree(self.m._path)
         
         return optimalP
     

@@ -12,6 +12,7 @@ sys.path.append("..")  # Adds higher directory to python modules path.
 from Node import Node
 from Sink import Sink
 from setParamsMPC import *
+from shutil import rmtree
 
 class MPCsink(Sink):
     def __init__(self, sizex, sizey, ctrlHrz, ctrlRes):
@@ -103,7 +104,7 @@ class MPCsink(Sink):
         self.m.solve(disp = False)
         #print('SECOND PRINT')
         #print('xTar: {0}\n yTar: {1}\n xDst: {2}\n yDst: {3}\n'.format(self.xTar.value,self.yTar.value,self.xDist.value,self.yDist.value))
-
+        rmtree(self.m._path)
         
         
     def plot(self):

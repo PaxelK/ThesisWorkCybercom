@@ -14,7 +14,7 @@ from MPCsink import MPCsink
 from setParamsMPC import *
 from collections import OrderedDict
 import random as rand
-
+from shutil import rmtree
 
 class MPCnode(Node):
     def __init__(self, id, x, y, nrj, ctrlHrz, ctrlRes):
@@ -224,7 +224,7 @@ class MPCnode(Node):
         if(self.DLcounter > time_segments):
             self.DLcounter = 0
 
-
+        rmtree(self.m._path)
 
 
 

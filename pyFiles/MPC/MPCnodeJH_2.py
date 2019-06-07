@@ -14,7 +14,7 @@ from Sink import Sink
 from setParamsMPC import *
 from collections import OrderedDict
 import random as rand
-
+from shutil import rmtree
 
 class MPCnode(Node):
     def __init__(self, id, x, y, nrj, ctrlHrz, ctrlRes):
