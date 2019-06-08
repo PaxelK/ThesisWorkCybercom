@@ -19,7 +19,7 @@ from EnvironmentEngine import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 100
+EPISODES = 50
 
 class DQNAgent:
     def __init__(self, state_size, action_size):

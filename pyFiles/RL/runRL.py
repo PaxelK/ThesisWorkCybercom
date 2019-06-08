@@ -8,11 +8,12 @@ from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
+from setParamsRL import *
 
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from setParams import *
+#from setParams import *
 from plotEnv import *
 from EnvironmentEngine import *
 
