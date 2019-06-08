@@ -25,7 +25,7 @@ class MPCsink(Sink):
         self.nrplots = 1
         self.xTarg = xSize/2
         self.yTarg = ySize/2
-        self.resetGEKKO()
+        #self.resetGEKKO()
         
         
         

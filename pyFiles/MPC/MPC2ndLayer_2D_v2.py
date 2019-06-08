@@ -23,7 +23,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         
         self.verbose = False
     
-        self.resetGEKKO()
+        #self.resetGEKKO()
         # time points
         self.ctrlHrz = ctrlHrz                  # Control Horizon
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
