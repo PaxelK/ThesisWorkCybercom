@@ -3,6 +3,7 @@ import random
 import math
 import gym
 import gym_WSN
+from setParamsRL import *
 import numpy as np
 from collections import deque
 from keras.models import Sequential
@@ -11,7 +12,7 @@ from keras.optimizers import Adam
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from setParams import *
+#from setParams import *
 from plotEnv import *
 from EnvironmentEngine import *
 
