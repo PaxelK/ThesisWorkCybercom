@@ -9,13 +9,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from Node import Node
-from Sink import Sink
-from EnvironmentEngine import EnvironmentEngine
+from EnvironmentEngineMPC import EnvironmentEngineMPC
 from plotEnv import *
 from setParams import *
 
-EE = EnvironmentEngine()
+EE = EnvironmentEngineMPC(10,11)
 x, y = EE.sink.getPos()  # Get position/coordinates of sink
 
 
@@ -38,19 +36,20 @@ The greater loop. One loop represents a round. During this loop the following st
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
 
-#while True:  # Run until all node dies
-for i in range(3):
+while True:  # Run until all node dies
+#for i in range(3):
     print(f"Round = {EE.rnd}")
-    plotEnv(EE)
+    #plotEnv(EE)
 
     #print('ENERGY AT START OF ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
     
     EE.cluster()
-    
+    """
     for i in range(10): #time_segments
         print('TIME SEGMENT: {0}'.format(i))
         EE.communicate()
-    
+    """
+    EE.communicate()
     EE.iterateRound()
     
     """
@@ -58,5 +57,5 @@ for i in range(3):
     dead and the loop ceases.
     """
     if len(EE.deadNodes) == numNodes:  # Break when all nodes have died
-        print('ENERGY AT BREAKPOINT, ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
+        print('ENERGY AT BREAKPOINT AT ROUND {0}'.format(EE.rnd))
         break

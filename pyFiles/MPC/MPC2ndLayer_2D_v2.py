@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 import pylab as pl
 from MPCsink import MPCsink
+from shutil import rmtree
 
 class MPC2ndLayer(EnvironmentEngineMPC):
     def __init__(self, ctrlHrz, ctrlRes):
@@ -39,11 +40,12 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         #Counter for plots
         self.nrplots = 1;
         
-        self.freeNonCHds = []
+        
 
 
     def controlEnv(self):
-        self.snkPos = [self.m.Var(value = self.sink.xPos, lb = 0, ub = 100), self.m.Var(value = self.sink.yPos, lb = 0, ub = 100)] 
+        self.resetGEKKO()
+        self.snkPos = [self.m.Var(value = self.sink.xPos, lb = 0, ub = xSize), self.m.Var(value = self.sink.yPos, lb = 0, ub = ySize)] 
         
         
         for i in range(len(self.CHds)):
@@ -149,7 +151,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
                 i+=1
             optimalP = [int(self.snkPos[0][0]), int(self.snkPos[1][0])]
                 
-
+        rmtree(self.m._path)
         
         return optimalP
     
@@ -180,9 +182,10 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.ECH_sum = []
         self.EnonCH_sum = []
         
+        self.freeNonCHds = []
         # options
         self.m.options.IMODE = 3                 # optimize a solid state
-
+        self.m.options.MAX_TIME = 10
     def plot(self):
         IDs = []
         for ch in self.CHds:

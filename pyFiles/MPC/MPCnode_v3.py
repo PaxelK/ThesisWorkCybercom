@@ -14,7 +14,7 @@ from MPCsink import MPCsink
 from setParamsMPC import *
 from collections import OrderedDict
 import random as rand
-
+from shutil import rmtree
 
 class MPCnode(Node):
     def __init__(self, id, x, y, nrj, ctrlHrz, ctrlRes):
@@ -34,6 +34,7 @@ class MPCnode(Node):
         self.DLcounter = 0                      # Counts control steps during a round in order to be able to move the deadline forward after each control cycle
         # constants
         self.Egen = 1*10**-5
+        self.Egen = 0
         
         # Counter for plots, list for plot colors to choose from
         self.nrplots = 1;
@@ -223,7 +224,7 @@ class MPCnode(Node):
         if(self.DLcounter > time_segments):
             self.DLcounter = 0
 
-
+        rmtree(self.m._path)
 
 
 

@@ -12,6 +12,7 @@ sys.path.append("..")  # Adds higher directory to python modules path.
 from Node import Node
 from Sink import Sink
 from setParamsMPC import *
+from shutil import rmtree
 
 class MPCsink(Sink):
     def __init__(self, sizex, sizey, ctrlHrz, ctrlRes):
@@ -21,8 +22,9 @@ class MPCsink(Sink):
         self.v = 1
         
         #Counter for plots
-        self.nrplots = 1;
-        
+        self.nrplots = 1
+        self.xTarg = xSize/2
+        self.yTarg = ySize/2
         self.resetGEKKO()
         
         
@@ -40,17 +42,21 @@ class MPCsink(Sink):
         self.yMove.STATUS = 1
         
         
-        self.xP = self.m.Var(value = self.xPos, lb = 0, ub= 100)
-        self.yP = self.m.Var(value = self.yPos, lb = 0, ub= 100)
+        self.xP = self.m.Var(value = self.xPos, lb = 0, ub= xSize)
+        self.yP = self.m.Var(value = self.yPos, lb = 0, ub= ySize)
         
-        self.xTar = self.m.Param()
-        self.yTar = self.m.Param()
+        self.xTar = self.m.Param(value = self.xTarg)
+        self.yTar = self.m.Param(value = self.yTarg)
         
         self.xDist = self.m.CV()
         self.xDist.STATUS = 1
         self.yDist = self.m.CV()
         self.yDist.STATUS = 1
         self.m.options.CV_TYPE = 2                          #Squared Error
+        
+        self.xDist.value = self.xP.value - self.xTarg
+        self.yDist.value = self.yP.value - self.yTarg 
+        
         self.m.Equation(self.xDist == self.xP - self.xTar)
         self.m.Equation(self.yDist == self.yP - self.yTar)
         
@@ -65,13 +71,16 @@ class MPCsink(Sink):
         self.yDist.SP = 0
         
         self.m.options.IMODE = 6 
-    
+        self.m.options.MAX_TIME = 10 
+        
     def setTarPoint(self, x, y):
-        self.xTar.value = x
-        self.yTar.value = y
+        self.xTarg = x
+        self.yTarg = y
         
         
     def produce_MoveVector(self):
+        self.resetGEKKO()
+        """
         if(type(self.xDist.value.value) is not list):
             self.xDist.value = self.xP.value - self.xTar.value
             self.yDist.value = self.yP.value - self.yTar.value 
@@ -89,12 +98,13 @@ class MPCsink(Sink):
             else:
                 self.xDist.value[0] = self.xP.value[0] - self.xTar.value.value
                 self.yDist.value[0] = self.yP.value[0] - self.yTar.value.value
+        """
                 
         #print('xTar: {0}\n yTar: {1}\n xDst: {2}\n yDst: {3}\n'.format(self.xTar.value,self.yTar.value,self.xDist.value,self.yDist.value))
         self.m.solve(disp = False)
         #print('SECOND PRINT')
         #print('xTar: {0}\n yTar: {1}\n xDst: {2}\n yDst: {3}\n'.format(self.xTar.value,self.yTar.value,self.xDist.value,self.yDist.value))
-
+        rmtree(self.m._path)
         
         
     def plot(self):

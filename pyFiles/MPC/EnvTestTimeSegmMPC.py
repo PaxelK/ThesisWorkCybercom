@@ -14,6 +14,7 @@ from MPCsink import MPCsink
 from MPC2ndLayer_2D_v2 import MPC2ndLayer
 from plotEnv import *
 from setParamsMPC import *
+
 ctrlHrz = 10
 ctrlRes = ctrlHrz + 1
 EE = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
@@ -48,11 +49,10 @@ for i in range(3):
     #print('ENERGY AT START OF ROUND {0}: {1}'.format(EE.rnd, EE.nodes[0].energy))
     
     EE.cluster()
-    EE.refreshSolvers()
     optimalP = EE.controlEnv()
     EE.sink.setTarPoint(optimalP[0], optimalP[1])
     print('Expected lifetime in rounds: {0}'.format(EE.expLifetime))
-    print('Packages received by sink: {0}'.format(EE.sink.dataRec))
+    print('Packages received by sink: {0}'.format((EE.sink.dataRec/ps)))
     print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE.nodesAlive), len(EE.deadNodes)))
     print('Number of nodes alive: {0}'.format(len(EE.nodesAlive)))
     

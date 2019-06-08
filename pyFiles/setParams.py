@@ -5,19 +5,21 @@ This function sets all the parameters that are needed in the simulation
 '''
 ### Bleach Parameters
 
-f = 0.2   # Weight coefficient between old LEACH and new SoC term
-k = 4000  # Size of data package, units in bits
+f = 1.5   # Weight coefficient between old LEACH and new SoC term
+k = 1000  # Size of data package, units in bits
 p = 0.05  # Suggested percentage of cluster head, a 5 percent of the total amount of nodes used in the network is proposed to give good results
 
 ########################### Network Establishment Parameters ###############################
 ### Area of Operation ###
 # Field Dimensions in meters #
-xSize = 300
-ySize = 300
+xSize = 100
+ySize = 100
 x = 0  # Added for better display results of the plot
 y = 0  # Added for better display results of the plot
 
-numNodes = 4  # Number of Nodes in the field
+
+numNodes = 100  # Number of Nodes in the field
+
 dead_nodes = 0 # Number of Dead Nodes in the beginning
 
 #### Data Packet Info ###
