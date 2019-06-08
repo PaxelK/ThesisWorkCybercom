@@ -122,5 +122,5 @@ if __name__ == "__main__":
         if len(agent.memory) > batch_size:
             agent.replay(batch_size)
 
-        env.render()
+        #env.render()
     print(f"Rounds survived: {rnd}")

@@ -2,15 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="247d8e49-01be-4595-956d-f36ae7039341" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/ThesisWorkCybercom.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyFiles/RL/runRL.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/runRL.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyFiles/RL/save/wsn-dqn.h5" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/save/wsn-dqn.h5" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyFiles/RL/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/test.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,25 +25,37 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pyFiles/RL/setParamsRL.py">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pyFiles/RL/runRL.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="132">
-              <caret line="106" column="8" selection-start-line="106" selection-start-column="8" selection-end-line="106" selection-end-column="8" />
+            <state relative-caret-position="360">
+              <caret line="124" column="9" selection-start-line="124" selection-start-column="9" selection-end-line="124" selection-end-column="9" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="494">
+            <state relative-caret-position="3900">
               <caret line="268" column="41" selection-start-line="268" selection-start-column="41" selection-end-line="268" selection-end-column="41" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -68,10 +73,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/pyFiles/RL/runRL.py" />
         <option value="$PROJECT_DIR$/pyFiles/RL/save/wsn-dqn.h5" />
         <option value="$PROJECT_DIR$/pyFiles/RL/test.py" />
         <option value="$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py" />
+        <option value="$PROJECT_DIR$/pyFiles/RL/runRL.py" />
+        <option value="$PROJECT_DIR$/pyFiles/RL/setParamsRL.py" />
       </list>
     </option>
   </component>
@@ -102,37 +108,6 @@
               <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
               <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
               <item name="RL" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ThesisWorkCybercom" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
-              <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
-              <item name="RL" type="462c0819:PsiDirectoryNode" />
-              <item name="gym-WSN" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ThesisWorkCybercom" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
-              <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
-              <item name="RL" type="462c0819:PsiDirectoryNode" />
-              <item name="gym-WSN" type="462c0819:PsiDirectoryNode" />
-              <item name="gym_WSN" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ThesisWorkCybercom" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
-              <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
-              <item name="RL" type="462c0819:PsiDirectoryNode" />
-              <item name="gym-WSN" type="462c0819:PsiDirectoryNode" />
-              <item name="gym_WSN" type="462c0819:PsiDirectoryNode" />
-              <item name="envs" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ThesisWorkCybercom" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
-              <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
-              <item name="RL" type="462c0819:PsiDirectoryNode" />
-              <item name="save" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -239,18 +214,31 @@
       <option name="presentableId" value="Default" />
       <updated>1559752857639</updated>
     </task>
+    <task id="LOCAL−00001" summary="Fixed small bugs">
+      <created>1559813687304</created>
+      <option name="number" value="LOCAL−00001" />
+      <option name="presentableId" value="LOCAL−00001" />
+      <updated>1559813687304</updated>
+    </task>
+    <task id="LOCAL−00002" summary="Fixed small bugs">
+      <created>1559815795367</created>
+      <option name="number" value="LOCAL−00002" />
+      <option name="presentableId" value="LOCAL−00002" />
+      <updated>1559815795367</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16913319" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16913319" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49682876" visible="true" weight="0.32866243" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49682876" visible="true" weight="0.32866243" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -263,6 +251,10 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fixed small bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed small bugs" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/pyFiles/RL/DQN.py">
@@ -306,10 +298,17 @@
     <entry file="file://$PROJECT_DIR$/pyFiles/RL/save/wsn-dqn.h5">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3900">
+          <caret line="268" column="41" selection-start-line="268" selection-start-column="41" selection-end-line="268" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pyFiles/RL/runRL.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="106" column="8" selection-start-line="106" selection-start-column="8" selection-end-line="106" selection-end-column="8" />
+        <state relative-caret-position="360">
+          <caret line="124" column="9" selection-start-line="124" selection-start-column="9" selection-end-line="124" selection-end-column="9" />
         </state>
       </provider>
     </entry>
@@ -323,12 +322,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="494">
-          <caret line="268" column="41" selection-start-line="268" selection-start-column="41" selection-end-line="268" selection-end-column="41" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/setParamsRL.py">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
   </component>
 </project>
