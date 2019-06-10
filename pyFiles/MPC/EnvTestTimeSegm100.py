@@ -13,11 +13,12 @@ from EnvironmentEngineMPC import EnvironmentEngineMPC
 from plotEnv import *
 from setParams import *
 import copy
+import csv
 
 totRounds_bleach = []
 totRounds_leach = []
 
-for i in range(100):
+for i in range(1):
     print("Current test case: {0}".format(i))
     EE_leach = EnvironmentEngineMPC(10,11)
     EE_BLEACH = copy.deepcopy(EE_leach)
@@ -63,3 +64,9 @@ for i in range(100):
             totRounds_bleach.append(EE_leach.rnd)
             totRounds_leach.append(EE_BLEACH.rnd)
             break
+
+with open('Results_bleachVSleach', 'w', newline='') as f:
+    results = csv.writer(f)
+    
+    results.writerow(['BLEACH: ', totRounds_bleach])
+    results.writerow(['LEACH: ', totRounds_leach])
