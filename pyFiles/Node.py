@@ -182,8 +182,6 @@ class Node:
                     
             k = self.PA * self.pSize  # k = the amount of bits that are sent
             # Calculate the energy that will be spent by transmitting signal
-            #distLEL = self.getDistance(self.CHparent)
-            #print('Node: ' + str(self.ID) + ', with dist: ' + str(distLEL))
             ETx = sP.Eelec * k + sP.Eamp * k * self.getDistance(self.CHparent)**2
             ERx = (sP.Eelec + sP.EDA) * self.pSize  # Calculate the energy that will be spent by receiving signal
             #EC = (Eelec + EDA) * self.pSize * self.conChildren + ETx
@@ -274,12 +272,12 @@ class Node:
 
         :param desiredPR: The desired packet rate
         '''
-
-        if desiredPR == round(desiredPR):
-            self.PA = desiredPR
-        else:  # In case the desired PR is not an int, the PR is rounded to closest int. THIS MIGHT NEED TO BE CHANGED!!
-            self.PA = round(desiredPR)
-            print('Desired packet rate was not a whole number. The PR was rounded to closest int \n')
+        if(desiredPR>=1):
+            if desiredPR == round(desiredPR):
+                self.PA = desiredPR
+            else:  # In case the desired PR is not an int, the PR is rounded to closest int. THIS MIGHT NEED TO BE CHANGED!!
+                self.PA = round(desiredPR)
+                print('Desired packet rate was not a whole number. The PR was rounded to closest int \n')
 
     def generateNRJ(self):
         '''
@@ -316,7 +314,7 @@ class Node:
         randVal = random.random()
         t = (p / (1 - p * (rnd % (1 / p))))
         if f < 1:  # If we want to try without BLEACH, we simply set f > 1
-            t = (1 - f) * (p / (1 - p * (rnd % (1 / p)))) * self.SoC +\
+            t = (1 - f) * bleachW * (p / (1 - p * (rnd % (1 / p)))) * self.SoC +\
                 (1 / (1 - (1 - f) * (p / (1 - p * (rnd % (1 / p)))))) * f * (p / (1 - p * (rnd % (1 / p))))
 
         # If t is bigger than the randomized value, this node becomes a CH
