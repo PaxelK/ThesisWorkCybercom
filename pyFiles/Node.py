@@ -314,7 +314,7 @@ class Node:
         randVal = random.random()
         t = (p / (1 - p * (rnd % (1 / p))))
         if f < 1:  # If we want to try without BLEACH, we simply set f > 1
-            t = (1 - f) * bleachW * (p / (1 - p * (rnd % (1 / p)))) * self.SoC +\
+            t = (1 - f) * sP.bleachW * (p / (1 - p * (rnd % (1 / p)))) * self.SoC +\
                 (1 / (1 - (1 - f) * (p / (1 - p * (rnd % (1 / p)))))) * f * (p / (1 - p * (rnd % (1 / p))))
 
         # If t is bigger than the randomized value, this node becomes a CH
