@@ -18,7 +18,7 @@ import csv
 totRounds_bleach = []
 totRounds_leach = []
 
-for i in range(1):
+for i in range(100):
     print("Current test case: {0}".format(i))
     EE_leach = EnvironmentEngineMPC(10,11)
     EE_BLEACH = copy.deepcopy(EE_leach)
