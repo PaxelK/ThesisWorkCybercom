@@ -102,7 +102,6 @@ if __name__ == "__main__":
     env.EE.nodes[3].yPos = 60
     '''
 
-
     # Run WSN env with plotting after training
     agent.load("./save/wsn-dqn.h5")  # Load weights from file
     agent.model.compile(loss='mae', optimizer=Adam(lr=agent.learning_rate))  # Compile NN
