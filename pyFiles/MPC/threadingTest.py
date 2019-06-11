@@ -62,7 +62,7 @@ if __name__ == '__main__':
         print("Current test case: {0}".format(i))
         EE_leach = EnvironmentEngineMPC(10,11)
         EE_BLEACH = copy.deepcopy(EE_leach)
-        EE_BLEACH.fParam = 0.7
+        EE_BLEACH.fParam = 0.3
              
         thr_bleach = multiprocessing.Process(target=threadFunc_BLEACH, args = (EE_BLEACH,totRounds_bleach, i,))
         thr_leach = multiprocessing.Process(target=threadFunc_LEACH, args = (EE_leach,totRounds_leach, i,))

@@ -9,7 +9,7 @@ import csv
 
 results = []
 
-with open('Results_bleachVSleach') as csv_file:
+with open('Results_bleachVSleach_f03.txt') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
     for row in csv_reader:
