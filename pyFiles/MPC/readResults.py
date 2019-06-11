@@ -15,14 +15,18 @@ with open('Results_bleachVSleach_f03.txt') as csv_file:
     for row in csv_reader:
         results.append(row)
     
-    BLEACH = results[0][1:]
-    LEACH = results[1][1:]
+    BLEACH = results[0][1:][0][1:-1].split(", ")
+    LEACH = results[1][1:][0][1:-1].split(", ")
     
+    print(BLEACH)
+
+    print(LEACH)
+
     for i in range(len(BLEACH)):
-        BLEACH[i] = int(BLEACH[i][1:-1])
+        BLEACH[i] = int(BLEACH[i])
     
     for i in range(len(LEACH)):
-        LEACH[i] = int(LEACH[i][1:-1])
+        LEACH[i] = int(LEACH[i])
 
     meanVal_BLEACH = sum(BLEACH)/len(BLEACH)
     meanVal_LEACH = sum(LEACH)/len(LEACH)
