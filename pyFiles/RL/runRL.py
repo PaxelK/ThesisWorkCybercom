@@ -8,12 +8,11 @@ from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
-from setParamsRL import *
 
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-#from setParams import *
+from setParams import *
 from plotEnv import *
 from EnvironmentEngine import *
 
@@ -77,10 +76,6 @@ if __name__ == "__main__":
     action_size = env.action_space.n
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
 
-    # Set default values
-    done = False
-    batch_size = 32
-
     env.EE.nodes[0].xPos = 130
     env.EE.nodes[0].yPos = 130
 
@@ -93,35 +88,63 @@ if __name__ == "__main__":
     env.EE.nodes[3].xPos = 170
     env.EE.nodes[3].yPos = 170
 
+    '''    
+    env.EE.nodes[0].xPos = 250
+    env.EE.nodes[0].yPos = 20
+
+    env.EE.nodes[1].xPos = 250
+    env.EE.nodes[1].yPos = 60
+
+    env.EE.nodes[2].xPos = 210
+    env.EE.nodes[2].yPos = 20
+
+    env.EE.nodes[3].xPos = 210
+    env.EE.nodes[3].yPos = 60
+    '''
+
+
     # Run WSN env with plotting after training
     agent.load("./save/wsn-dqn.h5")  # Load weights from file
-    agent.model.compile(loss='mae', optimizer=Adam(lr=agent.learning_rate))
-    rnd = 0
-    state = env.reset()  # Reset env to a random state
-    #env.EE.sink.xPos = int(xSize/2)
-    #env.EE.sink.yPos = int(ySize/2)
-    # Format state such that it can be used for training
-    for i in range(2, numNodes + 2):
-        state[i] = state[i][1]
-    state = np.reshape(state, [1, state_size])
-    while not done:
+    agent.model.compile(loss='mae', optimizer=Adam(lr=agent.learning_rate))  # Compile NN
+    avrRnd = []
 
-        rnd += 1
-        action = agent.act(state)
-        next_state_temp, reward, done, _ = env.step(action)
+    for episodes in range(5):
+        # Set default values
+        done = False
+        batch_size = 32
+        rnd = 0
+        state = env.reset()  # Reset env to a random state
+        #env.EE.sink.xPos = int(xSize/2)
+        #env.EE.sink.yPos = int(ySize/2)
+        # Format state such that it can be used for training
+        for i in range(2, numNodes + 2):
+            state[i] = state[i][1]
+        state = np.reshape(state, [1, state_size])
+        while not done:
 
-        next_state = [next_state_temp[0], next_state_temp[1]]
-        for i in range(numNodes):
-            next_state.append(next_state_temp[2][i][1])
-        for ii in range(numNodes):
-            next_state.append(next_state_temp[3][ii])
-        next_state = np.array(next_state)
-        next_state = np.reshape(next_state, [1, state_size])
-        agent.remember(state, action, reward, next_state, done)
-        state = next_state
+            rnd += 1
+            action = agent.act(state)
+            next_state_temp, reward, done, _ = env.step(action)
 
-        if len(agent.memory) > batch_size:
-            agent.replay(batch_size)
+            next_state = [next_state_temp[0], next_state_temp[1]]
+            for i in range(numNodes):
+                next_state.append(next_state_temp[2][i][1])
+            for ii in range(numNodes):
+                next_state.append(next_state_temp[3][ii])
+            next_state = np.array(next_state)
+            next_state = np.reshape(next_state, [1, state_size])
+            agent.remember(state, action, reward, next_state, done)
+            state = next_state
 
-        #env.render()
-    print(f"Rounds survived: {rnd}")
+            if done:
+                print(f"Episode: {episodes+1}/{5}, e: {agent.epsilon}, rnd: {rnd} \n")
+                break
+
+            if len(agent.memory) > batch_size:
+                agent.replay(batch_size)
+
+            #env.render()
+        avrRnd.append(rnd)
+
+    print(f"avrRnd: {avrRnd}")
+    print(f"Mean Rounds: {sum(avrRnd) / len(avrRnd)}")

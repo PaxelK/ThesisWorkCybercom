@@ -24,7 +24,7 @@ EE.nodes[3].yPos = 170
 # Get PR for all nodes (PR should be zero for dead nodes)
 PRcontrl = []
 for i in range(numNodes):
-    PRcontrl.append([i, 4])  # [Node ID, PR of node]
+    PRcontrl.append([i, 15])  # [Node ID, PR of node]
 
 '''
 EE.updateEnv(20, 43, PRcontrl)  # [sinkx, sinky, PRlist]

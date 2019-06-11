@@ -3,7 +3,6 @@ import random
 import math
 import gym
 import gym_WSN
-from setParamsRL import *
 import numpy as np
 from collections import deque
 from keras.models import Sequential
@@ -12,14 +11,14 @@ from keras.optimizers import Adam
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-#from setParams import *
+from setParams import *
 from plotEnv import *
 from EnvironmentEngine import *
 
 import matplotlib.pyplot as plt
 
 
-EPISODES = 50
+EPISODES = 7
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -79,10 +78,12 @@ class DQNAgent:
 if __name__ == "__main__":
     env = gym.make('WSN-v0')
     state_size = env.observation_space.shape[0]  # Get amount of states (Amount of states = 2 + 2*numNodes)
-    action_size = env.action_space.n
+    action_size = env.action_space.n  # Get amount of actions
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
     #agent.load("./save/wsn-dqn.h5")
+    #agent.model.compile(loss='mae', optimizer=Adam(lr=agent.learning_rate))
 
+    '''
     env.EE.nodes[0].xPos = 130
     env.EE.nodes[0].yPos = 130
 
@@ -94,6 +95,7 @@ if __name__ == "__main__":
 
     env.EE.nodes[3].xPos = 170
     env.EE.nodes[3].yPos = 170
+    '''
 
     # Set default values
     done = False
@@ -111,7 +113,6 @@ if __name__ == "__main__":
         state = np.reshape(state, [1, state_size])  # Reshape for NN
         while not done:
             rnd += 1
-            # env.render()
             action = agent.act(state)
             next_state_temp, reward, done, _ = env.step(action)
 
@@ -135,8 +136,9 @@ if __name__ == "__main__":
         avrRnd.append(rnd)
 
         #if rnd >= max(avrRnd):  # Save "best" run
-        #if rnd % 5 == 0: # Save every 5th rounds
+        #if rnd % 5 == 0: # Save every 5th round
         #agent.save("./save/wsn-dqn.h5")
+        #env.render()
 
     print(f"avrRnd: {avrRnd}")
     print(f"Mean Rounds: {sum(avrRnd)/len(avrRnd)}")
@@ -146,7 +148,6 @@ if __name__ == "__main__":
     plt.show()
 
     # Run WSN env with plotting after training
-    #agent.load("./save/wsn-dqn.h5")  # Load weights from file
     done = False
     rnd = 0
     state = env.reset()  # Reset env to a random state
@@ -155,7 +156,7 @@ if __name__ == "__main__":
         state[i] = state[i][1]
     state = np.reshape(state, [1, state_size])
     while not done:
-        env.render()
+
         rnd += 1
         action = agent.act(state)
         next_state_temp, reward, done, _ = env.step(action)
@@ -169,6 +170,11 @@ if __name__ == "__main__":
         next_state = np.reshape(next_state, [1, state_size])
         agent.remember(state, action, reward, next_state, done)
         state = next_state
+
+        if done:
+            break
+
+        env.render()
 
         if len(agent.memory) > batch_size:
             agent.replay(batch_size)
