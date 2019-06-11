@@ -56,7 +56,7 @@ if __name__ == '__main__':
     totRounds_bleach = multiprocessing.Array('i', 100)
     totRounds_leach = multiprocessing.Array('i', 100)
     
-    testRange = 2
+    testRange = 100
     for i in range(testRange):
         
         print("Current test case: {0}".format(i))
@@ -64,18 +64,14 @@ if __name__ == '__main__':
         EE_BLEACH = copy.deepcopy(EE_leach)
         EE_BLEACH.fParam = 0.7
              
-        print("HEJ 1")
         thr_bleach = multiprocessing.Process(target=threadFunc_BLEACH, args = (EE_BLEACH,totRounds_bleach, i,))
         thr_leach = multiprocessing.Process(target=threadFunc_LEACH, args = (EE_leach,totRounds_leach, i,))
-    
-        print("HEJ 2")
+
         thr_bleach.start()
         thr_leach.start()
-        print("HEJ 3")
+
         thr_bleach.join()
         thr_leach.join()
-    
-    
     
     with open('Results_bleachVSleach.txt', 'w', newline='') as f:
         results = csv.writer(f)
