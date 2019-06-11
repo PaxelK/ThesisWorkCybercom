@@ -23,7 +23,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         
         self.verbose = False
     
-        self.resetGEKKO()
+        #self.resetGEKKO()
         # time points
         self.ctrlHrz = ctrlHrz                  # Control Horizon
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
@@ -100,17 +100,20 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         #self.E_total = self.m.Intermediate(self.m.sum(self.ECH_sum) + self.m.sum(self.EnonCH_sum))
         
         E_temp = 0
-        for node in self.nodes:
-            E_temp += node.energy
+        for n in self.CHds:
+            E_temp += n.energy
+        for nf in self.freeNonCHds:
+            E_temp += nf.energy
         self.E_tot = self.m.Param(value = E_temp)
-
         
         for i in range(len(self.CHds)):
             self.dtrLst.append(self.m.Var(lb = 1, ub = 20))
             self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.CHds[i].conChildren + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdstLst[i]**2)))
             self.m.Equation(self.ECH_sum[i] >= self.e1Sum[i])
         for i in range(len(self.freeNonCHds)):
-            self.e2Sum.append(self.m.Intermediate(self.freeNonCHds[i].PA*self.pSize*(Eelec + Eamp * self.nonCHdstLst[i]**2)))
+            #self.e2Sum.append(self.m.Intermediate(self.freeNonCHds[i].PA*self.pSize*(Eelec + Eamp * self.nonCHdstLst[i]**2)))
+            self.e2Sum.append(self.m.Intermediate(1*self.pSize*(Eelec + Eamp * self.nonCHdstLst[i]**2)))
+
             self.m.Equation(self.EnonCH_sum[i] >= self.e2Sum[i])
             
         if self.verbose:
@@ -249,3 +252,37 @@ if __name__ == "__main__":
     testEnv.plot()
     
     
+    ch_dist = 0
+    non_dist = 0
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            

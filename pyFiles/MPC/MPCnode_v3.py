@@ -24,12 +24,12 @@ class MPCnode(Node):
         self.errorFlag = False
         
         # Creates the optimizing GEKKO module 
-        self.m = GEKKO(remote=False)
+        #self.m = GEKKO(remote=False)
         
         # Horizon, time points
         self.ctrlHrz = ctrlHrz                  # Control Horizon
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
-        self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
+        #self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
         self.desData = 0
         self.DLcounter = 0                      # Counts control steps during a round in order to be able to move the deadline forward after each control cycle
         # constants
@@ -44,7 +44,7 @@ class MPCnode(Node):
         self.lineColor = self.pltColors[colorNr]
 
         # Resets the gekko module so that the optimizing can be done with new parameters and variables
-        self.resetGEKKO()
+        #self.resetGEKKO()
         
     def resetGEKKO(self):
         self.errorFlag = False          # Sets errorflag back to false

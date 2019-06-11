@@ -8,6 +8,7 @@ This function sets all the parameters that are needed in the simulation
 f = 1.5   # Weight coefficient between old LEACH and new SoC term
 k = 1000  # Size of data package, units in bits
 p = 0.05  # Suggested percentage of cluster head, a 5 percent of the total amount of nodes used in the network is proposed to give good results
+bleachW = 2 #Weight value for the SoC-dependant part of the BLEACH eq. See generateCHstatus() in node
 
 ########################### Network Establishment Parameters ###############################
 ### Area of Operation ###
