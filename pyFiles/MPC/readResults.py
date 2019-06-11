@@ -34,4 +34,4 @@ with open('Results_bleachVSleach_f03.txt') as csv_file:
     print('Mean value for BLEACH: {0}\nMean value for LEACH: {1}'.format(meanVal_BLEACH, meanVal_LEACH))
     
     
-    
+    # for f03 - BLEACH 13241.06,   LEACH 13443.87
