@@ -65,7 +65,8 @@ for i in range(100):
             totRounds_leach.append(EE_BLEACH.rnd)
             break
 
-with open('Results_bleachVSleach_f07', 'w', newline='') as f:
+
+with open('Results_bleachVSleach_f07.txt', 'w', newline='') as f:
     results = csv.writer(f)
     
     results.writerow(['BLEACH: ', totRounds_bleach])
