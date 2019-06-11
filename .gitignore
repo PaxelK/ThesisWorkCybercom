@@ -1,2 +1,4 @@
+*/__pycache__/
 pyFiles/__pycache__/
 pyFiles/MPC/__pycache__/
+*.pyc
