@@ -41,7 +41,7 @@ class EnvironmentEngineMPC:
         self.CHds = []
         self.nonCHds = []
         self.plotDeadNodes = []  # Used for plotting amount of dead nodes
-
+        self.verbose = False
         self.fParam = f
         tempNRJ = 0
         for node in self.nodes:  # Iterate over all nodes
@@ -181,7 +181,7 @@ class EnvironmentEngineMPC:
             if self.nodes[i].alive:
                 if(self.nodes[i].CHstatus == 0):
                     outcome = self.nodes[i].sendMsg(self.sink)
-                    if not outcome:
+                    if not outcome and self.verbose:
                         print(f"Node {self.nodes[i].ID} failed to send to node {self.nodes[i].CHparent.ID}!\n")
                         actionmsg = self.nodes[i].getActionMsg()
                         print(str(actionmsg) + "\n")                  
@@ -194,7 +194,7 @@ class EnvironmentEngineMPC:
             if self.nodes[i].alive:
                 if(self.nodes[i].CHstatus == 1):
                     outcome = self.nodes[i].sendMsg(self.sink)
-                    if not outcome:
+                    if not outcome and self.verbose:
                         print(f"Node {self.nodes[i].ID} failed to send to node {self.nodes[i].CHparent.ID}!\n")
                         actionmsg = self.nodes[i].getActionMsg()
                         print(str(actionmsg) + "\n")
