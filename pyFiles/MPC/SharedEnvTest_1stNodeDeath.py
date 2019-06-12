@@ -101,7 +101,6 @@ for i in range(3):
             
             
     
-    EE_MPC.refreshSolvers()
     optimalP = EE_MPC.controlEnv()
     EE_MPC.sink.setTarPoint(optimalP[0], optimalP[1])
     print('Expected lifetime in rounds: {0}'.format(EE_MPC.expLifetime))

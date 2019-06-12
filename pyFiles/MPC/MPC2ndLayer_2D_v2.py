@@ -166,6 +166,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
     
     
     def resetGEKKO(self):
+        self.errorFlag = False
         self.m = GEKKO(remote = False)
         # time points
 
