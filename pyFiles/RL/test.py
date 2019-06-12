@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import random
 import math
+import csv
 import gym
 import gym_WSN
 import numpy as np
@@ -18,7 +19,7 @@ from EnvironmentEngine import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 7
+EPISODES = 50
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -83,6 +84,28 @@ if __name__ == "__main__":
     #agent.load("./save/wsn-dqn.h5")
     #agent.model.compile(loss='mae', optimizer=Adam(lr=agent.learning_rate))
 
+    with open('nodePlacement.csv') as nodePlacement_file:
+        csv_reader = csv.reader(nodePlacement_file, delimiter=',')
+        row_count = 0
+
+        for row in csv_reader:
+            i = 0
+            rowVec = []
+
+            for element in row:
+                rowVec.append(float(element))
+
+            if row_count == 0:
+                for valueX in rowVec:
+                    env.EE.nodes[i].xPos = valueX
+                    i += 1
+            if row_count == 1:
+                for valueY in rowVec:
+                    env.EE.nodes[i].yPos = valueY
+                    i += 1
+            row_count += 1
+
+
     '''
     env.EE.nodes[0].xPos = 130
     env.EE.nodes[0].yPos = 130
@@ -128,6 +151,7 @@ if __name__ == "__main__":
 
             if done:
                 print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd} \n")
+                print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000}")
                 break
 
             if len(agent.memory) > batch_size:
@@ -138,6 +162,7 @@ if __name__ == "__main__":
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
         #agent.save("./save/wsn-dqn.h5")
+
         #env.render()
 
     print(f"avrRnd: {avrRnd}")
