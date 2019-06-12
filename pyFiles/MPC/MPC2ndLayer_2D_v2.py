@@ -83,7 +83,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             print('nonCHdstLst:\n {0}'.format(self.nonCHdstLst))
         
 
-        self.rnds = self.m.Var(integer = True, lb = 0)
+        self.rnds = self.m.Var(lb = 0, integer = True)
 
         
         for i in range(len(self.CHds)):
@@ -97,7 +97,6 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             print('EnonCH_sum:\n {0}'.format(self.EnonCH_sum))
 
 
-        #self.E_total = self.m.Intermediate(self.m.sum(self.ECH_sum) + self.m.sum(self.EnonCH_sum))
         
         E_temp = 0
         for n in self.CHds:
@@ -121,10 +120,10 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             print('e1Sum:\n {0}'.format(self.e1Sum))
             print('e2Sum:\n {0}'.format(self.e2Sum))
             print('E_tot:\n {0}'.format(self.E_tot.value))
-            
-        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
-        #self.m.Equation(self.E_total >= (self.m.sum(self.e1Sum)+ self.m.sum(self.e2Sum))*self.rnds)
-        
+         
+        #self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum) + self.m.sum(self.e2Sum))*self.rnds)
+        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum) + self.m.sum(self.e2Sum))*self.rnds)
+
         
         self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*(self.rnds-1))
         self.m.Obj(-self.target)        
