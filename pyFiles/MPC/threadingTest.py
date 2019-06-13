@@ -32,7 +32,7 @@ def threadFunc_LEACH(EE, totRounds_leach,totPackRec_leach , case):
             If the number of dead nodes reaches the total number of nodes, the network is seen as
             dead and the loop ceases.
             """
-            print('LEACH ROUND AT BREAKPOINT AT ROUND {0}'.format(leach.rnd))
+            print('LEACH BREAKPOINT AT ROUND {0}'.format(leach.rnd))
             totRounds_leach[case] = leach.rnd
             totPackRec_leach[case] = leach.sink.dataRec
             break
@@ -45,7 +45,7 @@ def threadFunc_BLEACH(EE,totRounds_bleach, totPackRec_bleach, case):
             BLEACH.communicate()
             BLEACH.iterateRound()  
         else:
-            print('BLEACH ROUND AT BREAKPOINT AT ROUND {0}'.format(BLEACH.rnd))
+            print('BLEACH BREAKPOINT AT ROUND {0}'.format(BLEACH.rnd))
             totRounds_bleach[case] = BLEACH.rnd
             totPackRec_bleach[case] = BLEACH.sink.dataRec
             break
@@ -61,13 +61,16 @@ if __name__ == '__main__':
     totPackRec_leach = multiprocessing.Array('i', 100)
     totPackRec_bleach = multiprocessing.Array('i', 100)
 
-    testRange = 100
+    testRange = 2
     for i in range(testRange):
         
         print("Current test case: {0}".format(i))
         EE_leach = EnvironmentEngineMPC(10,11)
         EE_BLEACH = copy.deepcopy(EE_leach)
-        EE_BLEACH.fParam = 0.9
+        
+        EE_BLEACH.fParam = 0.8
+        EE_BLEACH.h_s_Param = 3
+        EE_BLEACH.h_r_Param = 0.8
              
         thr_bleach = multiprocessing.Process(target=threadFunc_BLEACH, args = (EE_BLEACH,totRounds_bleach, totPackRec_bleach, i,))
         thr_leach = multiprocessing.Process(target=threadFunc_LEACH, args = (EE_leach,totRounds_leach, totPackRec_leach, i,))

@@ -301,7 +301,7 @@ class Node:
 
         self.SoC = self.energy/self.maxEnergy  # State of charge has to be updated after every energy use
 
-    def generateCHstatus(self, f, p, rnd):
+    def generateCHstatus(self, f, h_s, h_r, p, rnd):
         '''
         :param f: Weight between SoC and LEACH
         :param p: CH probability
@@ -314,9 +314,9 @@ class Node:
         randVal = random.random()
         t = (p / (1 - p * (rnd % (1 / p))))
         if f < 1:  # If we want to try without BLEACH, we simply set f > 1
-            t = (1 - f) * sP.bleachW * (p / (1 - p * (rnd % (1 / p)))) * self.SoC +\
-                (1 / (1 - (1 - f) * (p / (1 - p * (rnd % (1 / p)))))) * f * (p / (1 - p * (rnd % (1 / p))))
-
+            t = (1 - f) * sP.h_s * (p / (1 - p * (rnd % (1 / p)))) * self.SoC +\
+                sP.h_r*(1 / (1 - (1 - f) * (p / (1 - p * (rnd % (1 / p)))))) * f * (p / (1 - p * (rnd % (1 / p))))
+            
         # If t is bigger than the randomized value, this node becomes a CH
         if t > randVal and self.CHflag == 0:
             self.CHstatus = 1
