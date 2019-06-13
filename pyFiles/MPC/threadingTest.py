@@ -61,7 +61,7 @@ if __name__ == '__main__':
     totPackRec_leach = multiprocessing.Array('i', 100)
     totPackRec_bleach = multiprocessing.Array('i', 100)
 
-    testRange = 2
+    testRange = 100
     for i in range(testRange):
         
         print("Current test case: {0}".format(i))
