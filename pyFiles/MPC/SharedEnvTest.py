@@ -15,6 +15,7 @@ from MPC2ndLayer_2D_v2 import MPC2ndLayer
 from plotEnv import *
 from setParamsMPC import *
 import copy
+import csv
 
 
 ctrlHrz = 10
@@ -101,10 +102,10 @@ for i in range(1):
                 totRounds_leach.append(EE_leach.rnd)
                 
                 totPacks_MPC.append(EE_MPC.sink.dataRec/ps)
-                totPacks_leach.append(EE.leach.sink.dataRec/ps)
+                totPacks_leach.append(EE_leach.sink.dataRec/ps)
                 break
 
-with open('Results_MPCVSleachHrz10.txt', 'w', newline='') as f:
+with open('Results_MPCVSleachHrz10_2.txt', 'w', newline='') as f:
     results = csv.writer(f)
     
     results.writerow(['MPC: ', totRounds_MPC])

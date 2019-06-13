@@ -67,7 +67,7 @@ if __name__ == '__main__':
         print("Current test case: {0}".format(i))
         EE_leach = EnvironmentEngineMPC(10,11)
         EE_BLEACH = copy.deepcopy(EE_leach)
-        EE_BLEACH.fParam = 0.3
+        EE_BLEACH.fParam = 0.9
              
         thr_bleach = multiprocessing.Process(target=threadFunc_BLEACH, args = (EE_BLEACH,totRounds_bleach, totPackRec_bleach, i,))
         thr_leach = multiprocessing.Process(target=threadFunc_LEACH, args = (EE_leach,totRounds_leach, totPackRec_leach, i,))
@@ -78,7 +78,8 @@ if __name__ == '__main__':
         thr_bleach.join()
         thr_leach.join()
     
-    with open('Results_bleachVSleach.txt', 'w', newline='') as f:
+    fileOpenName = 'Results_bleachVSleach_f0'+str(EE_BLEACH.fParam)[-1]+ '.txt'
+    with open(fileOpenName, 'w', newline='') as f:
         results = csv.writer(f)
         
         totrnd_leach = []
