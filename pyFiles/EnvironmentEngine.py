@@ -34,8 +34,10 @@ class EnvironmentEngine:
         self.deadNodes = []  # Contains the amount of dead nodes after each round
         self.posNodes = []  # The position of the nodes
         self.plotDeadNodes = []  # Used for plotting amount of dead nodes
-
+        
         self.fParam = f
+        self.h_s_Param = h_s
+        self.h_r_Param = h_r
         tempNRJ = 0
         for node in self.nodes:  # Iterate over all nodes
             tempNRJ += node.nrjCons
@@ -133,7 +135,7 @@ class EnvironmentEngine:
             self.nodes[i].resetConChildren()
             self.nodes[i].clearTempDataRec()
             if self.nodes[i].alive:  # Generate CH status with BLEACH if node is alive
-                self.nodes[i].generateCHstatus(self.fParam, p, self.rnd)
+                self.nodes[i].generateCHstatus(self.fParam, self.h_s_Param, self.h_r_Param, p, self.rnd)
             else:  # If node is not alive, node cannot be CH
                 self.nodes[i].CHstatus = 0
 
