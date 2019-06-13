@@ -18,10 +18,10 @@ class EnvironmentEngine:
         # Initializes a node for each node in WSN
         if energyMode == "rand":
             for i in range(numNodes):
-                self.nodes.append(Node(i, random.random() * xSize, random.random() * ySize, maxNrj * random.random()))
+                self.nodes.append(Node(i, round(random.random() * xSize), round(random.random() * ySize), maxNrj * random.random()))
         elif energyMode == "distr":
             for i in range(numNodes):
-                self.nodes.append(Node(i, random.random() * xSize, random.random() * ySize, maxNrj))
+                self.nodes.append(Node(i, round(random.random() * xSize), round(random.random() * ySize), maxNrj))
         else:
             print("The choice of energy mode is invalid! \n")
 

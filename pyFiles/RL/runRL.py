@@ -67,7 +67,7 @@ class DQNAgent:
 
     def load(self, name):
         self.model.load_weights(name)
-
+        self.model.compile(loss='mae', optimizer=Adam(lr=self.learning_rate))  # Compile NN
 
 
 if __name__ == "__main__":
@@ -76,6 +76,8 @@ if __name__ == "__main__":
     action_size = env.action_space.n
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
 
+    '''
+    # If node placement needs to be hardcoded 
     env.EE.nodes[0].xPos = 130
     env.EE.nodes[0].yPos = 130
 
@@ -88,7 +90,7 @@ if __name__ == "__main__":
     env.EE.nodes[3].xPos = 170
     env.EE.nodes[3].yPos = 170
 
-    '''    
+        
     env.EE.nodes[0].xPos = 250
     env.EE.nodes[0].yPos = 20
 
@@ -104,7 +106,6 @@ if __name__ == "__main__":
 
     # Run WSN env with plotting after training
     agent.load("./save/wsn-dqn.h5")  # Load weights from file
-    agent.model.compile(loss='mae', optimizer=Adam(lr=agent.learning_rate))  # Compile NN
     avrRnd = []
 
     for episodes in range(5):
@@ -137,6 +138,7 @@ if __name__ == "__main__":
 
             if done:
                 print(f"Episode: {episodes+1}/{5}, e: {agent.epsilon}, rnd: {rnd} \n")
+                print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
                 break
 
             if len(agent.memory) > batch_size:

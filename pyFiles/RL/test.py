@@ -19,7 +19,7 @@ from EnvironmentEngine import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 75
+EPISODES = 10
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -107,18 +107,19 @@ if __name__ == "__main__":
             row_count += 1
 
     '''
+    '''
+    env.EE.nodes[0].xPos = 40
+    env.EE.nodes[0].yPos = 40
 
-    env.EE.nodes[0].xPos = 130
-    env.EE.nodes[0].yPos = 130
+    env.EE.nodes[1].xPos = 40
+    env.EE.nodes[1].yPos = 60
 
-    env.EE.nodes[1].xPos = 170
-    env.EE.nodes[1].yPos = 130
+    env.EE.nodes[2].xPos = 60
+    env.EE.nodes[2].yPos = 60
 
-    env.EE.nodes[2].xPos = 130
-    env.EE.nodes[2].yPos = 170
-
-    env.EE.nodes[3].xPos = 170
-    env.EE.nodes[3].yPos = 170
+    env.EE.nodes[3].xPos = 60
+    env.EE.nodes[3].yPos = 40
+    '''
 
 
     # Set default values
@@ -135,6 +136,7 @@ if __name__ == "__main__":
         for i in range(2, numNodes+2):
             state[i] = state[i][1]
         state = np.reshape(state, [1, state_size])  # Reshape for NN
+
         while not done:
             rnd += 1
             action = agent.act(state)
@@ -152,7 +154,7 @@ if __name__ == "__main__":
 
             if done:
                 print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd} \n")
-                print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000}")
+                print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
                 break
 
             if len(agent.memory) > batch_size:
@@ -162,9 +164,9 @@ if __name__ == "__main__":
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
-        agent.save("./save/wsn-dqn.h5")
+        #agent.save("./save/wsn-dqn.h5")
 
-        if e % 15 == 0:
+        if e % 15 == 0: # Change node placement after every 15th round
             for i in range(numNodes):
                 env.EE.nodes[i].xPos = random.random()*xSize
                 env.EE.nodes[i].yPos = random.random()*ySize
@@ -172,7 +174,7 @@ if __name__ == "__main__":
         #env.render()
 
     print(f"avrRnd: {avrRnd}")
-    print(f"Mean Rounds: {sum(avrRnd)/len(avrRnd)}")
+    print(f"Mean Rounds Survived: {sum(avrRnd)/len(avrRnd)}")
 
     x = np.linspace(0, len(avrRnd), num=len(avrRnd), endpoint=True)
     plt.plot(x, avrRnd)
