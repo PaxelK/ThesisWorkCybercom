@@ -15,6 +15,7 @@ from MPC2ndLayer_2D_v2 import MPC2ndLayer
 from plotEnv import *
 from setParamsMPC import *
 import copy
+import csv
 
 
 ctrlHrz = 10
@@ -25,6 +26,12 @@ EE_leach = copy.deepcopy(EE_MPC)
 
 x, y = EE_MPC.sink.getPos()  # Get position/coordinates of sink
 
+
+totRounds_MPC = []
+totRounds_leach = []
+
+totPacks_MPC = []
+totPacks_leach = []
 
 """
 The greater loop. One loop represents a round. During this loop the following steps occur:
@@ -44,98 +51,71 @@ The greater loop. One loop represents a round. During this loop the following st
                 d) The sink moves another step on its planned route.
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
-
-#while True:  # Run until all node dies
-for i in range(3):
-    print(f"Round = {EE_MPC.rnd}")
-    plotEnv(EE_MPC)
-    plotEnv(EE_leach)
-    
-    EE_MPC.cluster()
-    
-
-    """
-    The pseudo-clustering process for the LEACH-environment
-    ############################################################
-    """
-    
-    EE_leach.CHds = []       # Reset lists of current CHs and non-CHs
-    EE_leach.nonCHds = []
+for i in range(1):
+    while True:  # Run until all node dies
+    #for i in range(3):
+        print(f"Round = {EE_MPC.rnd}")
+        #plotEnv(EE_MPC)
+        #plotEnv(EE_leach)
         
-        # Check if node is alive, then generate its CHs
-    for i in range(len(EE_leach.nodes)):
-        EE_leach.nodes[i].resetConChildren()
-        EE_leach.nodes[i].clearTempDataRec()
+        
+        if(len(EE_MPC.deadNodes) != numNodes):
+            EE_MPC.cluster()
+            optimalP = EE_MPC.controlEnv()
+            EE_MPC.sink.setTarPoint(optimalP[0], optimalP[1])
+            
+            print('Expected lifetime in rounds: {0}'.format(EE_MPC.expLifetime))
+            print('Packages received by sink: {0}'.format(EE_MPC.sink.dataRec))
+            print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE_MPC.nodesAlive), len(EE_MPC.deadNodes)))
+            print('Number of nodes alive: {0}'.format(len(EE_MPC.nodesAlive)))
+            
+            for i in range(10): #time_segments
+                print('TIME SEGMENT: {0}'.format(i))
+                EE_MPC.sink.produce_MoveVector()
+                for c in EE_MPC.CHds:
+                    c.controlPR(EE_MPC.sink)
+                    #print(c.data.value)
+                    print('\n')
+                    #c.plot()
+                    #print(c.data.value)
+                EE_MPC.communicate()
+                EE_MPC.sink.move(EE_MPC.sink.xMove.value[1], EE_MPC.sink.yMove.value[1])
+            
+            EE_MPC.iterateRound()
+        
+        if(len(EE_leach.deadNodes) != numNodes):
+            EE_leach.cluster()        
+            EE_leach.communicate()
+            EE_leach.iterateRound()
+            print('Finished leach round.')
+        
+        
         
         """
-        If each CH chosen is alive in both systems, the loop keeps on
-        going with the same hierarchy roles.
+        If the number of dead nodes reaches the total number of nodes, the network is seen as
+        dead and the loop ceases.
         """
-        EE_leach.nodes[i].CHstatus = EE_MPC.nodes[i].CHstatus          
-    """
-    Connection phase for the LEACH network's nodes. Pretty much copied from the Cluster() method
-    """
-    for i in range(len(EE_leach.nodes)):  # Non-CH nodes connect to nearest CH/sink and CHs connect to sink
-            if EE_leach.nodes[i].getCHstatus() == 0:  # If node is a simple node (non-CH)
-                EE_leach.nonCHds.append(EE_leach.nodes[i]) # Add to list of current non-CHs
-                minDistance = EE_leach.nodes[i].getDistance(EE_leach.sink)  # Starts off with the distance to sink
-                jshortest = -1  # jshortest starts of as a "non index" number
-                for j in range(len(EE_leach.nodes)):
-                    if EE_leach.nodes[j].getCHstatus() == 1:  # Checks all cluster head nodes
-                        if minDistance > EE_leach.nodes[i].getDistance(EE_leach.nodes[j]):
-                            # If distance to cluster head j was shorter than what has been measured before, make
-                            # this the new minimum distance
-                            minDistance = EE_leach.nodes[i].getDistance(EE_leach.nodes[j])
-                            jshortest = j # Store index of this node
+        if len(EE_MPC.deadNodes) == numNodes and len(EE_leach.deadNodes) == numNodes:  # Break when all nodes have died
+                print('MPC BREAKPOINT AT ROUND {0}'.format(EE_MPC.rnd))
+                print('LEACH BREAKPOINT AT ROUND {0}'.format(EE_leach.rnd))
+                totRounds_MPC.append(EE_MPC.rnd)
+                totRounds_leach.append(EE_leach.rnd)
+                
+                totPacks_MPC.append(EE_MPC.sink.dataRec/ps)
+                totPacks_leach.append(EE_leach.sink.dataRec/ps)
+                break
 
-                if jshortest >= 0:  # If a CH with in-between distance shorter than that to the sink, connect to this CH
-                    EE_leach.nodes[i].connect(EE_leach.nodes[jshortest])
-                else:
-                    EE_leach.nodes[i].connect(EE_leach.sink)  # Otherwise connect to the sink
-            else:  # If node is CH, connect to sink and add to list of current CHs
-                EE_leach.nodes[i].connect(EE_leach.sink)
-                EE_leach.CHds.append(EE_leach.nodes[i])          
-            
-    """        
-    ##############################################################        
-    """              
-            
-            
+with open('Results_MPCVSleachHrz10_2.txt', 'w', newline='') as f:
+    results = csv.writer(f)
     
-    EE_MPC.refreshSolvers()
-    optimalP = EE_MPC.controlEnv()
-    EE_MPC.sink.setTarPoint(optimalP[0], optimalP[1])
-    print('Expected lifetime in rounds: {0}'.format(EE_MPC.expLifetime))
-    print('Packages received by sink: {0}'.format(EE_MPC.sink.dataRec))
-    print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE_MPC.nodesAlive), len(EE_MPC.deadNodes)))
-    print('Number of nodes alive: {0}'.format(len(EE_MPC.nodesAlive)))
+    results.writerow(['MPC: ', totRounds_MPC])
+    results.writerow(['MPC data Rec [packets]: ', totPacks_MPC])
+    results.writerow(['LEACH: ', totRounds_leach])
+    results.writerow(['LEACH data Rec [packets]: ', totPacks_leach])
     
-    #if(len(EE_MPC.CHds)>0):
-    #    print(EE_MPC.CHds[0].desData)
-    for i in range(10): #time_segments
-        print('TIME SEGMENT: {0}'.format(i))
-        EE_MPC.sink.produce_MoveVector()
-        for c in EE_MPC.CHds:
-            c.controlPR(EE_MPC.sink)
-            #print(c.data.value)
-            print('\n')
-            #c.plot()
-            #print(c.data.value)
-        EE_MPC.communicate()
-        EE_MPC.sink.move(EE_MPC.sink.xMove.value[1], EE_MPC.sink.yMove.value[1])
-        
-        EE_leach.communicate()
-        
-    #print('ENERGY AT TIME SEGMENT {0}: {1}'.format(i, EE_MPC.nodes[0].energy))
-    #print('ENERGY AT END OF ROUND {0}: {1}'.format(EE_MPC.rnd, EE_MPC.nodes[0].energy))
     
-    EE_MPC.iterateRound()
-    EE_leach.iterateRound()
     
-    """
-    If the number of dead nodes reaches the total number of nodes, the network is seen as
-    dead and the loop ceases.
-    """
-    if (len(EE_MPC.deadNodes) > 0 or len(EE_leach.deadNodes >0)):  # Break when one node has died
-        print('ENERGY AT BREAKPOINT, ROUND {0}: {1}'.format(EE_MPC.rnd, EE_MPC.nodes[0].energy))
-        break
+    
+    
+    
+    

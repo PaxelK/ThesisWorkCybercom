@@ -147,5 +147,5 @@ while True:  # Run until all nodes dies
     """
     
     if len(EE_MPC.deadNodes) == numNodes:  # Break when all nodes have died
-        print('ENERGY AT BREAKPOINT, ROUND {0}: {1}'.format(EE_MPC.rnd, EE_MPC.nodes[0].energy))
+        print('ROUNDS AT BREAKPOINT, ROUND {0}'.format(EE_MPC.rnd))
         break

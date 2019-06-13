@@ -81,5 +81,5 @@ while True:  # Run until all node dies
     dead and the loop ceases.
     """
     if len(EE.deadNodes) == numNodes:  # Break when all nodes have died
-        print('ENERGY AT BREAKPOINT, ROUND {0}'.format(EE.rnd))
+        print('ROUND AT BREAKPOINT, ROUND {0}'.format(EE.rnd))
         break

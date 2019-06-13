@@ -19,7 +19,7 @@ import os
 import sys
 
     
-def threadFunc_LEACH(EE, totRounds_leach, case):
+def threadFunc_LEACH(EE, totRounds_leach,totPackRec_leach , case):
     leach = EE
     while True:
         sys.stdout.flush()
@@ -34,8 +34,9 @@ def threadFunc_LEACH(EE, totRounds_leach, case):
             """
             print('LEACH ROUND AT BREAKPOINT AT ROUND {0}'.format(leach.rnd))
             totRounds_leach[case] = leach.rnd
+            totPackRec_leach[case] = leach.sink.dataRec
             break
-def threadFunc_BLEACH(EE,totRounds_bleach, case):  
+def threadFunc_BLEACH(EE,totRounds_bleach, totPackRec_bleach, case):  
     BLEACH = EE
     while True:
         sys.stdout.flush()
@@ -46,6 +47,7 @@ def threadFunc_BLEACH(EE,totRounds_bleach, case):
         else:
             print('BLEACH ROUND AT BREAKPOINT AT ROUND {0}'.format(BLEACH.rnd))
             totRounds_bleach[case] = BLEACH.rnd
+            totPackRec_bleach[case] = BLEACH.sink.dataRec
             break
         
         
@@ -56,16 +58,19 @@ if __name__ == '__main__':
     totRounds_bleach = multiprocessing.Array('i', 100)
     totRounds_leach = multiprocessing.Array('i', 100)
     
+    totPackRec_leach = multiprocessing.Array('i', 100)
+    totPackRec_bleach = multiprocessing.Array('i', 100)
+
     testRange = 100
     for i in range(testRange):
         
         print("Current test case: {0}".format(i))
         EE_leach = EnvironmentEngineMPC(10,11)
         EE_BLEACH = copy.deepcopy(EE_leach)
-        EE_BLEACH.fParam = 0.3
+        EE_BLEACH.fParam = 0.9
              
-        thr_bleach = multiprocessing.Process(target=threadFunc_BLEACH, args = (EE_BLEACH,totRounds_bleach, i,))
-        thr_leach = multiprocessing.Process(target=threadFunc_LEACH, args = (EE_leach,totRounds_leach, i,))
+        thr_bleach = multiprocessing.Process(target=threadFunc_BLEACH, args = (EE_BLEACH,totRounds_bleach, totPackRec_bleach, i,))
+        thr_leach = multiprocessing.Process(target=threadFunc_LEACH, args = (EE_leach,totRounds_leach, totPackRec_leach, i,))
 
         thr_bleach.start()
         thr_leach.start()
@@ -73,17 +78,27 @@ if __name__ == '__main__':
         thr_bleach.join()
         thr_leach.join()
     
-    with open('Results_bleachVSleach.txt', 'w', newline='') as f:
+    fileOpenName = 'Results_bleachVSleach_f0'+str(EE_BLEACH.fParam)[-1]+ '.txt'
+    with open(fileOpenName, 'w', newline='') as f:
         results = csv.writer(f)
         
         totrnd_leach = []
         totrnd_bleach = []
+
+        totpr_leach = []
+        totpr_bleach = []
         for i in range(testRange):
             totrnd_leach.append(totRounds_leach[i])
             totrnd_bleach.append(totRounds_bleach[i])
+
+            totpr_leach.append(totPackRec_leach[i]/ps)
+            totpr_bleach.append(totPackRec_bleach[i]/ps)
             
-        results.writerow(['BLEACH: ', totrnd_bleach])
-        results.writerow(['LEACH: ', totrnd_leach])
+        results.writerow(['BLEACH rounds: ', totrnd_bleach])
+        results.writerow(['BLEACH data [packets]: ', totpr_bleach])
+
+        results.writerow(['LEACH rounds: ', totrnd_leach])
+        results.writerow(['LEACH data [packets]: ', totpr_leach])
         
         
         
