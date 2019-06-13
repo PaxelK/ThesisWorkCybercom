@@ -23,10 +23,10 @@ class EnvironmentEngineMPC:
         
         if energyMode == "rand":
             for i in range(numNodes):
-                self.nodes.append(MPCnode(i, random.random() * xSize, random.random() * ySize, maxNrj * random.random(), self.hrz,self.Res))
+                self.nodes.append(MPCnode(i, round(random.random() * xSize), round(random.random() * ySize), maxNrj * random.random(), self.hrz,self.Res))
         elif energyMode == "distr":
             for i in range(numNodes):
-                self.nodes.append(MPCnode(i, random.random() * xSize, random.random() * ySize, maxNrj, self.hrz,self.Res))
+                self.nodes.append(MPCnode(i, round(random.random() * xSize), round(random.random() * ySize), maxNrj, self.hrz,self.Res))
         else:
             print("The choice of energy mode is invalid! \n")
 
