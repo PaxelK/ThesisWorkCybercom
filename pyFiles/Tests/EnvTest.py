@@ -13,7 +13,7 @@ sys.path.append("../RL")  # Adds higher directory to python modules path.
 def run():
     EE = EnvironmentEngine()  # Initiate environment
 
-    x, y = EE.sink.getPos()  # Get position/coordinates of sink
+    #x, y = EE.sink.getPos()  # Get position/coordinates of sink
 
     with open('nodePlacement.csv') as nodePlacement_file:
         csv_reader = csv.reader(nodePlacement_file, delimiter=',')
@@ -93,6 +93,8 @@ def run():
         # print(f"deadnodes Length = {len(EE.deadNodes)}")
 
         #plotEnv(EE)
+
+        '''
         temp = random.random()
         x = 0
         y = 0
@@ -105,6 +107,7 @@ def run():
             y = -1
         elif temp < 1 and temp >= 0.75:
             y = 1
+        '''
 
 
         EE.cluster()
