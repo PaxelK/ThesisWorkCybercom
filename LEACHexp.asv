@@ -36,20 +36,13 @@ for i = 1:episode
     t_bleach_low = [t_bleach_low, h1*(1 - f) * (p / (1 - p * mod(rnd, episode))) * SoC_low(i) + h2*(1 / (1 - (1 - f) * (p / (1 - p * mod(rnd, episode))))) * f * (p / (1 - p * mod(rnd, episode)))];
     t_bleach_zero = [t_bleach_zero, h1*(1 - f) * (p / (1 - p * mod(rnd, episode))) * leach_zeros(i) + h2*(1 / (1 - (1 - f) * (p / (1 - p * mod(rnd, episode))))) * f * (p / (1 - p * mod(rnd, episode)))];
     
-    if(rnd == 0)
+    if(i == 0)
         START_S_HIGH = h1*(1 - f) * (p / (1 - p * mod(rnd, episode))) * leach_ones(i);
-        START_R_HIGH = h2*(1 / (1 - (1 - f) * (p / (1 - p * mod(rnd, episode))))) * f * (p / (1 - p * mod(rnd, episode)));
-    
-        START_S_LOW = h1*(1 - f) * (p / (1 - p * mod(rnd, episode))) * leach_zeros(i);
-        START_R_LOW = h2*(1 / (1 - (1 - f) * (p / (1 - p * mod(rnd, episode))))) * f * (p / (1 - p * mod(rnd, episode)));
-    
+        START_R_HIGH = h2*(1 / (1 - (1 - f) * (p / (1 - p * mod(rnd, episode))))) * f * (p / (1 - p * mod(rnd, episode)))];
     end
-    if(rnd == 1/p-1)
+    if(i == 1/p-1)
         END_S_HIGH = h1*(1 - f) * (p / (1 - p * mod(rnd, episode))) * leach_ones(i);
-        END_R_HIGH = h2*(1 / (1 - (1 - f) * (p / (1 - p * mod(rnd, episode))))) * f * (p / (1 - p * mod(rnd, episode)));
-    
-        END_S_LOW = h1*(1 - f) * (p / (1 - p * mod(rnd, episode))) * leach_zeros(i);
-        END_R_LOW = h2*(1 / (1 - (1 - f) * (p / (1 - p * mod(rnd, episode))))) * f * (p / (1 - p * mod(rnd, episode)));
+        START_R_HIGH = h2*(1 / (1 - (1 - f) * (p / (1 - p * mod(rnd, episode))))) * f * (p / (1 - p * mod(rnd, episode)))];
     end
     
     
