@@ -3,12 +3,12 @@ clc, clear all, close all
 t = [];
 t_bleach_desc = [];
 
-t_bleach_high = [];
-t_bleach_low = [];
-t_bleach_zero = [];
-t_bleach_ones = [];
-p = 0.05;
-f = 0.6;
+t_bleach_high = [];     % Vector for T-values with energy at 0.8 SoC for all rounds
+t_bleach_low = [];      % Vector for T-values with energy at 0.2 SoC for all rounds
+t_bleach_zero = [];     % Vector for T-values with energy at 0 SoC for all rounds
+t_bleach_ones = [];     % Vector for T-values with energy at 1 SoC for all rounds
+p = 0.05;               
+
 episode = 1/p;
 rnd = 0;
 
@@ -19,8 +19,17 @@ SoC_high = 0.8.*ones(9);
 
 SoC_low = 0.2.*ones(9);  
 
-h1 = 3;
-h2 = 0.6;
+% Spread decides which value T_BLEACH_zero is to end at.
+% It also makes T_BLEACH_one end at 2-spread. So it ends at an even space
+% around 1.
+spread = 0.8;      
+
+h2 = spread;
+f = 0.6;
+   
+% This was a formula calculated on paper
+h1 = (2-2*spread)/(1-f);
+
 
 K1 = (1-f)*h1
 K2 = f*h2
@@ -56,6 +65,12 @@ for i = 1:episode
     rnd = rnd+1;
 end
 
+
+residMax = t_bleach_ones-t;
+leastQuadMax = residMax*residMax'
+
+residMin = t-t_bleach_zero;
+leastQuadMin = residMin*residMin'
 
 rndVec = 0:length(t)-1;
 

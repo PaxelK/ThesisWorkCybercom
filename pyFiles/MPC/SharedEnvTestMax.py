@@ -69,7 +69,8 @@ for i in range(1):
             print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE_MPC.nodesAlive), len(EE_MPC.deadNodes)))
             print('Number of nodes alive: {0}'.format(len(EE_MPC.nodesAlive)))
             
-            for i in range(10): #time_segments
+            EE_MPC.newCycle = True
+            for i in range(1): #time_segments
                 print('TIME SEGMENT: {0}'.format(i))
                 EE_MPC.sink.produce_MoveVector()
                 for c in EE_MPC.CHds:
@@ -81,6 +82,7 @@ for i in range(1):
                 EE_MPC.communicate()
                 EE_MPC.sink.move(EE_MPC.sink.xMove.value[1], EE_MPC.sink.yMove.value[1])
             
+            
             EE_MPC.iterateRound()
         
         if(len(EE_leach.deadNodes) != numNodes):
@@ -88,6 +90,7 @@ for i in range(1):
             for c in EE_leach.CHds:
                     c.PA = maxPR
 
+            EE_leach.newCycle = True
             EE_leach.communicate()
             EE_leach.iterateRound()
             print('Finished leach round.')
