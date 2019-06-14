@@ -8,7 +8,8 @@ from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
-
+import csv
+import nodePlacementGeneration  # Generates node placement and saves to csv file
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
@@ -16,6 +17,8 @@ from setParams import *
 from plotEnv import *
 from EnvironmentEngine import *
 
+sys.path.append("../Tests")  # Adds higher directory to python modules path.
+import EnvTest
 import matplotlib.pyplot as plt
 
 
@@ -104,11 +107,38 @@ if __name__ == "__main__":
     env.EE.nodes[3].yPos = 60
     '''
 
-    # Run WSN env with plotting after training
-    agent.load("./save/wsn-dqn.h5")  # Load weights from file
-    avrRnd = []
+    times = 1
 
-    for episodes in range(5):
+    for tests in range(100):
+        nodePlacementGeneration.run()  # Generate new node placement and save in csv file
+        EnvTest.run()  # Run LEACH comparison
+
+        # Run WSN env with plotting after training
+        agent.load("./save/wsn-dqn.h5")  # Load weights from file
+        avrRnd = []
+
+        with open('nodePlacement.csv') as nodePlacement_file:  # Load the new node placement
+            csv_reader = csv.reader(nodePlacement_file, delimiter=',')
+            row_count = 0
+
+            for row in csv_reader:
+                i = 0
+                rowVec = []
+
+                for element in row:
+                    rowVec.append(float(element))
+
+                if row_count == 0:
+                    for valueX in rowVec:
+                        env.EE.nodes[i].xPos = valueX
+                        i += 1
+                if row_count == 1:
+                    for valueY in rowVec:
+                        env.EE.nodes[i].yPos = valueY
+                        i += 1
+                row_count += 1
+
+
         # Set default values
         done = False
         batch_size = 32
@@ -137,15 +167,22 @@ if __name__ == "__main__":
             state = next_state
 
             if done:
-                print(f"Episode: {episodes+1}/{5}, e: {agent.epsilon}, rnd: {rnd} \n")
-                print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
+                #print(f"Episode: {episodes+1}/{5}, e: {agent.epsilon}, rnd: {rnd} \n")
+                #print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
                 break
 
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
 
             #env.render()
-        avrRnd.append(rnd)
 
-    print(f"avrRnd: {avrRnd}")
-    print(f"Mean Rounds: {sum(avrRnd) / len(avrRnd)}")
+        print(f"Times: {times}")
+        times += 1
+        with open('RLresults.txt', 'a', newline='') as f:
+            f.write(str(env.EE.rnd) + ",")
+            f.write(str(env.EE.sink.dataRec / 1000) + ",")
+
+        avrRnd.append("RL: " + str(rnd))
+
+    #print(f"avrRnd: {avrRnd}")
+    #print(f"Mean Rounds: {sum(avrRnd) / len(avrRnd)}")

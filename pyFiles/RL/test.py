@@ -166,10 +166,10 @@ if __name__ == "__main__":
         #if rnd % 5 == 0: # Save every 5th round
         #agent.save("./save/wsn-dqn.h5")
 
-        if e % 15 == 0: # Change node placement after every 15th round
+        if e % 20 == 0: # Change node placement after every 20th round
             for i in range(numNodes):
-                env.EE.nodes[i].xPos = random.random()*xSize
-                env.EE.nodes[i].yPos = random.random()*ySize
+                env.EE.nodes[i].xPos = round(random.random()*xSize)
+                env.EE.nodes[i].yPos = round(random.random()*ySize)
 
         #env.render()
 
