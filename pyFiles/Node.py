@@ -198,7 +198,7 @@ class Node:
                     self.actionMsg = "Node " + str(self.ID) + " of type " + str(self.CHstatus) +\
                                      " successfully sent to target node " + str(self.CHparent.ID) + " of type " +\
                                      str(self.CHparent.CHstatus) + '.'
-                    self.PS = self.PS + k               # Update packages sent
+                    self.PS += k + self.tempDataRec               # Update packages sent
                     self.CHparent.dataRec += k          # Update packets received for CH
                     self.CHparent.tempDataRec += k      # Update temporary packets received for CH which are then sent on to the sink as well
                     outcome = True
@@ -237,7 +237,7 @@ class Node:
                 if self.energy >= 0 and sink.energy >= 0:
                     # If no power failure was had, data has been transmitted and received
                     self.actionMsg = "Node " + str(self.ID) + " successfully sent to sink " + str(sink.ID) + "!\n"
-                    self.PS = self.PS + k
+                    self.PS += k + self.tempDataRec
                     
                     sink.dataRec += self.tempDataRec + k
                     outcome = True

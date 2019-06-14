@@ -1,4 +1,4 @@
-MPC: ,[]
-MPC data Rec [packets]: ,[]
-LEACH: ,[]
-LEACH data Rec [packets]: ,[]
+MPC: ,[919]
+MPC data Rec [packets]: ,[3114741.0]
+LEACH: ,[12516]
+LEACH data Rec [packets]: ,[688089.0]

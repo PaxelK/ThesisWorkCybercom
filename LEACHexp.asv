@@ -22,10 +22,10 @@ SoC_low = 0.2.*ones(9);
 % Spread decides which value T_BLEACH_zero is to end at.
 % It also makes T_BLEACH_one end at 2-spread. So it ends at an even space
 % around 1.
-spread = 0.8;      
+spread = 0.9;      
 
 h2 = spread;
-f = 0.6;
+f = 0.8;
    
 % This was a formula calculated on paper
 h1 = (2-2*spread)/(1-f);
