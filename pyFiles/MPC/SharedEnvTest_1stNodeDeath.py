@@ -44,11 +44,11 @@ The greater loop. One loop represents a round. During this loop the following st
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
 
-#while True:  # Run until all node dies
-for i in range(3):
+while True:  # Run until all node dies
+#for i in range(1):
     print(f"Round = {EE_MPC.rnd}")
-    plotEnv(EE_MPC)
-    plotEnv(EE_leach)
+    #plotEnv(EE_MPC)
+    #plotEnv(EE_leach)
     
     EE_MPC.cluster()
     
@@ -110,19 +110,50 @@ for i in range(3):
     
     #if(len(EE_MPC.CHds)>0):
     #    print(EE_MPC.CHds[0].desData)
-    for i in range(10): #time_segments
+    EE_MPC.newCycle = True
+    for i in range(time_segments): #time_segments
         print('TIME SEGMENT: {0}'.format(i))
+        
+        # LET MPC NON-CHds SEND DATA FIRST. CODE IS COPIED FROM COMMUNICATE FUNCTION IN ENV
+        if i==0:
+            for n in EE_MPC.nonCHds:
+                if n.alive:
+                    outcome = n.sendMsg(EE_MPC.sink)
+                    if not outcome and EE_MPC.verbose:
+                        print(f"Node {n.ID} failed to send to node {n.CHparent.ID}!\n")
+                        actionmsg = n.getActionMsg()
+                        print(str(actionmsg) + "\n")   
+        
+        
+
+            
+        
         EE_MPC.sink.produce_MoveVector()
         for c in EE_MPC.CHds:
-            c.controlPR(EE_MPC.sink)
-            #print(c.data.value)
-            print('\n')
-            #c.plot()
-            #print(c.data.value)
-        EE_MPC.communicate()
+            if i == 1:
+                c.tempDataRec = 0
+            if c.alive:
+                c.controlPR(EE_MPC.sink)
+                #print(c.data.value)
+                #print('\n')
+                #c.plot()
+                #print(c.data.value)
+                outcome = c.sendMsg(EE_MPC.sink)
+                if not outcome and EE_MPC.verbose:
+                    print(f"Node {c.ID} failed to send to node {c.CHparent.ID}!\n")
+                    actionmsg = c.getActionMsg()
+                    print(str(actionmsg) + "\n")
+
+                    
+        #EE_MPC.communicate()
         EE_MPC.sink.move(EE_MPC.sink.xMove.value[1], EE_MPC.sink.yMove.value[1])
-        
-        EE_leach.communicate()
+
+    
+    for c in EE_leach.CHds:
+        c.PA = 1
+
+    EE_leach.newCycle = True
+    EE_leach.communicate()
         
     #print('ENERGY AT TIME SEGMENT {0}: {1}'.format(i, EE_MPC.nodes[0].energy))
     #print('ENERGY AT END OF ROUND {0}: {1}'.format(EE_MPC.rnd, EE_MPC.nodes[0].energy))
@@ -134,6 +165,6 @@ for i in range(3):
     If the number of dead nodes reaches the total number of nodes, the network is seen as
     dead and the loop ceases.
     """
-    if (len(EE_MPC.deadNodes) > 0 or len(EE_leach.deadNodes >0)):  # Break when one node has died
+    if (len(EE_MPC.deadNodes) > 0 or len(EE_leach.deadNodes)>0):  # Break when one node has died
         print('ENERGY AT BREAKPOINT, ROUND {0}: {1}'.format(EE_MPC.rnd, EE_MPC.nodes[0].energy))
         break

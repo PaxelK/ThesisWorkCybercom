@@ -72,14 +72,35 @@ for i in range(1):
             EE_MPC.newCycle = True
             for i in range(time_segments): #time_segments
                 print('TIME SEGMENT: {0}'.format(i))
+                if i==0:
+                    for n in EE_MPC.nonCHds:
+                        if n.alive:
+                            outcome = n.sendMsg(EE_MPC.sink)
+                            if not outcome and EE_MPC.verbose:
+                                print(f"Node {n.ID} failed to send to node {n.CHparent.ID}!\n")
+                                actionmsg = n.getActionMsg()
+                                print(str(actionmsg) + "\n")   
+        
+        
+
+            
+        
                 EE_MPC.sink.produce_MoveVector()
                 for c in EE_MPC.CHds:
-                    c.controlPR(EE_MPC.sink)
-                    #print(c.data.value)
-                    print('\n')
-                    #c.plot()
-                    #print(c.data.value)
-                EE_MPC.communicate()
+                    if i == 1:
+                        c.tempDataRec = 0
+                    if c.alive:
+                        c.controlPR(EE_MPC.sink)
+                        #print(c.data.value)
+                        #print('\n')
+                        #c.plot()
+                        #print(c.data.value)
+                        outcome = c.sendMsg(EE_MPC.sink)
+                        if not outcome and EE_MPC.verbose:
+                            print(f"Node {c.ID} failed to send to node {c.CHparent.ID}!\n")
+                            actionmsg = c.getActionMsg()
+                            print(str(actionmsg) + "\n")
+        
                 EE_MPC.sink.move(EE_MPC.sink.xMove.value[1], EE_MPC.sink.yMove.value[1])
             
             
@@ -111,7 +132,7 @@ for i in range(1):
                 totPacks_leach.append(EE_leach.sink.dataRec/ps)
                 break
 
-with open('Results_MPCVSleachHrz10_max2.txt', 'w', newline='') as f:
+with open('Results_MPCVSleachHrz10_max1TEST.txt', 'w', newline='') as f:
     results = csv.writer(f)
     
     results.writerow(['MPC: ', totRounds_MPC])
