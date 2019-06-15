@@ -18,11 +18,10 @@ import multiprocessing
 import os
 import sys
 
-    
+
 def threadFunc_LEACH(EE, totRounds_leach,totPackRec_leach , case):
     leach = EE
     while True:
-        sys.stdout.flush()
         if(len(leach.deadNodes) != numNodes):
             leach.cluster()
             leach.communicate()
@@ -39,7 +38,6 @@ def threadFunc_LEACH(EE, totRounds_leach,totPackRec_leach , case):
 def threadFunc_BLEACH(EE,totRounds_bleach, totPackRec_bleach, case):  
     BLEACH = EE
     while True:
-        sys.stdout.flush()
         if(len(BLEACH.deadNodes) != numNodes):    
             BLEACH.cluster()
             BLEACH.communicate()
@@ -61,7 +59,7 @@ if __name__ == '__main__':
     totPackRec_leach = multiprocessing.Array('i', 100)
     totPackRec_bleach = multiprocessing.Array('i', 100)
 
-    testRange = 100
+    testRange = 1
     for i in range(testRange):
         
         print("Current test case: {0}".format(i))

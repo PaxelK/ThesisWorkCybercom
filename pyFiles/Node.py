@@ -1,7 +1,7 @@
 import math  # Needed for sqrt
 import random
 import setParams as sP
-
+import numpy as np
 
 class Node:
     def __init__(self, id, x, y, nrj):
@@ -44,6 +44,23 @@ class Node:
             self.alive = False
 
 
+        self.otherBLEACH = False
+        self.spread = 0.5
+        """
+        Creates the lookup table for the alternative BLEACH
+        """
+        self.tLookUp = []
+        for i in range(0,int(1/sP.p)):
+            self.tLookUp.append((sP.p / (1 - sP.p * (i % (1 / sP.p)))))
+        
+        
+        self.maxVec = (1+self.spread)*np.array(self.tLookUp);
+        self.minVec = (1-self.spread)*np.array(self.tLookUp);
+                
+        self.tVector = []
+        for i in np.linspace(-self.spread,self.spread,100):
+            self.tVector.append(np.array(self.tLookUp)*(1+i))
+        
     def getDataRec(self):
         return self.dataRec
 
@@ -307,15 +324,24 @@ class Node:
         :param p: CH probability
         :param rnd: Random number used to determine CH status
         '''
-
+               
         if rnd % (1 / p) == 0:
             self.CHflag = 0
 
         randVal = random.random()
         t = (p / (1 - p * (rnd % (1 / p))))
-        if f < 1:  # If we want to try without BLEACH, we simply set f > 1
+        if f < 1 and not self.otherBLEACH:  # If we want to try without BLEACH, we simply set f > 1
             t = (1 - f) * sP.h_s * (p / (1 - p * (rnd % (1 / p)))) * self.SoC +\
                 sP.h_r*(1 / (1 - (1 - f) * (p / (1 - p * (rnd % (1 / p)))))) * f * (p / (1 - p * (rnd % (1 / p))))
+        
+        # Generates the t-value if otherBLEACH is True. Uses the lookup-table tVector
+        # to generate a t-value according to it's state of charge.
+        if(self.otherBLEACH):   
+            instance = int(round(self.SoC,2)*100)
+            if instance == 100:
+                instance -= 1
+            rndIndex = int(round(rnd % (1 / p)))
+            t = self.tVector[instance][rndIndex]
             
         # If t is bigger than the randomized value, this node becomes a CH
         if t > randVal and self.CHflag == 0:
@@ -326,4 +352,5 @@ class Node:
 
 
 
-
+if __name__ == "__main__":
+    n = Node(1, 5, 5, 0.5)
