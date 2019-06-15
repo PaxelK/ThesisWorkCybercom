@@ -1,4 +1,4 @@
-BLEACH rounds: ,"[0, 0, 0, 0, 0]"
-BLEACH data [packets]: ,"[0.0, 0.0, 0.0, 0.0, 0.0]"
-LEACH rounds: ,"[0, 0, 0, 0, 0]"
-LEACH data [packets]: ,"[0.0, 0.0, 0.0, 0.0, 0.0]"
+BLEACH rounds: ,[92]
+BLEACH data [packets]: ,[2840.0]
+LEACH rounds: ,[95]
+LEACH data [packets]: ,[2896.0]

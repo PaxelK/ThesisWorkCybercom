@@ -52,8 +52,8 @@ The greater loop. One loop represents a round. During this loop the following st
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
 for i in range(1):
-    while True:  # Run until all node dies
-    #for i in range(1):
+    #while True:  # Run until all node dies
+    for i in range(4):
         print(f"Round = {EE_MPC.rnd}")
         #plotEnv(EE_MPC)
         #plotEnv(EE_leach)

@@ -1,4 +1,0 @@
-BLEACH rounds: ,[0]
-BLEACH data [packets]: ,[0.0]
-LEACH rounds: ,[0]
-LEACH data [packets]: ,[0.0]
