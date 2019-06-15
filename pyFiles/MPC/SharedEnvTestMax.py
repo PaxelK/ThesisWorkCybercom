@@ -51,9 +51,9 @@ The greater loop. One loop represents a round. During this loop the following st
                 d) The sink moves another step on its planned route.
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
-for i in range(1):
+for test in range(1):
     #while True:  # Run until all node dies
-    for i in range(4):
+    for i in range(2):
         print(f"Round = {EE_MPC.rnd}")
         #plotEnv(EE_MPC)
         #plotEnv(EE_leach)
@@ -131,14 +131,14 @@ for i in range(1):
                 totPacks_MPC.append(EE_MPC.sink.dataRec/ps)
                 totPacks_leach.append(EE_leach.sink.dataRec/ps)
                 break
-
-with open('Results_MPCVSleachHrz10_max1TEST.txt', 'w', newline='') as f:
-    results = csv.writer(f)
-    
-    results.writerow(['MPC: ', totRounds_MPC])
-    results.writerow(['MPC data Rec [packets]: ', totPacks_MPC])
-    results.writerow(['LEACH: ', totRounds_leach])
-    results.writerow(['LEACH data Rec [packets]: ', totPacks_leach])
+    tempStr = 'Results_MPCVSleachHrz10_reg_' + str(test) + '.txt'
+    with open(tempStr, 'w', newline='') as f:
+        results = csv.writer(f)
+        
+        results.writerow(['MPC: ', totRounds_MPC])
+        results.writerow(['MPC data Rec [packets]: ', totPacks_MPC])
+        results.writerow(['LEACH: ', totRounds_leach])
+        results.writerow(['LEACH data Rec [packets]: ', totPacks_leach])
     
     
     
