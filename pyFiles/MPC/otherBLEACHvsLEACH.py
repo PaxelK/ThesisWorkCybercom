@@ -9,9 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from EnvironmentEngineMPC import EnvironmentEngineMPC
+from EnvironmentEngineMPCbleach import EnvironmentEngineMPC
 from plotEnv import *
-from setParams import *
+#from setParams import *
 import copy
 import csv
 import multiprocessing
