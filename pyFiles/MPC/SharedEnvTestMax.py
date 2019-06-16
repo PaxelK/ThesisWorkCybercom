@@ -55,7 +55,7 @@ for test in range(1):
     EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
     EE_leach = copy.deepcopy(EE_MPC)
     #while True:  # Run until all node dies
-    for i in range(200):
+    for i in range(10):
         print(f"Round = {EE_MPC.rnd}")
         #plotEnv(EE_MPC)
         #plotEnv(EE_leach)
