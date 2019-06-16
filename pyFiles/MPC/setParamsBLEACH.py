@@ -26,7 +26,7 @@ ps = 1000
 maxPR = 20				# Maximum amount of packages that can be sent during one transmission round
 
 ### Energy Values ###
-energyMode = "rand"  	# Energy mode can be "rand"=random or "distr"=distributed
+energyMode = "distr"  	# Energy mode can be "rand"=random or "distr"=distributed
 maxNrj = 0.5
 Eelec = 50*10**(-9)   	# Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 ETx = 50*10**(-9)     	# Units in Joules/bit

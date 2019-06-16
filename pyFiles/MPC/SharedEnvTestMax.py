@@ -52,10 +52,10 @@ The greater loop. One loop represents a round. During this loop the following st
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
 for test in range(1):
-    #while True:  # Run until all node dies
     EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
     EE_leach = copy.deepcopy(EE_MPC)
-    for i in range(100):
+    #while True:  # Run until all node dies
+    for i in range(200):
         print(f"Round = {EE_MPC.rnd}")
         #plotEnv(EE_MPC)
         #plotEnv(EE_leach)

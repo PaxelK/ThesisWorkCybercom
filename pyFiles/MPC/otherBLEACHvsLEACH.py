@@ -83,7 +83,7 @@ if __name__ == '__main__':
             thr_bleach.join()
             thr_leach.join()
         
-        fileOpenName = 'Results_ObleachVSleach_sprd_0'+str(round(sprd,1))[-1]+ '.txt'
+        fileOpenName = 'Results_ObleachVSleach_REGsprd_0'+str(round(sprd,1))[-1]+ '.txt'
         with open(fileOpenName, 'w', newline='') as f:
             results = csv.writer(f)
             
