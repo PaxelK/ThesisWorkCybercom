@@ -51,9 +51,11 @@ The greater loop. One loop represents a round. During this loop the following st
                 d) The sink moves another step on its planned route.
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
-for test in range(5):
-    while True:  # Run until all node dies
-    #for i in range(2):
+for test in range(1):
+    #while True:  # Run until all node dies
+    EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
+    EE_leach = copy.deepcopy(EE_MPC)
+    for i in range(100):
         print(f"Round = {EE_MPC.rnd}")
         #plotEnv(EE_MPC)
         #plotEnv(EE_leach)
@@ -72,7 +74,7 @@ for test in range(5):
             EE_MPC.newCycle = True
             for i in range(time_segments): #time_segments
                 print('TIME SEGMENT: {0}'.format(i))
-                if i==0:
+                if i==9:
                     for n in EE_MPC.nonCHds:
                         if n.alive:
                             outcome = n.sendMsg(EE_MPC.sink)
@@ -87,7 +89,7 @@ for test in range(5):
         
                 EE_MPC.sink.produce_MoveVector()
                 for c in EE_MPC.CHds:
-                    if i == 1:
+                    if i == 0:
                         c.tempDataRec = 0
                     if c.alive:
                         c.controlPR(EE_MPC.sink)
@@ -109,7 +111,7 @@ for test in range(5):
         if(len(EE_leach.deadNodes) != numNodes):
             EE_leach.cluster()     
             for c in EE_leach.CHds:
-                    c.PA = maxPR
+                    c.PA = 1#maxPR
 
             EE_leach.newCycle = True
             EE_leach.communicate()
@@ -131,14 +133,14 @@ for test in range(5):
                 totPacks_MPC.append(EE_MPC.sink.dataRec/ps)
                 totPacks_leach.append(EE_leach.sink.dataRec/ps)
                 break
-    tempStr = 'Results_MPCVSleachHrz10_max_' + str(test) + '.txt'
-    with open(tempStr, 'w', newline='') as f:
-        results = csv.writer(f)
+tempStr = 'Results_MPCVSleachHrz10_max_' + str(test) + '.txt'
+with open(tempStr, 'w', newline='') as f:
+    results = csv.writer(f)
         
-        results.writerow(['MPC: ', totRounds_MPC])
-        results.writerow(['MPC data Rec [packets]: ', totPacks_MPC])
-        results.writerow(['LEACH: ', totRounds_leach])
-        results.writerow(['LEACH data Rec [packets]: ', totPacks_leach])
+    results.writerow(['MPC: ', totRounds_MPC])
+    results.writerow(['MPC data Rec [packets]: ', totPacks_MPC])
+    results.writerow(['LEACH: ', totRounds_leach])
+    results.writerow(['LEACH data Rec [packets]: ', totPacks_leach])
     
     
     

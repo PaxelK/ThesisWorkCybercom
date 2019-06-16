@@ -200,7 +200,7 @@ class Node:
             k = self.PA * self.pSize  # k = the amount of bits that are sent
             # Calculate the energy that will be spent by transmitting signal
             ETx = sP.Eelec * k + sP.Eamp * k * self.getDistance(self.CHparent)**2
-            ERx = (sP.Eelec + sP.EDA) * self.pSize  # Calculate the energy that will be spent by receiving signal
+            ERx = (sP.Eelec + sP.EDA)*k  # Calculate the energy that will be spent by receiving signal
             #EC = (Eelec + EDA) * self.pSize * self.conChildren + ETx
             #if(self.ID == 9):
             #    print('PROBE PRINT: Real EC for node ' + str(EC))

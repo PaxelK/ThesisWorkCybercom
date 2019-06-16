@@ -1,4 +1,4 @@
-MPC: ,"[249, 249, 249, 249, 249]"
-MPC data Rec [packets]: ,"[34322.0, 34322.0, 34322.0, 34322.0, 34322.0]"
-LEACH: ,"[282, 282, 282, 282, 282]"
-LEACH data Rec [packets]: ,"[30270.0, 30270.0, 30270.0, 30270.0, 30270.0]"
+MPC: ,[]
+MPC data Rec [packets]: ,[]
+LEACH: ,[]
+LEACH data Rec [packets]: ,[]
