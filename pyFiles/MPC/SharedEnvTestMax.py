@@ -55,7 +55,7 @@ for test in range(1):
     EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
     EE_leach = copy.deepcopy(EE_MPC)
     #while True:  # Run until all node dies
-    for i in range(10):
+    for i in range(19):
         print(f"Round = {EE_MPC.rnd}")
         #plotEnv(EE_MPC)
         #plotEnv(EE_leach)
@@ -70,7 +70,7 @@ for test in range(1):
             print('Packages received by sink: {0}'.format(EE_MPC.sink.dataRec))
             print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE_MPC.nodesAlive), len(EE_MPC.deadNodes)))
             print('Number of nodes alive: {0}'.format(len(EE_MPC.nodesAlive)))
-            
+            print('Number of CHs active: {0}'.format(len(EE_MPC.CHds)))
             EE_MPC.newCycle = True
             for i in range(time_segments): #time_segments
                 print('TIME SEGMENT: {0}'.format(i))
