@@ -9,7 +9,7 @@ import csv
 
 results = []
 
-with open('Results_bleachVSleach_f08.txt') as csv_file:
+with open('Results_ObleachVSleach_sprd_01.txt') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
     for row in csv_reader:
@@ -23,10 +23,10 @@ with open('Results_bleachVSleach_f08.txt') as csv_file:
     
     
     
-    print(BLEACH)
-    print(bleach_packrec)
-    print(LEACH)
-    print(leach_packrec)
+    #print(BLEACH)
+    #print(bleach_packrec)
+    #print(LEACH)
+    #print(leach_packrec)
     for i in range(len(BLEACH)):
         BLEACH[i] = int(BLEACH[i])
         bleach_packrec[i] = float(bleach_packrec[i])
@@ -34,7 +34,7 @@ with open('Results_bleachVSleach_f08.txt') as csv_file:
     for i in range(len(LEACH)):
         LEACH[i] = int(LEACH[i])
         leach_packrec[i] = float(leach_packrec[i])
-        
+    #print(BLEACH)   
     meanVal_BLEACH = sum(BLEACH)/len(BLEACH)
     meanVal_LEACH = sum(LEACH)/len(LEACH)
     

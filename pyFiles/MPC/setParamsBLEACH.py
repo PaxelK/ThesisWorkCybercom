@@ -10,7 +10,6 @@ k = 1000  # Size of data package, units in bits
 p = 0.1  # Suggested percentage of cluster head, a 5 percent of the total amount of nodes used in the network is proposed to give good results
 h_s = 3   # Weight value for the SoC-dependant part of the BLEACH eq. See generateCHstatus() in node
 h_r = 0.8 
-spread = 0.3
 ########################### Network Establishment Parameters ###############################
 ### Area of Operation ###
 # Field Dimensions in meters #

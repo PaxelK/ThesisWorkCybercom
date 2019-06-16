@@ -53,7 +53,7 @@ def threadFunc_BLEACH(EE,totRounds_bleach, totPackRec_bleach, case):
 if __name__ == '__main__':
     sprdV = np.linspace(0.5,0.1,5)
     for sprd in sprdV:
-        testRange = 50
+        testRange = 1
         
         totRounds_bleach = multiprocessing.Array('i', testRange)
         totRounds_leach = multiprocessing.Array('i', testRange)
@@ -83,8 +83,7 @@ if __name__ == '__main__':
             thr_bleach.join()
             thr_leach.join()
         
-        
-        fileOpenName = 'Results_ObleachVSleach_sprd_0'+str(sprd)[-1]+ '.txt'
+        fileOpenName = 'Results_ObleachVSleach_sprd_0'+str(round(sprd,1))[-1]+ '.txt'
         with open(fileOpenName, 'w', newline='') as f:
             results = csv.writer(f)
             
