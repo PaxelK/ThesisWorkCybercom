@@ -109,12 +109,12 @@ if __name__ == "__main__":
 
     times = 1
 
-    for tests in range(100):
+    for tests in range(20):
         nodePlacementGeneration.run()  # Generate new node placement and save in csv file
         EnvTest.run()  # Run LEACH comparison
 
         # Run WSN env with plotting after training
-        agent.load("./save/wsn-dqn.h5")  # Load weights from file
+        agent.load("./save/wsn-dqn-new.h5")  # Load weights from file
         avrRnd = []
 
         with open('nodePlacement.csv') as nodePlacement_file:  # Load the new node placement
@@ -144,8 +144,9 @@ if __name__ == "__main__":
         batch_size = 32
         rnd = 0
         state = env.reset()  # Reset env to a random state
-        #env.EE.sink.xPos = int(xSize/2)
-        #env.EE.sink.yPos = int(ySize/2)
+        env.EE.sink.xPos = int(xSize / 2)
+        env.EE.sink.yPos = int(ySize / 2)
+
         # Format state such that it can be used for training
         for i in range(2, numNodes + 2):
             state[i] = state[i][1]

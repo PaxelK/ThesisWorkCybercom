@@ -9,7 +9,6 @@ from plotEnv import *
 
 sys.path.append("../RL")  # Adds higher directory to python modules path.
 
-
 def run():
     EE = EnvironmentEngine()  # Initiate environment
 
@@ -204,3 +203,5 @@ nodeList[4].connect(nodeList[6])
 nodeList[4].sendMsg(sink)
 print(nodeList[4].actionMsg)
 '''
+
+run()

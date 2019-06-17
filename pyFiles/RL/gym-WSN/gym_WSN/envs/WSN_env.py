@@ -208,14 +208,14 @@ class WSN(gym.Env):
             dist = self.EE.nodes[i].getDistance(self.EE.sink)
             pacRate = self.EE.nodes[i].PA
             if dist >= max(xSize, ySize) / 2:
-                reward -= 10000 * dist
-                reward += 0.0001 * pacRate
+                reward -= 0.3 * dist
+                reward += 1 * pacRate
             elif dist < max(xSize, ySize) / 2 and pacRate >= maxPR / 2:
-                reward -= 2500 * dist
-                reward += 0.0005 * pacRate
+                reward -= 1.7 * dist
+                reward += 5 * pacRate
             elif dist < max(xSize, ySize) / 2 and pacRate < maxPR / 2:
-                reward -= 6000 * dist
-                reward += 0.0003 * pacRate
+                reward -= 1 * dist
+                reward += 3 * pacRate
             # reward -= (self.EE.nodes[i].getDistance(self.EE.sink) * 400) # * 0.05)  # Reward for distance to each CH
             # reward += self.EE.nodes[i].energy * 0.05
             # reward += self.EE.nodes[i].PA * 0.01
