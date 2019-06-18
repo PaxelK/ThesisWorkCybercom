@@ -74,7 +74,7 @@ for test in range(1):
             EE_MPC.newCycle = True
             for i in range(time_segments): #time_segments
                 print('TIME SEGMENT: {0}'.format(i))
-                if i==9:
+                if i==time_segments-1:
                     for n in EE_MPC.nonCHds:
                         if n.alive:
                             outcome = n.sendMsg(EE_MPC.sink)
