@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="247d8e49-01be-4595-956d-f36ae7039341" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/pyFiles/RL/LEACHtest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyFiles/RL/nodePlacement.csv" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/nodePlacement.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyFiles/RL/runRL.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/runRL.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyFiles/RL/setParamsRL.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/setParamsRL.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyFiles/RL/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyFiles/Tests/EnvTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/Tests/EnvTest.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,11 +18,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyFiles/RL/LEACHtest.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="155">
+              <caret line="85" column="9" selection-start-line="85" selection-start-column="9" selection-end-line="85" selection-end-column="9" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pyFiles/RL/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="1" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
+            <state relative-caret-position="-1895">
+              <caret line="21" column="13" lean-forward="true" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
               <folding>
                 <element signature="e#24#37#0" expanded="true" />
               </folding>
@@ -27,10 +43,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pyFiles/RL/setParamsRL.py">
+        <entry file="file://$PROJECT_DIR$/pyFiles/setParams.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="112">
-              <caret line="20" column="13" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="13" />
+            <state relative-caret-position="465">
+              <caret line="31" column="10" selection-start-line="31" selection-start-column="10" selection-end-line="31" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -38,8 +54,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pyFiles/RL/runRL.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="15" column="1" selection-start-line="15" selection-start-column="1" selection-end-line="15" selection-end-column="1" />
+            <state relative-caret-position="56">
+              <caret line="71" column="29" lean-forward="true" selection-start-line="71" selection-end-line="72" />
               <folding>
                 <element signature="e#24#37#0" expanded="true" />
               </folding>
@@ -47,11 +63,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3900">
-              <caret line="268" column="41" selection-start-line="268" selection-start-column="41" selection-end-line="268" selection-end-column="41" />
+            <state relative-caret-position="14">
+              <caret line="243" column="50" selection-start-line="243" selection-start-column="50" selection-end-line="243" selection-end-column="50" />
             </state>
           </provider>
         </entry>
@@ -68,6 +84,26 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>episod</find>
+      <find>epis</find>
+      <find>epi</find>
+      <find>setparam</find>
+      <find>load</find>
+      <find>episode</find>
+      <find>episo</find>
+      <find>commun</find>
+      <find>communi</find>
+      <find>timeSegTemp</find>
+      <find>timesegt</find>
+      <find>envte</find>
+      <find>rndco</find>
+      <find>test</find>
+      <find>hej</find>
+      <find>10</find>
+      <find>self.time</find>
+      <find>temp</find>
+      <find>timese</find>
+      <find>csv</find>
+      <find>sav</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -82,16 +118,22 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/pyFiles/RL/save/wsn-dqn.h5" />
-        <option value="$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py" />
-        <option value="$PROJECT_DIR$/pyFiles/RL/runRL.py" />
         <option value="$PROJECT_DIR$/pyFiles/RL/setParamsRL.py" />
+        <option value="$PROJECT_DIR$/pyFiles/setParams.py" />
+        <option value="$PROJECT_DIR$/pyFiles/Node.py" />
+        <option value="$PROJECT_DIR$/pyFiles/Tests/EnvTest.py" />
+        <option value="$PROJECT_DIR$/pyFiles/RL/runRL.py" />
+        <option value="$PROJECT_DIR$/pyFiles/RL/LEACHtest.py" />
         <option value="$PROJECT_DIR$/pyFiles/RL/test.py" />
+        <option value="$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-11" />
+    <option name="y" value="23" />
     <option name="width" value="1440" />
-    <option name="height" value="900" />
+    <option name="height" value="877" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -116,6 +158,37 @@
               <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
               <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
               <item name="RL" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ThesisWorkCybercom" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
+              <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
+              <item name="RL" type="462c0819:PsiDirectoryNode" />
+              <item name="gym-WSN" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ThesisWorkCybercom" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
+              <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
+              <item name="RL" type="462c0819:PsiDirectoryNode" />
+              <item name="gym-WSN" type="462c0819:PsiDirectoryNode" />
+              <item name="gym_WSN" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ThesisWorkCybercom" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
+              <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
+              <item name="RL" type="462c0819:PsiDirectoryNode" />
+              <item name="gym-WSN" type="462c0819:PsiDirectoryNode" />
+              <item name="gym_WSN" type="462c0819:PsiDirectoryNode" />
+              <item name="envs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ThesisWorkCybercom" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ThesisWorkCybercom" type="462c0819:PsiDirectoryNode" />
+              <item name="pyFiles" type="462c0819:PsiDirectoryNode" />
+              <item name="RL" type="462c0819:PsiDirectoryNode" />
+              <item name="Results" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ThesisWorkCybercom" type="b2602c69:ProjectViewProjectNode" />
@@ -157,6 +230,48 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pyFiles/RL/DQN.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="EnvTest" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="ThesisWorkCybercom" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pyFiles/Tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pyFiles/Tests/EnvTest.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="nodePlacementGeneration" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="ThesisWorkCybercom" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pyFiles/RL" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pyFiles/RL/nodePlacementGeneration.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -211,6 +326,8 @@
       <list>
         <item itemvalue="Python.test" />
         <item itemvalue="Python.runRL" />
+        <item itemvalue="Python.EnvTest" />
+        <item itemvalue="Python.nodePlacementGeneration" />
         <item itemvalue="Python.DQN" />
       </list>
     </recent_temporary>
@@ -244,23 +361,36 @@
       <option name="presentableId" value="LOCAL−00003" />
       <updated>1559986168801</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL−00004" summary="Fixed small bugs">
+      <created>1559986428872</created>
+      <option name="number" value="LOCAL−00004" />
+      <option name="presentableId" value="LOCAL−00004" />
+      <updated>1559986428872</updated>
+    </task>
+    <task id="LOCAL−00005" summary="Fixed small bugs">
+      <created>1559986544558</created>
+      <option name="number" value="LOCAL−00005" />
+      <option name="presentableId" value="LOCAL−00005" />
+      <updated>1559986544558</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16913319" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.16842847" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49682876" weight="0.32866243" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49682876" visible="true" weight="0.32866243" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info active="true" anchor="bottom" id="Version Control" order="7" visible="true" weight="0.31082803" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.31082803" />
       <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49612403" weight="0.31082803" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50317127" side_tool="true" weight="0.32866243" />
       <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.4989429" weight="0.3299363" />
@@ -268,15 +398,71 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
+    <layout-to-restore>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16842847" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49682876" visible="true" weight="0.32866243" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.31082803" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49612403" weight="0.31082803" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50317127" side_tool="true" weight="0.32866243" />
+      <window_info anchor="bottom" id="Python Console" order="10" sideWeight="0.4989429" weight="0.3299363" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout-to-restore>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Fixed small bugs" />
     <option name="LAST_COMMIT_MESSAGE" value="Fixed small bugs" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/pyFiles/RL/DQN.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/keras/backend/tensorflow_backend.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -315,44 +501,400 @@
     <entry file="file://$PROJECT_DIR$/pyFiles/RL/save/wsn-dqn.h5">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/pyFiles/setParams.py">
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/setParamsRL.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        <state relative-caret-position="300">
+          <caret line="20" column="13" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="13" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py">
+    <entry file="file://$PROJECT_DIR$/pyFiles/Sink.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/MPC/SharedEnvTestMax.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3900">
-          <caret line="268" column="41" selection-start-line="268" selection-start-column="41" selection-end-line="268" selection-end-column="41" />
+        <state relative-caret-position="155">
+          <caret line="93" column="27" selection-start-line="93" selection-start-column="21" selection-end-line="93" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/MPC/SharedEnvTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="362">
+          <caret line="87" column="28" selection-start-line="87" selection-start-column="21" selection-end-line="87" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/Node.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="71" column="11" selection-start-line="71" selection-start-column="11" selection-end-line="71" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/EnvironmentEngine.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="204" column="26" lean-forward="true" selection-start-line="204" selection-start-column="26" selection-end-line="204" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/Tests/EnvTest.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret column="134" selection-end-column="134" />
+          <caret line="1" column="134" selection-start-line="1" selection-end-line="1" selection-end-column="134" />
+          <caret line="2" column="134" selection-start-line="2" selection-end-line="2" selection-end-column="134" />
+          <caret line="3" column="134" selection-start-line="3" selection-end-line="3" selection-end-column="134" />
+          <caret line="4" column="134" selection-start-line="4" selection-end-line="4" selection-end-column="134" />
+          <caret line="5" column="134" selection-start-line="5" selection-end-line="5" selection-end-column="134" />
+          <caret line="6" column="134" selection-start-line="6" selection-end-line="6" selection-end-column="134" />
+          <caret line="7" column="134" selection-start-line="7" selection-end-line="7" selection-end-column="134" />
+          <caret line="8" column="134" selection-start-line="8" selection-end-line="8" selection-end-column="134" />
+          <caret line="9" column="134" selection-start-line="9" selection-end-line="9" selection-end-column="134" />
+          <caret line="10" column="134" selection-start-line="10" selection-end-line="10" selection-end-column="134" />
+          <caret line="11" column="134" selection-start-line="11" selection-end-line="11" selection-end-column="134" />
+          <caret line="12" column="134" selection-start-line="12" selection-end-line="12" selection-end-column="134" />
+          <caret line="13" column="134" selection-start-line="13" selection-end-line="13" selection-end-column="134" />
+          <caret line="14" column="134" selection-start-line="14" selection-end-line="14" selection-end-column="134" />
+          <caret line="15" column="134" selection-start-line="15" selection-end-line="15" selection-end-column="134" />
+          <caret line="16" column="134" selection-start-line="16" selection-end-line="16" selection-end-column="134" />
+          <caret line="17" column="134" selection-start-line="17" selection-end-line="17" selection-end-column="134" />
+          <caret line="18" column="134" selection-start-line="18" selection-end-line="18" selection-end-column="134" />
+          <caret line="19" column="134" selection-start-line="19" selection-end-line="19" selection-end-column="134" />
+          <caret line="20" column="134" selection-start-line="20" selection-end-line="20" selection-end-column="134" />
+          <caret line="21" column="134" selection-start-line="21" selection-end-line="21" selection-end-column="134" />
+          <caret line="22" column="134" selection-start-line="22" selection-end-line="22" selection-end-column="134" />
+          <caret line="23" column="134" selection-start-line="23" selection-end-line="23" selection-end-column="134" />
+          <caret line="24" column="134" selection-start-line="24" selection-end-line="24" selection-end-column="134" />
+          <caret line="25" column="134" selection-start-line="25" selection-end-line="25" selection-end-column="134" />
+          <caret line="26" column="134" selection-start-line="26" selection-end-line="26" selection-end-column="134" />
+          <caret line="27" column="134" selection-start-line="27" selection-end-line="27" selection-end-column="134" />
+          <caret line="28" column="134" selection-start-line="28" selection-end-line="28" selection-end-column="134" />
+          <caret line="29" column="134" selection-start-line="29" selection-end-line="29" selection-end-column="134" />
+          <caret line="30" column="134" selection-start-line="30" selection-end-line="30" selection-end-column="134" />
+          <caret line="31" column="134" selection-start-line="31" selection-end-line="31" selection-end-column="134" />
+          <caret line="32" column="134" selection-start-line="32" selection-end-line="32" selection-end-column="134" />
+          <caret line="33" column="134" selection-start-line="33" selection-end-line="33" selection-end-column="134" />
+          <caret line="34" column="134" selection-start-line="34" selection-end-line="34" selection-end-column="134" />
+          <caret line="35" column="134" selection-start-line="35" selection-end-line="35" selection-end-column="134" />
+          <caret line="36" column="134" selection-start-line="36" selection-end-line="36" selection-end-column="134" />
+          <caret line="37" column="134" selection-start-line="37" selection-end-line="37" selection-end-column="134" />
+          <caret line="38" column="134" selection-start-line="38" selection-end-line="38" selection-end-column="134" />
+          <caret line="39" column="134" selection-start-line="39" selection-end-line="39" selection-end-column="134" />
+          <caret line="40" column="134" selection-start-line="40" selection-end-line="40" selection-end-column="134" />
+          <caret line="41" column="134" selection-start-line="41" selection-end-line="41" selection-end-column="134" />
+          <caret line="42" column="134" selection-start-line="42" selection-end-line="42" selection-end-column="134" />
+          <caret line="43" column="134" selection-start-line="43" selection-end-line="43" selection-end-column="134" />
+          <caret line="44" column="134" selection-start-line="44" selection-end-line="44" selection-end-column="134" />
+          <caret line="45" column="134" selection-start-line="45" selection-end-line="45" selection-end-column="134" />
+          <caret line="46" column="134" selection-start-line="46" selection-end-line="46" selection-end-column="134" />
+          <caret line="47" column="134" selection-start-line="47" selection-end-line="47" selection-end-column="134" />
+          <caret line="48" column="134" selection-start-line="48" selection-end-line="48" selection-end-column="134" />
+          <caret line="49" column="134" selection-start-line="49" selection-end-line="49" selection-end-column="134" />
+          <caret line="50" column="134" selection-start-line="50" selection-end-line="50" selection-end-column="134" />
+          <caret line="51" column="134" selection-start-line="51" selection-end-line="51" selection-end-column="134" />
+          <caret line="52" column="134" selection-start-line="52" selection-end-line="52" selection-end-column="134" />
+          <caret line="53" column="134" selection-start-line="53" selection-end-line="53" selection-end-column="134" />
+          <caret line="54" column="134" selection-start-line="54" selection-end-line="54" selection-end-column="134" />
+          <caret line="55" column="134" selection-start-line="55" selection-end-line="55" selection-end-column="134" />
+          <caret line="56" column="134" selection-start-line="56" selection-end-line="56" selection-end-column="134" />
+          <caret line="57" column="134" selection-start-line="57" selection-end-line="57" selection-end-column="134" />
+          <caret line="58" column="134" selection-start-line="58" selection-end-line="58" selection-end-column="134" />
+          <caret line="59" column="134" selection-start-line="59" selection-end-line="59" selection-end-column="134" />
+          <caret line="60" column="134" selection-start-line="60" selection-end-line="60" selection-end-column="134" />
+          <caret line="61" column="134" selection-start-line="61" selection-end-line="61" selection-end-column="134" />
+          <caret line="62" column="134" selection-start-line="62" selection-end-line="62" selection-end-column="134" />
+          <caret line="63" column="134" selection-start-line="63" selection-end-line="63" selection-end-column="134" />
+          <caret line="64" column="134" selection-start-line="64" selection-end-line="64" selection-end-column="134" />
+          <caret line="65" column="134" selection-start-line="65" selection-end-line="65" selection-end-column="134" />
+          <caret line="66" column="134" selection-start-line="66" selection-end-line="66" selection-end-column="134" />
+          <caret line="67" column="134" selection-start-line="67" selection-end-line="67" selection-end-column="134" />
+          <caret line="68" column="134" selection-start-line="68" selection-end-line="68" selection-end-column="134" />
+          <caret line="69" column="134" selection-start-line="69" selection-end-line="69" selection-end-column="134" />
+          <caret line="70" column="134" selection-start-line="70" selection-end-line="70" selection-end-column="134" />
+          <caret line="71" column="134" selection-start-line="71" selection-end-line="71" selection-end-column="134" />
+          <caret line="72" column="134" selection-start-line="72" selection-end-line="72" selection-end-column="134" />
+          <caret line="73" column="134" selection-start-line="73" selection-end-line="73" selection-end-column="134" />
+          <caret line="74" column="134" selection-start-line="74" selection-end-line="74" selection-end-column="134" />
+          <caret line="75" column="134" selection-start-line="75" selection-end-line="75" selection-end-column="134" />
+          <caret line="76" column="134" selection-start-line="76" selection-end-line="76" selection-end-column="134" />
+          <caret line="77" column="134" selection-start-line="77" selection-end-line="77" selection-end-column="134" />
+          <caret line="78" column="134" selection-start-line="78" selection-end-line="78" selection-end-column="134" />
+          <caret line="79" column="134" selection-start-line="79" selection-end-line="79" selection-end-column="134" />
+          <caret line="80" column="134" selection-start-line="80" selection-end-line="80" selection-end-column="134" />
+          <caret line="81" column="134" selection-start-line="81" selection-end-line="81" selection-end-column="134" />
+          <caret line="82" column="134" selection-start-line="82" selection-end-line="82" selection-end-column="134" />
+          <caret line="83" column="134" selection-start-line="83" selection-end-line="83" selection-end-column="134" />
+          <caret line="84" column="134" selection-start-line="84" selection-end-line="84" selection-end-column="134" />
+          <caret line="85" column="134" selection-start-line="85" selection-end-line="85" selection-end-column="134" />
+          <caret line="86" column="134" selection-start-line="86" selection-end-line="86" selection-end-column="134" />
+          <caret line="87" column="134" selection-start-line="87" selection-end-line="87" selection-end-column="134" />
+          <caret line="88" column="134" selection-start-line="88" selection-end-line="88" selection-end-column="134" />
+          <caret line="89" column="134" selection-start-line="89" selection-end-line="89" selection-end-column="134" />
+          <caret line="90" column="134" selection-start-line="90" selection-end-line="90" selection-end-column="134" />
+          <caret line="91" column="134" selection-start-line="91" selection-end-line="91" selection-end-column="134" />
+          <caret line="92" column="134" selection-start-line="92" selection-end-line="92" selection-end-column="134" />
+          <caret line="93" column="134" selection-start-line="93" selection-end-line="93" selection-end-column="134" />
+          <caret line="94" column="134" selection-start-line="94" selection-end-line="94" selection-end-column="134" />
+          <caret line="95" column="134" selection-start-line="95" selection-end-line="95" selection-end-column="134" />
+          <caret line="96" column="134" selection-start-line="96" selection-end-line="96" selection-end-column="134" />
+          <caret line="97" column="134" selection-start-line="97" selection-end-line="97" selection-end-column="134" />
+          <caret line="98" column="134" selection-start-line="98" selection-end-line="98" selection-end-column="134" />
+          <caret line="99" column="134" selection-start-line="99" selection-end-line="99" selection-end-column="134" />
+          <caret line="100" column="134" selection-start-line="100" selection-end-line="100" selection-end-column="134" />
+          <caret line="101" column="134" selection-start-line="101" selection-end-line="101" selection-end-column="134" />
+          <caret line="102" column="134" selection-start-line="102" selection-end-line="102" selection-end-column="134" />
+          <caret line="103" column="134" selection-start-line="103" selection-end-line="103" selection-end-column="134" />
+          <caret line="104" column="134" selection-start-line="104" selection-end-line="104" selection-end-column="134" />
+          <caret line="105" column="134" selection-start-line="105" selection-end-line="105" selection-end-column="134" />
+          <caret line="106" column="134" selection-start-line="106" selection-end-line="106" selection-end-column="134" />
+          <caret line="107" column="134" selection-start-line="107" selection-end-line="107" selection-end-column="134" />
+          <caret line="108" column="134" selection-start-line="108" selection-end-line="108" selection-end-column="134" />
+          <caret line="109" column="134" selection-start-line="109" selection-end-line="109" selection-end-column="134" />
+          <caret line="110" column="134" selection-start-line="110" selection-end-line="110" selection-end-column="134" />
+          <caret line="111" column="134" selection-start-line="111" selection-end-line="111" selection-end-column="134" />
+          <caret line="112" column="134" selection-start-line="112" selection-end-line="112" selection-end-column="134" />
+          <caret line="113" column="134" selection-start-line="113" selection-end-line="113" selection-end-column="134" />
+          <caret line="114" column="134" selection-start-line="114" selection-end-line="114" selection-end-column="134" />
+          <caret line="115" column="134" selection-start-line="115" selection-end-line="115" selection-end-column="134" />
+          <caret line="116" column="134" selection-start-line="116" selection-end-line="116" selection-end-column="134" />
+          <caret line="117" column="134" selection-start-line="117" selection-end-line="117" selection-end-column="134" />
+          <caret line="118" column="134" selection-start-line="118" selection-end-line="118" selection-end-column="134" />
+          <caret line="119" column="134" selection-start-line="119" selection-end-line="119" selection-end-column="134" />
+          <caret line="120" column="134" selection-start-line="120" selection-end-line="120" selection-end-column="134" />
+          <caret line="121" column="134" selection-start-line="121" selection-end-line="121" selection-end-column="134" />
+          <caret line="122" column="134" selection-start-line="122" selection-end-line="122" selection-end-column="134" />
+          <caret line="123" column="134" selection-start-line="123" selection-end-line="123" selection-end-column="134" />
+          <caret line="124" column="134" selection-start-line="124" selection-end-line="124" selection-end-column="134" />
+          <caret line="125" column="134" selection-start-line="125" selection-end-line="125" selection-end-column="134" />
+          <caret line="126" column="134" selection-start-line="126" selection-end-line="126" selection-end-column="134" />
+          <caret line="127" column="134" selection-start-line="127" selection-end-line="127" selection-end-column="134" />
+          <caret line="128" column="134" selection-start-line="128" selection-end-line="128" selection-end-column="134" />
+          <caret line="129" column="134" selection-start-line="129" selection-end-line="129" selection-end-column="134" />
+          <caret line="130" column="134" selection-start-line="130" selection-end-line="130" selection-end-column="134" />
+          <caret line="131" column="134" selection-start-line="131" selection-end-line="131" selection-end-column="134" />
+          <caret line="132" column="134" selection-start-line="132" selection-end-line="132" selection-end-column="134" />
+          <caret line="133" column="134" selection-start-line="133" selection-end-line="133" selection-end-column="134" />
+          <caret line="134" column="134" selection-start-line="134" selection-end-line="134" selection-end-column="134" />
+          <caret line="135" column="134" selection-start-line="135" selection-end-line="135" selection-end-column="134" />
+          <caret line="136" column="134" selection-start-line="136" selection-end-line="136" selection-end-column="134" />
+          <caret line="137" column="134" selection-start-line="137" selection-end-line="137" selection-end-column="134" />
+          <caret line="138" column="134" selection-start-line="138" selection-end-line="138" selection-end-column="134" />
+          <caret line="139" column="134" selection-start-line="139" selection-end-line="139" selection-end-column="134" />
+          <caret line="140" column="134" selection-start-line="140" selection-end-line="140" selection-end-column="134" />
+          <caret line="141" column="134" selection-start-line="141" selection-end-line="141" selection-end-column="134" />
+          <caret line="142" column="134" selection-start-line="142" selection-end-line="142" selection-end-column="134" />
+          <caret line="143" column="134" selection-start-line="143" selection-end-line="143" selection-end-column="134" />
+          <caret line="144" column="134" selection-start-line="144" selection-end-line="144" selection-end-column="134" />
+          <caret line="145" column="134" selection-start-line="145" selection-end-line="145" selection-end-column="134" />
+          <caret line="146" column="134" selection-start-line="146" selection-end-line="146" selection-end-column="134" />
+          <caret line="147" column="134" selection-start-line="147" selection-end-line="147" selection-end-column="134" />
+          <caret line="148" column="134" selection-start-line="148" selection-end-line="148" selection-end-column="134" />
+          <caret line="149" column="134" selection-start-line="149" selection-end-line="149" selection-end-column="134" />
+          <caret line="150" column="134" selection-start-line="150" selection-end-line="150" selection-end-column="134" />
+          <caret line="151" column="134" selection-start-line="151" selection-end-line="151" selection-end-column="134" />
+          <caret line="152" column="134" selection-start-line="152" selection-end-line="152" selection-end-column="134" />
+          <caret line="153" column="134" selection-start-line="153" selection-end-line="153" selection-end-column="134" />
+          <caret line="154" column="134" selection-start-line="154" selection-end-line="154" selection-end-column="134" />
+          <caret line="155" column="134" selection-start-line="155" selection-end-line="155" selection-end-column="134" />
+          <caret line="156" column="134" selection-start-line="156" selection-end-line="156" selection-end-column="134" />
+          <caret line="157" column="134" selection-start-line="157" selection-end-line="157" selection-end-column="134" />
+          <caret line="158" column="134" selection-start-line="158" selection-end-line="158" selection-end-column="134" />
+          <caret line="159" column="134" selection-start-line="159" selection-end-line="159" selection-end-column="134" />
+          <caret line="160" column="134" selection-start-line="160" selection-end-line="160" selection-end-column="134" />
+          <caret line="161" column="134" selection-start-line="161" selection-end-line="161" selection-end-column="134" />
+          <caret line="162" column="134" selection-start-line="162" selection-end-line="162" selection-end-column="134" />
+          <caret line="163" column="134" selection-start-line="163" selection-end-line="163" selection-end-column="134" />
+          <caret line="164" column="134" selection-start-line="164" selection-end-line="164" selection-end-column="134" />
+          <caret line="165" column="134" selection-start-line="165" selection-end-line="165" selection-end-column="134" />
+          <caret line="166" column="134" selection-start-line="166" selection-end-line="166" selection-end-column="134" />
+          <caret line="167" column="134" selection-start-line="167" selection-end-line="167" selection-end-column="134" />
+          <caret line="168" column="134" selection-start-line="168" selection-end-line="168" selection-end-column="134" />
+          <caret line="169" column="134" selection-start-line="169" selection-end-line="169" selection-end-column="134" />
+          <caret line="170" column="134" selection-start-line="170" selection-end-line="170" selection-end-column="134" />
+          <caret line="171" column="134" selection-start-line="171" selection-end-line="171" selection-end-column="134" />
+          <caret line="172" column="134" selection-start-line="172" selection-end-line="172" selection-end-column="134" />
+          <caret line="173" column="134" selection-start-line="173" selection-end-line="173" selection-end-column="134" />
+          <caret line="174" column="134" selection-start-line="174" selection-end-line="174" selection-end-column="134" />
+          <caret line="175" column="134" selection-start-line="175" selection-end-line="175" selection-end-column="134" />
+          <caret line="176" column="134" selection-start-line="176" selection-end-line="176" selection-end-column="134" />
+          <caret line="177" column="134" selection-start-line="177" selection-end-line="177" selection-end-column="134" />
+          <caret line="178" column="134" selection-start-line="178" selection-end-line="178" selection-end-column="134" />
+          <caret line="179" column="134" selection-start-line="179" selection-end-line="179" selection-end-column="134" />
+          <caret line="180" column="134" selection-start-line="180" selection-end-line="180" selection-end-column="134" />
+          <caret line="181" column="134" selection-start-line="181" selection-end-line="181" selection-end-column="134" />
+          <caret line="182" column="134" selection-start-line="182" selection-end-line="182" selection-end-column="134" />
+          <caret line="183" column="134" selection-start-line="183" selection-end-line="183" selection-end-column="134" />
+          <caret line="184" column="134" selection-start-line="184" selection-end-line="184" selection-end-column="134" />
+          <caret line="185" column="134" selection-start-line="185" selection-end-line="185" selection-end-column="134" />
+          <caret line="186" column="134" selection-start-line="186" selection-end-line="186" selection-end-column="134" />
+          <caret line="187" column="134" selection-start-line="187" selection-end-line="187" selection-end-column="134" />
+          <caret line="188" column="134" selection-start-line="188" selection-end-line="188" selection-end-column="134" />
+          <caret line="189" column="134" selection-start-line="189" selection-end-line="189" selection-end-column="134" />
+          <caret line="190" column="134" selection-start-line="190" selection-end-line="190" selection-end-column="134" />
+          <caret line="191" column="134" selection-start-line="191" selection-end-line="191" selection-end-column="134" />
+          <caret line="192" column="134" selection-start-line="192" selection-end-line="192" selection-end-column="134" />
+          <caret line="193" column="134" selection-start-line="193" selection-end-line="193" selection-end-column="134" />
+          <caret line="194" column="134" selection-start-line="194" selection-end-line="194" selection-end-column="134" />
+          <caret line="195" column="134" selection-start-line="195" selection-end-line="195" selection-end-column="134" />
+          <caret line="196" column="134" selection-start-line="196" selection-end-line="196" selection-end-column="134" />
+          <caret line="197" column="134" selection-start-line="197" selection-end-line="197" selection-end-column="134" />
+          <caret line="198" column="134" selection-start-line="198" selection-end-line="198" selection-end-column="134" />
+          <caret line="199" column="134" selection-start-line="199" selection-end-line="199" selection-end-column="134" />
+          <caret line="200" column="134" selection-start-line="200" selection-end-line="200" selection-end-column="134" />
+          <caret line="201" column="134" selection-start-line="201" selection-end-line="201" selection-end-column="134" />
+          <caret line="202" column="134" selection-start-line="202" selection-end-line="202" selection-end-column="134" />
+          <caret line="203" column="134" selection-start-line="203" selection-end-line="203" selection-end-column="134" />
+          <caret line="204" column="134" selection-start-line="204" selection-end-line="204" selection-end-column="134" />
+          <caret line="205" column="134" selection-start-line="205" selection-end-line="205" selection-end-column="134" />
+          <caret line="206" column="134" selection-start-line="206" selection-end-line="206" selection-end-column="134" />
+          <caret line="207" column="134" selection-start-line="207" selection-end-line="207" selection-end-column="134" />
+          <caret line="208" column="134" selection-start-line="208" selection-end-line="208" selection-end-column="134" />
+          <caret line="209" column="134" selection-start-line="209" selection-end-line="209" selection-end-column="134" />
+          <caret line="210" column="134" selection-start-line="210" selection-end-line="210" selection-end-column="134" />
+          <caret line="211" column="134" selection-start-line="211" selection-end-line="211" selection-end-column="134" />
+          <caret line="212" column="134" selection-start-line="212" selection-end-line="212" selection-end-column="134" />
+          <caret line="213" column="134" selection-start-line="213" selection-end-line="213" selection-end-column="134" />
+          <caret line="214" column="134" selection-start-line="214" selection-end-line="214" selection-end-column="134" />
+          <caret line="215" column="134" selection-start-line="215" selection-end-line="215" selection-end-column="134" />
+          <caret line="216" column="134" selection-start-line="216" selection-end-line="216" selection-end-column="134" />
+          <caret line="217" column="134" selection-start-line="217" selection-end-line="217" selection-end-column="134" />
+          <caret line="218" column="134" selection-start-line="218" selection-end-line="218" selection-end-column="134" />
+          <caret line="219" column="134" selection-start-line="219" selection-end-line="219" selection-end-column="134" />
+          <caret line="220" column="134" selection-start-line="220" selection-end-line="220" selection-end-column="134" />
+          <caret line="221" column="134" selection-start-line="221" selection-end-line="221" selection-end-column="134" />
+          <caret line="222" column="134" selection-start-line="222" selection-end-line="222" selection-end-column="134" />
+          <caret line="223" column="134" selection-start-line="223" selection-end-line="223" selection-end-column="134" />
+          <caret line="224" column="134" selection-start-line="224" selection-end-line="224" selection-end-column="134" />
+          <caret line="225" column="134" selection-start-line="225" selection-end-line="225" selection-end-column="134" />
+          <caret line="226" column="134" selection-start-line="226" selection-end-line="226" selection-end-column="134" />
+          <caret line="227" column="134" selection-start-line="227" selection-end-line="227" selection-end-column="134" />
+          <caret line="228" column="134" selection-start-line="228" selection-end-line="228" selection-end-column="134" />
+          <caret line="229" column="134" selection-start-line="229" selection-end-line="229" selection-end-column="134" />
+          <caret line="230" column="134" selection-start-line="230" selection-end-line="230" selection-end-column="134" />
+          <caret line="231" column="134" selection-start-line="231" selection-end-line="231" selection-end-column="134" />
+          <caret line="232" column="134" selection-start-line="232" selection-end-line="232" selection-end-column="134" />
+          <caret line="233" column="134" selection-start-line="233" selection-end-line="233" selection-end-column="134" />
+          <caret line="234" column="134" selection-start-line="234" selection-end-line="234" selection-end-column="134" />
+          <caret line="235" column="134" selection-start-line="235" selection-end-line="235" selection-end-column="134" />
+          <caret line="236" column="134" selection-start-line="236" selection-end-line="236" selection-end-column="134" />
+          <caret line="237" column="134" selection-start-line="237" selection-end-line="237" selection-end-column="134" />
+          <caret line="238" column="134" selection-start-line="238" selection-end-line="238" selection-end-column="134" />
+          <caret line="239" column="134" selection-start-line="239" selection-end-line="239" selection-end-column="134" />
+          <caret line="240" column="134" selection-start-line="240" selection-end-line="240" selection-end-column="134" />
+          <caret line="241" column="134" selection-start-line="241" selection-end-line="241" selection-end-column="134" />
+          <caret line="242" column="134" selection-start-line="242" selection-end-line="242" selection-end-column="134" />
+          <caret line="243" column="134" selection-start-line="243" selection-end-line="243" selection-end-column="134" />
+          <caret line="244" column="134" selection-start-line="244" selection-end-line="244" selection-end-column="134" />
+          <caret line="245" column="134" selection-start-line="245" selection-end-line="245" selection-end-column="134" />
+          <caret line="246" column="134" selection-start-line="246" selection-end-line="246" selection-end-column="134" />
+          <caret line="247" column="134" selection-start-line="247" selection-end-line="247" selection-end-column="134" />
+          <caret line="248" column="134" selection-start-line="248" selection-end-line="248" selection-end-column="134" />
+          <caret line="249" column="134" selection-start-line="249" selection-end-line="249" selection-end-column="134" />
+          <caret line="250" column="134" selection-start-line="250" selection-end-line="250" selection-end-column="134" />
+          <caret line="251" column="134" selection-start-line="251" selection-end-line="251" selection-end-column="134" />
+          <caret line="252" column="134" selection-start-line="252" selection-end-line="252" selection-end-column="134" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/WSNRL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/LEACHresults.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/nodePlacementGeneration.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="55" selection-start-line="14" selection-start-column="55" selection-end-line="14" selection-end-column="55" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/nodePlacement.csv">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/qVal.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/DQN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-867" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/Results/DQNnewweights.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="184" selection-start-line="1" selection-start-column="182" selection-end-line="1" selection-end-column="184" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/Results/DQNoldweights.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="6" lean-forward="true" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/setParams.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="31" column="10" selection-start-line="31" selection-start-column="10" selection-end-line="31" selection-end-column="10" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pyFiles/RL/runRL.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="1" selection-start-line="15" selection-start-column="1" selection-end-line="15" selection-end-column="1" />
+        <state relative-caret-position="56">
+          <caret line="71" column="29" lean-forward="true" selection-start-line="71" selection-end-line="72" />
           <folding>
             <element signature="e#24#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pyFiles/RL/setParamsRL.py">
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/LEACHtest.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="20" column="13" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="13" />
+        <state relative-caret-position="155">
+          <caret line="85" column="9" selection-start-line="85" selection-start-column="9" selection-end-line="85" selection-end-column="9" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pyFiles/RL/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="1" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
+        <state relative-caret-position="-1895">
+          <caret line="21" column="13" lean-forward="true" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
           <folding>
             <element signature="e#24#37#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="14">
+          <caret line="243" column="50" selection-start-line="243" selection-start-column="50" selection-end-line="243" selection-end-column="50" />
         </state>
       </provider>
     </entry>

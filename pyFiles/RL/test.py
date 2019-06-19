@@ -19,7 +19,7 @@ from EnvironmentEngine import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 200
+EPISODES = 20
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -69,6 +69,8 @@ class DQNAgent:
 
     def load(self, name):
         self.model.load_weights(name)
+        self.model.compile(loss='mae', optimizer=Adam(lr=self.learning_rate))  # Compile NN
+
 
     def save(self, name):
         open(name, 'w').close() # Clear file contents before saving
@@ -82,7 +84,6 @@ if __name__ == "__main__":
     action_size = env.action_space.n  # Get amount of actions
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
     #agent.load("./save/wsn-dqn.h5")
-    #agent.model.compile(loss='mae', optimizer=Adam(lr=agent.learning_rate))
 
     '''
     with open('nodePlacement.csv') as nodePlacement_file:
@@ -137,22 +138,22 @@ if __name__ == "__main__":
             state[i] = state[i][1]
         state = np.reshape(state, [1, state_size])  # Reshape for NN
 
-        while not done:
+        while not done: # While-loop trains one episode
             rnd += 1
             action = agent.act(state)
-            next_state_temp, reward, done, _ = env.step(action)
+            next_state_temp, reward, done, _ = env.step(action) # Take one step through WSN env
 
             next_state = [next_state_temp[0], next_state_temp[1]]
             for i in range(numNodes):
-                next_state.append(next_state_temp[2][i][1])
+                next_state.append(next_state_temp[2][i][1]) # Append PR status
             for ii in range(numNodes):
-                next_state.append(next_state_temp[3][ii])
+                next_state.append(next_state_temp[3][ii]) # Append CH status
             next_state = np.array(next_state)
             next_state = np.reshape(next_state, [1, state_size])
-            agent.remember(state, action, reward, next_state, done)
-            state = next_state
+            agent.remember(state, action, reward, next_state, done)  # Fit NN model
+            state = next_state # Current state is now next_state
 
-            if done:
+            if done: # Done if all nodes have died
                 print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd} \n")
                 print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
                 break
@@ -171,11 +172,13 @@ if __name__ == "__main__":
                 env.EE.nodes[i].xPos = round(random.random()*xSize)
                 env.EE.nodes[i].yPos = round(random.random()*ySize)
 
-        #env.render()
+        #env.render()  # Uncomment if plot is wanted
 
+    # Print episode information
     print(f"avrRnd: {avrRnd}")
     print(f"Mean Rounds Survived: {sum(avrRnd)/len(avrRnd)}")
 
+    # After all episodes have ended, plot how many rounds WSN has survived for every episode
     x = np.linspace(0, len(avrRnd), num=len(avrRnd), endpoint=True)
     plt.plot(x, avrRnd)
     plt.show()

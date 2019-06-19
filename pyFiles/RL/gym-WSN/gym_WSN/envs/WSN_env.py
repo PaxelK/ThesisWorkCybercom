@@ -37,6 +37,10 @@ class WSN(gym.Env):
         # Init the WSN env
         self.EE = EnvironmentEngine()
 
+        # Used when time segments are implemented
+        self.timeSegTemp = 0
+        self.sendStatus = [False] * numNodes
+
         # Define size of WSN grid in meters
         self.xSize = xSize
         self.ySize = ySize
@@ -91,9 +95,11 @@ class WSN(gym.Env):
         # Assert that chosen action is within action space
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
 
-        if self.rndCounter % time_segments == 0:  # How often nodes are clustered is determined by time_segment (setParams)
+        if self.timeSegTemp == 0:
             # Cluster nodes in WSN env
             self.EE.cluster()
+            self.sendStatus = [False] * numNodes
+
 
         # Get state of current time step
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
@@ -193,7 +199,7 @@ class WSN(gym.Env):
                     break  # Break from for-loop when the correct action is found
 
                 elif action == i + act_temp + 5:  # This action is PR -= 1
-                    if self.EE.nodes[i].PA > 1:
+                    if self.EE.nodes[i].PA > 0:
                         #reward -= 5 # 1/self.EE.nodes[i].PA
                         PR[i][1] -= 1
                         self.state[2][i][1] = self.EE.nodes[i].PA - 1
@@ -202,6 +208,19 @@ class WSN(gym.Env):
                         reward = -50
                     break  # Break from for-loop when the correct action is found
                 act_temp += 1
+
+        for i in range(numNodes):
+            if self.EE.nodes[i].PA != 0:
+                self.sendStatus[i] = True
+
+
+
+
+        if self.timeSegTemp == time_segments -1 and all(self.sendStatus): # Ensure that all node sends 1 packet each round
+            reward += -100
+            for i in range(numNodes):
+                if self.sendStatus[i] == False:
+                    self.EE.nodes[i].PA = 1 # If node didn't send anything during a round, it now sends 1 packet
 
         for i in range(numNodes):
             #if self.EE.nodes[i].CHstatus == 1:  # If node is a CH
@@ -222,9 +241,32 @@ class WSN(gym.Env):
         # reward += (self.EE.nodes[0].getEnergy() * 0.0001)
 
         # Increment WSN env
-        self.EE.communicate()
-        self.EE.iterateRound()
-        self.rndCounter += 1
+        # Substitute for communicate function in EnvironmentalEngine
+        if self.timeSegTemp == time_segments - 1:  # Non CH sending at end of each round
+            for i in range(len(self.EE.nodes)):
+                if self.EE.nodes[i].alive:
+                    if (self.EE.nodes[i].CHstatus == 0):
+                        outcome = self.EE.nodes[i].sendMsg(self.EE.sink)
+                        if not outcome:
+                            print(f"Node {self.EE.nodes[i].ID} failed to send to node {self.EE.nodes[i].CHparent.ID}!\n")
+                            actionmsg = self.EE.nodes[i].getActionMsg()
+                            print(str(actionmsg) + "\n")
+
+        for i in range(len(self.EE.nodes)):  # CH can send every time segment
+            if self.EE.nodes[i].alive:
+                if (self.EE.nodes[i].CHstatus == 1):
+                    outcome = self.EE.nodes[i].sendMsg(self.EE.sink)
+                    if not outcome:
+                        print(f"Node {self.EE.nodes[i].ID} failed to send to node {self.EE.nodes[i].CHparent.ID}!\n")
+                        actionmsg = self.EE.nodes[i].getActionMsg()
+                        print(str(actionmsg) + "\n")
+
+        self.timeSegTemp += 1
+
+        if self.timeSegTemp == time_segments:
+            self.EE.iterateRound()
+            self.rndCounter += 1  # Rnd counter for RL env
+            self.timeSegTemp = 0
 
         return np.array(self.state), reward, done, {}
 

@@ -3,6 +3,7 @@ import random
 import math
 import gym
 import gym_WSN
+import LEACHtest
 import numpy as np
 from collections import deque
 from keras.models import Sequential
@@ -17,8 +18,6 @@ from setParams import *
 from plotEnv import *
 from EnvironmentEngine import *
 
-sys.path.append("../Tests")  # Adds higher directory to python modules path.
-import EnvTest
 import matplotlib.pyplot as plt
 
 
@@ -111,7 +110,7 @@ if __name__ == "__main__":
 
     for tests in range(20):
         nodePlacementGeneration.run()  # Generate new node placement and save in csv file
-        EnvTest.run()  # Run LEACH comparison
+        LEACHtest.run()  # Run LEACH comparison
 
         # Run WSN env with plotting after training
         agent.load("./save/wsn-dqn-new.h5")  # Load weights from file
