@@ -130,6 +130,8 @@ if __name__ == "__main__":
     avrRnd = []
     # Train agent on episodes
     for e in range(EPISODES):
+
+        # rnd need to be changed here
         done = False
         rnd = 0
         state = env.reset()  # Reset env to a random state
@@ -153,8 +155,10 @@ if __name__ == "__main__":
             agent.remember(state, action, reward, next_state, done)  # Fit NN model
             state = next_state # Current state is now next_state
 
+            print(f"rnd: {rnd}")
+
             if done: # Done if all nodes have died
-                print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd} \n")
+                print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {env.EE.rnd} \n")
                 print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
                 break
 

@@ -38,8 +38,8 @@ class WSN(gym.Env):
         self.EE = EnvironmentEngine()
 
         # Used when time segments are implemented
-        self.timeSegTemp = 0
-        self.sendStatus = [False] * numNodes
+        self.timeSegTemp = 0 # Current time segment
+        self.sendStatus = [False] * numNodes # List containing status if node has sent a packet during current round
 
         # Define size of WSN grid in meters
         self.xSize = xSize
@@ -98,10 +98,10 @@ class WSN(gym.Env):
         if self.timeSegTemp == 0:
             # Cluster nodes in WSN env
             self.EE.cluster()
-            self.sendStatus = [False] * numNodes
+            self.sendStatus = [False] * numNodes # Reset transmission status
 
 
-        # Get state of current time step
+        # Get state of current time step (for action)
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
         # Get PR of every node
         PRtemp  = []
@@ -114,7 +114,7 @@ class WSN(gym.Env):
         _, _, PR, _ = self.state
 
         # Default values
-        reward = -2
+        reward = -20
         done = False
 
 
@@ -209,15 +209,15 @@ class WSN(gym.Env):
                     break  # Break from for-loop when the correct action is found
                 act_temp += 1
 
-        for i in range(numNodes):
-            if self.EE.nodes[i].PA != 0:
+        for i in range(numNodes):  # Change send status to True if node has sent during time segment
+            if self.EE.nodes[i].PA > 0:
                 self.sendStatus[i] = True
 
 
 
 
-        if self.timeSegTemp == time_segments -1 and not all(self.sendStatus): # Ensure that all node sends 1 packet each round
-            reward += -100
+        if self.timeSegTemp == time_segments - 1 and not all(self.sendStatus): # Ensure that all node sends 1 packet each round
+            reward += -10000
             for i in range(numNodes):
                 if self.sendStatus[i] == False:
                     self.EE.nodes[i].PA = 1 # If node didn't send anything during a round, it now sends 1 packet
@@ -265,7 +265,7 @@ class WSN(gym.Env):
 
         if self.timeSegTemp == time_segments:
             self.EE.iterateRound()
-            self.rndCounter += 1  # Rnd counter for RL env
+            self.rndCounter += 1  # Rnd counter for RL env (In this class)
             self.timeSegTemp = 0
 
         return np.array(self.state), reward, done, {}
@@ -274,6 +274,8 @@ class WSN(gym.Env):
         '''
         Resets the entire WSN by placing the sink in a random position and all nodes have a random PR
         '''
+        self.sendStatus = [False] * numNodes
+        self.timeSegTemp = 0
 
         self.rndCounter = 0
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
