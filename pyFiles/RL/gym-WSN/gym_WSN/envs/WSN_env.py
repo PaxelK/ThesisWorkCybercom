@@ -210,7 +210,7 @@ class WSN(gym.Env):
                 act_temp += 1
 
         for i in range(numNodes):  # Change send status to True if node has sent during time segment
-            if self.EE.nodes[i].PA > 0:
+            if self.EE.nodes[i].PA > 0 and self.sendStatus == False:
                 self.sendStatus[i] = True
 
 
