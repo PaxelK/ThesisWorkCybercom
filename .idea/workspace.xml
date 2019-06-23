@@ -4,7 +4,6 @@
     <list default="true" id="247d8e49-01be-4595-956d-f36ae7039341" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyFiles/RL/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyFiles/RL/test.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -62,8 +61,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="327">
-              <caret line="218" column="47" selection-start-line="218" selection-start-column="47" selection-end-line="218" selection-end-column="47" />
+            <state relative-caret-position="-314">
+              <caret line="219" column="22" selection-start-line="219" selection-start-column="22" selection-end-line="219" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -130,7 +129,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-11" />
+    <option name="x" value="-82" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="877" />
@@ -385,7 +384,19 @@
       <option name="presentableId" value="LOCAL−00007" />
       <updated>1560956176593</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL−00008" summary="Fixed time segment stuff for RL">
+      <created>1561020879345</created>
+      <option name="number" value="LOCAL−00008" />
+      <option name="presentableId" value="LOCAL−00008" />
+      <updated>1561020879345</updated>
+    </task>
+    <task id="LOCAL−00009" summary="Fixed time segment stuff for RL">
+      <created>1561021267256</created>
+      <option name="number" value="LOCAL−00009" />
+      <option name="presentableId" value="LOCAL−00009" />
+      <updated>1561021267256</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -905,8 +916,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pyFiles/RL/gym-WSN/gym_WSN/envs/WSN_env.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="327">
-          <caret line="218" column="47" selection-start-line="218" selection-start-column="47" selection-end-line="218" selection-end-column="47" />
+        <state relative-caret-position="-314">
+          <caret line="219" column="22" selection-start-line="219" selection-start-column="22" selection-end-line="219" selection-end-column="22" />
         </state>
       </provider>
     </entry>

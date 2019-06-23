@@ -217,7 +217,7 @@ class WSN(gym.Env):
 
 
         if self.timeSegTemp == time_segments - 1 and not all(self.sendStatus): # Ensure that all node sends 1 packet each round
-            reward += -10000
+            reward -= 10000
             for i in range(numNodes):
                 if self.sendStatus[i] == False:
                     self.EE.nodes[i].PA = 1 # If node didn't send anything during a round, it now sends 1 packet
