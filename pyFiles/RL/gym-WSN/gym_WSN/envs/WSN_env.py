@@ -96,9 +96,9 @@ class WSN(gym.Env):
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
 
         if self.timeSegTemp == 0:
-            # Cluster nodes in WSN env
+            # Cluster nodes in WSN env after every round is finished
             self.EE.cluster()
-            self.sendStatus = [False] * numNodes # Reset transmission status
+            self.sendStatus = [False] * numNodes # Reset transmission status after each round
 
 
         # Get state of current time step (for action)
@@ -188,7 +188,7 @@ class WSN(gym.Env):
         if not action in self.tempActList:
             act_temp = 0  # Variable used to get the corresponding action pair for every node
             for i in range(numNodes):
-                if action == i + act_temp + 4:  # This action is PR += 1
+                if action == i + act_temp + 8:  # This action is PR += 1
                     if self.EE.nodes[i].PA < maxPR:
                         #reward += 5 # self.EE.nodes[i].PA
                         PR[i][1] += 1
@@ -198,7 +198,7 @@ class WSN(gym.Env):
                         reward = -50
                     break  # Break from for-loop when the correct action is found
 
-                elif action == i + act_temp + 5:  # This action is PR -= 1
+                elif action == i + act_temp + 9:  # This action is PR -= 1
                     if self.EE.nodes[i].PA > 0:
                         #reward -= 5 # 1/self.EE.nodes[i].PA
                         PR[i][1] -= 1
@@ -217,7 +217,7 @@ class WSN(gym.Env):
 
 
         if self.timeSegTemp == time_segments - 1 and not all(self.sendStatus): # Ensure that all node sends 1 packet each round
-            reward -= 10000
+            reward -= 1000
             for i in range(numNodes):
                 if self.sendStatus[i] == False:
                     self.EE.nodes[i].PA = 1 # If node didn't send anything during a round, it now sends 1 packet
@@ -227,13 +227,13 @@ class WSN(gym.Env):
             dist = self.EE.nodes[i].getDistance(self.EE.sink)
             pacRate = self.EE.nodes[i].PA
             if dist >= max(xSize, ySize) / 2:
-                reward -= 0.3 * dist
+                reward -= 0.6 * dist
                 reward += 1 * pacRate
             elif dist < max(xSize, ySize) / 2 and pacRate >= maxPR / 2:
-                reward -= 1.7 * dist
+                reward -= 3.4 * dist
                 reward += 5 * pacRate
             elif dist < max(xSize, ySize) / 2 and pacRate < maxPR / 2:
-                reward -= 1 * dist
+                reward -= 2 * dist
                 reward += 3 * pacRate
             # reward -= (self.EE.nodes[i].getDistance(self.EE.sink) * 400) # * 0.05)  # Reward for distance to each CH
             # reward += self.EE.nodes[i].energy * 0.05

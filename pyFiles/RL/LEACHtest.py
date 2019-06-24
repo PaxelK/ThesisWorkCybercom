@@ -1,8 +1,7 @@
 import csv
 import sys
 
-sys.path.append(
-    "..")  # Adds higher directory to python modules path.
+sys.path.append("..")  # Adds higher directory to python modules path.
 
 from random import *
 from EnvironmentEngine import *
