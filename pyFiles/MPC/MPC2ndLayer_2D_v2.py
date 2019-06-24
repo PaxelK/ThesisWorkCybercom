@@ -46,7 +46,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
     def controlEnv(self):
         self.resetGEKKO()
         self.snkPos = [self.m.Var(value = self.sink.xPos, lb = 0, ub = xSize), self.m.Var(value = self.sink.yPos, lb = 0, ub = ySize)] 
-        
+        #self.snkPos = [self.m.Param(value = 50), self.m.Param(value = 50)]
         
         for i in range(len(self.CHds)):
             self.CHxPos.append(self.m.Param(value = self.CHds[i].xPos))
