@@ -151,7 +151,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             for CH in self.CHds:
                 CH.setDesData((self.dtrLst[i][0]))
                 i+=1
-            optimalP = [int(self.snkPos[0][0]), int(self.snkPos[1][0])]
+            optimalP = [int(round(self.snkPos[0][0])), int(round(self.snkPos[1][0]))]
                 
         rmtree(self.m._path)
         

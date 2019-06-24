@@ -33,6 +33,12 @@ totRounds_leach = []
 totPacks_MPC = []
 totPacks_leach = []
 
+enQuotas = []
+datQuotas = []
+ppJleach = []
+ppJMPC = []
+
+
 """
 The greater loop. One loop represents a round. During this loop the following steps occur:
     1. The environment is plotted, shows change in network energy and packages aggrevated
@@ -54,8 +60,8 @@ The greater loop. One loop represents a round. During this loop the following st
 for test in range(1):
     EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
     EE_leach = copy.deepcopy(EE_MPC)
-    #while True:  # Run until all node dies
-    for i in range(50):
+    while True:  # Run until all node dies
+    #for i in range(5):
         print(f"Round = {EE_MPC.rnd}")
         #plotEnv(EE_MPC)
         #plotEnv(EE_leach)
@@ -83,7 +89,8 @@ for test in range(1):
                                 print(f"Node {n.ID} failed to send to node {n.CHparent.ID}!\n")
                                 actionmsg = n.getActionMsg()
                                 print(str(actionmsg) + "\n")   
-                    """    
+                    """  
+                    # This segment is for if one wants to try without PR-control
                     for c in EE_MPC.CHds:
                         if c.alive:
                             c.setPR(1)
@@ -155,18 +162,26 @@ for test in range(1):
         leach_en = 5-sumen1   
         
         en_quota = leach_en/MPC_en
+        enQuotas.append(en_quota)
         print('Energy spent for LEACH: {0}\nEnergy spent by MPC: {1}\n Quota (LEACH/MPC): {2}'.format(leach_en, MPC_en, en_quota))
         print('\n')
         
         dat_quota = EE_leach.sink.dataRec/EE_MPC.sink.dataRec
+        datQuotas.append(dat_quota)
         print('Packets received by LEACH: {0}\nPackets received by MPC: {1}\n Quota (LEACH/MPC): {2}'.format(EE_leach.sink.dataRec/ps, EE_MPC.sink.dataRec/ps, dat_quota))
     
         ppJ_leach = EE_leach.sink.dataRec/leach_en/ps
+        ppJleach.append(ppJ_leach)
         ppJ_MPC = EE_MPC.sink.dataRec/MPC_en/ps
+        ppJMPC.append(ppJ_MPC)
         
         print('Packets per Joule for MPC: {0}\nPackets per Joule for leach: {1}'.format(ppJ_MPC, ppJ_leach))
         print('\n\n')
-        
+pltrnds = np.linspace(0,len(ppJleach)-1, len(ppJleach))
+plt.plot(pltrnds, ppJleach, pltrnds, ppJMPC)
+plt.legend(['LEACH', 'MPC'])
+
+
 tempStr = 'Results_MPCVSleachHrz10_max_' + str(test) + '.txt'
 with open(tempStr, 'w', newline='') as f:
     results = csv.writer(f)
@@ -176,6 +191,14 @@ with open(tempStr, 'w', newline='') as f:
     results.writerow(['LEACH: ', totRounds_leach])
     results.writerow(['LEACH data Rec [packets]: ', totPacks_leach])
     
+    results.writerow(['---'])
+    
+    results.writerow(['Energy Quota [leach/MPC]: ', enQuotas])
+    results.writerow(['Data Quota [leach/MPC]: ', datQuotas])
+    results.writerow(['Packets per Joule for LEACH: ', ppJleach])
+    results.writerow(['Packets per Joule for MPC: ', ppJMPC])
+    
+
     
     
     
