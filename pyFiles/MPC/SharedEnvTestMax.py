@@ -130,8 +130,8 @@ for test in range(1):
                 
                 EE_MPC.sink.move(EE_MPC.sink.xMove.value[1], EE_MPC.sink.yMove.value[1])
                 #print('xVec: {0}, yVec: {1}'.format(EE_MPC.sink.xMove.value, EE_MPC.sink.yMove.value))
-            plotEnv(EE_MPC,1)
-            EE_MPC.iterateRound()
+            
+            #EE_MPC.iterateRound()
         
         if(len(EE_leach.deadNodes) != numNodes):
             EE_leach.cluster()     
@@ -140,7 +140,7 @@ for test in range(1):
 
             EE_leach.newCycle = True
             EE_leach.communicate()
-            EE_leach.iterateRound()
+            #EE_leach.iterateRound()
             print('Finished leach round.')
     
         """
@@ -205,9 +205,17 @@ for test in range(1):
         if(MPC_enDiff != 0 and MPC_datDiff != 0):    
             ppJ_MPC = MPC_datDiff/MPC_enDiff/ps
         ppJMPC.append(ppJ_MPC)
-        
         print('Packets per Joule for MPC: {0}\nPackets per Joule for leach: {1}'.format(ppJ_MPC, ppJ_leach))
         print('\n\n')
+        if(ppJ_MPC<ppJ_leach):
+            plotEnv(EE_MPC) 
+        
+        if(len(EE_leach.deadNodes) != numNodes):
+            EE_leach.iterateRound()
+        if(len(EE_MPC.deadNodes) != numNodes):
+            EE_MPC.iterateRound()
+            
+            
 pltrnds = np.linspace(0,len(ppJleach)-1, len(ppJleach))
 plt.plot(pltrnds, ppJleach, pltrnds, ppJMPC)
 plt.legend(['LEACH', 'MPC'])
