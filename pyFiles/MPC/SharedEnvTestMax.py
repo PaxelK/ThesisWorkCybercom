@@ -38,6 +38,13 @@ datQuotas = []
 ppJleach = []
 ppJMPC = []
 
+temp_MPC_en = 0
+temp_leach_en = 0
+temp_MPC_dat = 0
+temp_leach_dat = 0
+
+temp_ppJleach = 0
+temp_ppjMPC = 0
 
 """
 The greater loop. One loop represents a round. During this loop the following steps occur:
@@ -61,7 +68,7 @@ for test in range(1):
     EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
     EE_leach = copy.deepcopy(EE_MPC)
     while True:  # Run until all node dies
-    #for i in range(5):
+    #for i in range(100):
         print(f"Round = {EE_MPC.rnd}")
         #plotEnv(EE_MPC)
         #plotEnv(EE_leach)
@@ -77,7 +84,7 @@ for test in range(1):
             print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE_MPC.nodesAlive), len(EE_MPC.deadNodes)))
             print('Number of nodes alive: {0}'.format(len(EE_MPC.nodesAlive)))
             print('Number of CHs active: {0}'.format(len(EE_MPC.CHds)))
-            print('Sink Position: X={0}, Y={1}'.format(EE_MPC.sink.xPos, EE_MPC.sink.yPos))
+            print('Sink Position: X={0}, Y={1}'.format(EE_leach.sink.xPos, EE_leach.sink.yPos))
             EE_MPC.newCycle = True
             for i in range(time_segments): #time_segments
                 print('TIME SEGMENT: {0}'.format(i))
@@ -109,7 +116,7 @@ for test in range(1):
                 for c in EE_MPC.CHds:
                     if i == 0:
                         c.tempDataRec = 0
-                    if c.alive:
+                    if c.energy>0:
                         c.controlPR(EE_MPC.sink)
                         #print(c.data.value)
                         #print('\n')
@@ -153,26 +160,50 @@ for test in range(1):
         sumen = 0
         sumen1 = 0
         
+        
+        
+        temp_ppJleach = 0
+        temp_ppjMPC = 0
+        
         for e in EE_MPC.nodes:
             sumen += e.energy
         MPC_en = 5-sumen
-            
+        MPC_enDiff = MPC_en - temp_MPC_en
+        temp_MPC_en = MPC_en
+        
         for e in EE_leach.nodes:
             sumen1 += e.energy
         leach_en = 5-sumen1   
+        leach_enDiff = leach_en - temp_leach_en
+        temp_leach_en = leach_en
         
         en_quota = leach_en/MPC_en
         enQuotas.append(en_quota)
         print('Energy spent for LEACH: {0}\nEnergy spent by MPC: {1}\n Quota (LEACH/MPC): {2}'.format(leach_en, MPC_en, en_quota))
         print('\n')
         
+        MPC_datDiff = EE_MPC.sink.dataRec - temp_MPC_dat
+        temp_MPC_dat = EE_MPC.sink.dataRec
+        
+        leach_datDiff = EE_leach.sink.dataRec - temp_leach_dat
+        temp_leach_dat = EE_leach.sink.dataRec
+
+
         dat_quota = EE_leach.sink.dataRec/EE_MPC.sink.dataRec
         datQuotas.append(dat_quota)
         print('Packets received by LEACH: {0}\nPackets received by MPC: {1}\n Quota (LEACH/MPC): {2}'.format(EE_leach.sink.dataRec/ps, EE_MPC.sink.dataRec/ps, dat_quota))
-    
+        
+        """
         ppJ_leach = EE_leach.sink.dataRec/leach_en/ps
         ppJleach.append(ppJ_leach)
         ppJ_MPC = EE_MPC.sink.dataRec/MPC_en/ps
+        ppJMPC.append(ppJ_MPC)
+        """
+        if(leach_enDiff != 0):
+            ppJ_leach = leach_datDiff/leach_enDiff/ps
+        ppJleach.append(ppJ_leach)
+        if(MPC_enDiff != 0):    
+            ppJ_MPC = MPC_datDiff/MPC_enDiff/ps
         ppJMPC.append(ppJ_MPC)
         
         print('Packets per Joule for MPC: {0}\nPackets per Joule for leach: {1}'.format(ppJ_MPC, ppJ_leach))
