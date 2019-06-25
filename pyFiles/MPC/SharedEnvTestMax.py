@@ -84,7 +84,7 @@ for test in range(1):
             print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE_MPC.nodesAlive), len(EE_MPC.deadNodes)))
             print('Number of nodes alive: {0}'.format(len(EE_MPC.nodesAlive)))
             print('Number of CHs active: {0}'.format(len(EE_MPC.CHds)))
-            print('Sink Position: X={0}, Y={1}'.format(EE_leach.sink.xPos, EE_leach.sink.yPos))
+            print('Sink Position: X={0}, Y={1}'.format(EE_MPC.sink.xPos, EE_MPC.sink.yPos))
             EE_MPC.newCycle = True
             for i in range(time_segments): #time_segments
                 print('TIME SEGMENT: {0}'.format(i))
@@ -202,7 +202,7 @@ for test in range(1):
         if(leach_enDiff != 0):
             ppJ_leach = leach_datDiff/leach_enDiff/ps
         ppJleach.append(ppJ_leach)
-        if(MPC_enDiff != 0):    
+        if(MPC_enDiff != 0 and MPC_datDiff != 0):    
             ppJ_MPC = MPC_datDiff/MPC_enDiff/ps
         ppJMPC.append(ppJ_MPC)
         

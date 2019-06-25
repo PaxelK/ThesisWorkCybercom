@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 import pylab as pl
 from MPCsink import MPCsink
+from MPCnode_v3 import MPCnode
 from shutil import rmtree
 
 class MPC2ndLayer(EnvironmentEngineMPC):
@@ -53,7 +54,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             self.CHyPos.append(self.m.Param(value = self.CHds[i].yPos))
             
             temp = np.sqrt((self.CHds[i].xPos)**2 + (self.CHds[i].yPos)**2)
-            self.CHdstLst.append(self.m.Var(value = temp))
+            self.CHdstLst.append(self.m.Var())
             
             self.m.Equation(self.CHdstLst[i] == self.m.abs2(self.m.sqrt((self.snkPos[0] - self.CHxPos[i])**2 + (self.snkPos[1] - self.CHyPos[i])**2)))
         
@@ -74,7 +75,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
                 
             temp = np.sqrt((self.freeNonCHds[i].xPos)**2 + (self.freeNonCHds[i].yPos)**2)
                 
-            self.nonCHdstLst.append(self.m.Var(value = temp))
+            self.nonCHdstLst.append(self.m.Var())
             self.m.Equation(self.nonCHdstLst[i] == self.m.abs2(self.m.sqrt((self.snkPos[0] - self.nonCHxPos[i])**2 + (self.snkPos[1] - self.nonCHyPos[i])**2)))
         
         if self.verbose:
@@ -235,7 +236,10 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             plt.plot(ch.xPos, ch.yPos, 'bo')  # plot x and y using blue circle markers
             pl.text(ch.xPos, ch.yPos, str(ch.ID), color="teal", fontsize=10)
         for nonch in self.nonCHds:
-            plt.plot(nonch.xPos, nonch.yPos, 'go')  # plot x and y using blue circle markers
+            if(type(nonch.CHparent) is MPCnode):
+                plt.plot(nonch.xPos, nonch.yPos, 'go')  # plot x and y using blue circle markers
+            else:
+                plt.plot(nonch.xPos, nonch.yPos, 'yo')
         plt.plot(self.snkPos[0].value, self.snkPos[1].value, 'ro', markersize=12)
     
 
