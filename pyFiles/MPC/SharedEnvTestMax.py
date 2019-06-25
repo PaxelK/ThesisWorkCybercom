@@ -70,7 +70,7 @@ for test in range(1):
     while True:  # Run until all node dies
     #for i in range(100):
         print(f"Round = {EE_MPC.rnd}")
-        #plotEnv(EE_MPC)
+        
         #plotEnv(EE_leach)
         
         
@@ -130,7 +130,7 @@ for test in range(1):
                 
                 EE_MPC.sink.move(EE_MPC.sink.xMove.value[1], EE_MPC.sink.yMove.value[1])
                 #print('xVec: {0}, yVec: {1}'.format(EE_MPC.sink.xMove.value, EE_MPC.sink.yMove.value))
-            
+            plotEnv(EE_MPC,1)
             EE_MPC.iterateRound()
         
         if(len(EE_leach.deadNodes) != numNodes):
