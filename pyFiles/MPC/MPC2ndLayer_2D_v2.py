@@ -252,7 +252,26 @@ class MPC2ndLayer(EnvironmentEngineMPC):
 if __name__ == "__main__":
     Hrz = 8
     Res = Hrz + 1
+    moveDists = []
+    oldX = 50
+    oldY = 50
     
+    for i in range(100):
+        testEnv = MPC2ndLayer(Hrz,Res)
+        testEnv.cluster()
+        print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
+        testEnv.controlEnv()
+        
+        
+        dist = np.sqrt((testEnv.snkPos[0].value[0] - oldX)**2 + (testEnv.snkPos[1].value[0] - oldY)**2)
+        
+        oldX = testEnv.snkPos[0].value[0]
+        oldY = testEnv.snkPos[1].value[0]
+        
+        moveDists.append(dist)
+        
+        
+    """
     testEnv = MPC2ndLayer(Hrz,Res)
     testEnv.cluster()
     print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
@@ -261,7 +280,9 @@ if __name__ == "__main__":
         print(element.desData)
     testEnv.plot()
     
-    
+    """
+    avrg_moveDist = sum(moveDists)/len(moveDists)
+    print('Average move distance: {0}'.format(avrg_moveDist))
     ch_dist = 0
     non_dist = 0
 
