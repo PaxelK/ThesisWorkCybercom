@@ -228,13 +228,6 @@ class MPCnode(Node):
 
 
 
-
-
-
-
-
-
-
 if __name__ == "__main__":
     Hrz = 10
     Res = Hrz + 1

@@ -1,4 +1,0 @@
-BLEACH rounds: ,"[13028, 13964]"
-BLEACH data [packets]: ,"[690557.0, 756052.0]"
-LEACH rounds: ,"[12861, 14106]"
-LEACH data [packets]: ,"[692555.0, 757310.0]"
