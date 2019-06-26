@@ -256,7 +256,7 @@ if __name__ == "__main__":
     oldX = 50
     oldY = 50
     
-    for i in range(100):
+    for i in range(1000):
         testEnv = MPC2ndLayer(Hrz,Res)
         testEnv.cluster()
         print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
