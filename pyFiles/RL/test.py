@@ -19,7 +19,7 @@ from EnvironmentEngine import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 20
+EPISODES = 300
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
-        #agent.save("./save/wsn-dqn-new.h5")
+        agent.save("./save/wsn-dqn-new.h5")
 
         if e % 20 == 0: # Change node placement after every 20th round
             for i in range(numNodes):
@@ -190,6 +190,8 @@ if __name__ == "__main__":
     done = False
     rnd = 0
     state = env.reset()  # Reset env to a random state
+    env.EE.sink.xPos = xSize/2
+    env.EE.sink.yPos = ySize/2
     # Format state such that it can be used for training
     for i in range(2, numNodes + 2):
         state[i] = state[i][1]

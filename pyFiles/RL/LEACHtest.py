@@ -90,12 +90,12 @@ def run():
     print(f"Rounds survived: {EE.rnd}")
     print(f"Data packets received: {EE.sink.dataRec / 1000}")
 
-    '''             
+
     # Uncomment if results shall be saved                                                                                                                  
     with open('LEACHresults.txt', 'a', newline='') as f:                                                                              
         f.write(str(EE.rnd) + ",")                                                                                                    
         f.write(str(EE.sink.dataRec/1000) + ",")                                                                                      
-    '''
+
 
 if __name__ == "__main__":
     run()

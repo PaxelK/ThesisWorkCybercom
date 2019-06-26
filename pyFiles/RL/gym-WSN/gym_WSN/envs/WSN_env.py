@@ -95,6 +95,11 @@ class WSN(gym.Env):
         # Assert that chosen action is within action space
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
 
+        if self.timeSegTemp == time_segments: # New round starts if currentTimeSegment = timeSegment
+            self.EE.iterateRound()
+            self.rndCounter += 1  # Rnd counter for RL env (In this class)
+            self.timeSegTemp = 0
+
         if self.timeSegTemp == 0:
             # Cluster nodes in WSN env after every round is finished
             self.EE.cluster()
@@ -263,10 +268,6 @@ class WSN(gym.Env):
 
         self.timeSegTemp += 1
 
-        if self.timeSegTemp == time_segments:
-            self.EE.iterateRound()
-            self.rndCounter += 1  # Rnd counter for RL env (In this class)
-            self.timeSegTemp = 0
 
         return np.array(self.state), reward, done, {}
 
@@ -359,6 +360,5 @@ class WSN(gym.Env):
         This method plots the WSN env
         :return: None
         '''
-        plotEnv(self.EE)
-
+        plotEnv(self.EE, 3)
 
