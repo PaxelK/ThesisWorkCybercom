@@ -33,7 +33,7 @@ def plotEnv(env, figNr):
                     plt.plot(n.xPos, n.yPos, 'yo')
         
         #plt.plot(nodePos[:, 0], nodePos[:, 1],  'ro', markersize = 6)
-        plt.plot(xs, ys, marker='o', markersize = 12, markerfacecolor= 'g')
+        plt.plot(xs, ys, marker='o', markersize = 12, markerfacecolor= 'r')
         plt.xlim(0, xSize)
         plt.ylim(0, ySize)
 

@@ -50,7 +50,7 @@ for i = 1:length(spread:-steplen:-spread)
 end
 legend([hVec(50) hVec(1)], 'LEACH', 'BLEACH spectrum')
 xlabel('Rounds')
-ylabel('T(rnd, SoC)')
+ylabel('T(n, SoC)')
 ylim([0 1+spread])
 xlim([0 (episode-1)])
 residMax = maxVec-t;

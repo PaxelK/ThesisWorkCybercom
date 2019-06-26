@@ -272,7 +272,8 @@ if __name__ == "__main__":
             testNode1.plot(timesegment = i)
  
             print("Segment: {0} | Node | PR  | PS\t\t|\n\t\t {1}   {2}   {3} \n\t\t {4}   {5}   {6}".format(i, testNode.ID, testNode.getPA(), testNode.getPS(), testNode1.ID, testNode1.getPA(), testNode1.getPS()))
-            print("Node {0}:\n Data: {1}\nPR: {4}\nFinal: {6}\n\nNode {2}\n Data: {3}\nPR: {5}\nFinal: {7}".format(testNode.ID, testNode.data.value, testNode1.ID, testNode1.data.value, testNode.dtr.value, testNode1.dtr.value,testNode.final.value, testNode1.final.value))
+            print("Node {0}:\n Data: {1}\nPR: {4}\nFinal: {6}\nVelocity: {8}\n\nNode {2}\n Data: {3}\nPR: {5}\nFinal: {7}\nVelocity: {9}".format(testNode.ID, testNode.data.value, testNode1.ID, testNode1.data.value, testNode.dtr.value, testNode1.dtr.value,testNode.final.value, testNode1.final.value, testNode.v.value, testNode1.v.value))
+            
             print('\n')
                 
           
