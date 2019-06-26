@@ -291,6 +291,13 @@ plt.ylabel("Pack/J", fontsize =11)
 avrgppJ_MPC = sum(ppJMPC)/len(ppJMPC)
 avrgppJ_leach = sum(ppJleach)/len(ppJleach)
 
+print('Average ppJ MPC: {0}'.format(avrgppJ_MPC))
+print('Average ppJ LEACH: {0}'.format(avrgppJ_leach))
+print('Data Received by MPC: {0}'.format(EE_MPC.sink.dataRec))
+print('Data Received by LEACH: {0}'.format(EE_leach.sink.dataRec))
+print('Energy consumed by MPC: {0}'.format(MPC_en))
+print('Energy consumed by LEACH: {0}'.format(leach_en))
+
 tempStr = 'Results_MPCVSleachHrz10_max_' + str(test) + '.txt'
 with open(tempStr, 'w', newline='') as f:
     results = csv.writer(f)
