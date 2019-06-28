@@ -171,7 +171,7 @@ if __name__ == "__main__":
                 #print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
                 energyList = []
                 for i in range(numNodes):
-                    energyList.append(EE.nodes[i].getEC())
+                    energyList.append(env.EE.nodes[i].getEC())
                 #print(f"Energy consumed: {sum(energyList)}")
                 break
 
