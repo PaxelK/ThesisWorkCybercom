@@ -169,6 +169,10 @@ if __name__ == "__main__":
             if done:
                 #print(f"Episode: {episodes+1}/{5}, e: {agent.epsilon}, rnd: {rnd} \n")
                 #print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
+                energyList = []
+                for i in range(numNodes):
+                    energyList.append(EE.nodes[i].getEC())
+                #print(f"Energy consumed: {sum(energyList)}")
                 break
 
             if len(agent.memory) > batch_size:
@@ -181,6 +185,8 @@ if __name__ == "__main__":
         with open('RLresults.txt', 'a', newline='') as f:
             f.write(str(env.EE.rnd) + ",")
             f.write(str(env.EE.sink.dataRec / 1000) + ",")
+            f.write(str(sum(energyList)))
+
 
         avrRnd.append("RL: " + str(rnd))
 

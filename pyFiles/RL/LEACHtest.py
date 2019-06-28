@@ -89,12 +89,17 @@ def run():
 
     print(f"Rounds survived: {EE.rnd}")
     print(f"Data packets received: {EE.sink.dataRec / 1000}")
+    energyList = []
+    for i in range(numNodes):
+        energyList.append(EE.nodes[i].getEC())
+    print(f"Energy consumed: {sum(energyList)}")
 
 
     # Uncomment if results shall be saved                                                                                                                  
     with open('LEACHresults.txt', 'a', newline='') as f:                                                                              
         f.write(str(EE.rnd) + ",")                                                                                                    
-        f.write(str(EE.sink.dataRec/1000) + ",")                                                                                      
+        f.write(str(EE.sink.dataRec/1000) + ",")
+        f.write(str(sum(energyList)))
 
 
 if __name__ == "__main__":

@@ -159,6 +159,10 @@ if __name__ == "__main__":
             if done: # Done if all nodes have died
                 print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {env.EE.rnd} \n")
                 print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
+                energyList = []
+                for i in range(numNodes):
+                    energyList.append(EE.nodes[i].getEC())
+                print(f"Energy consumed: {sum(energyList)}")
                 break
 
             if len(agent.memory) > batch_size:
