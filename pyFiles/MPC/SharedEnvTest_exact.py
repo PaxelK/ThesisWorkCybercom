@@ -297,6 +297,8 @@ print('Data Received by MPC: {0}'.format(EE_MPC.sink.dataRec))
 print('Data Received by LEACH: {0}'.format(EE_leach.sink.dataRec))
 print('Energy consumed by MPC: {0}'.format(MPC_en))
 print('Energy consumed by LEACH: {0}'.format(leach_en))
+print('Minimum ppJ by LEACH: {0}, Max ppJ by LEACH: {1}'.format(min(ppJleach), max(ppJleach)))
+print('Minimum ppJ by MPC: {0}, Max ppJ by MPC: {1}'.format(min(ppJMPC), max(ppJMPC)))
 
 tempStr = 'Results_MPCVSleachHrz10_max_' + str(test) + '.txt'
 with open(tempStr, 'w', newline='') as f:
