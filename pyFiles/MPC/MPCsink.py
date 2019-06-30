@@ -19,7 +19,7 @@ class MPCsink(Sink):
         super().__init__(sizex, sizey)  
         self.ctrlHrz = ctrlHrz
         self.ctrlRes = ctrlRes
-        self.v = 10
+        self.v = 5
         
         #Counter for plots
         self.nrplots = 1

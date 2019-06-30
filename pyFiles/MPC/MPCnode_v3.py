@@ -256,7 +256,7 @@ if __name__ == "__main__":
             testNode1.PS = 0
             testNode.resetGEKKO()
             testNode1.resetGEKKO()
-        for i in range(10):
+        for i in range(2):
             testNode.updateEnergy(-testNode.Egen)
             testNode1.updateEnergy(-testNode1.Egen)
             sink.produce_MoveVector()
