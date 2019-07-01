@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
-        agent.save("./save/wsn-dqn-new.h5")
+        #agent.save("./save/wsn-dqn-new.h5")
 
         if e % 20 == 0: # Change node placement after every 20th round
             for i in range(numNodes):

@@ -40,6 +40,7 @@ class WSN(gym.Env):
         # Used when time segments are implemented
         self.timeSegTemp = 0 # Current time segment
         self.sendStatus = [False] * numNodes # List containing status if node has sent a packet during current round
+        self.CHtemp = []
 
         # Define size of WSN grid in meters
         self.xSize = xSize
@@ -110,12 +111,12 @@ class WSN(gym.Env):
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
         # Get PR of every node
         PRtemp  = []
-        CHtemp = []
+        self.CHtemp = []
         for i in range(numNodes):
                 PRtemp.append([self.EE.nodes[i].ID, self.EE.nodes[i].PA])
-                CHtemp.append(self.EE.nodes[i].getCHstatus())
+                self.CHtemp.append(self.EE.nodes[i].getCHstatus())
         self.state.append(PRtemp)
-        self.state.append(CHtemp)
+        self.state.append(self.CHtemp)
         _, _, PR, _ = self.state
 
         # Default values
@@ -123,7 +124,7 @@ class WSN(gym.Env):
         done = False
 
 
-        if len(self.EE.deadNodes) == numNodes:  # Episode is done if all nodes have died
+        if len(self.EE.deadNodes) >= 1: # numNodes  # Episode is done if all nodes have died
             done = True
 
         if action == 0:  # This action is yPos -= 1
