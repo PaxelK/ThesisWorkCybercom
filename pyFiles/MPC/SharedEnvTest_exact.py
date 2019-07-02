@@ -18,11 +18,11 @@ import copy
 import csv
 
 
-ctrlHrz = 10
+ctrlHrz = 8
 ctrlRes = ctrlHrz + 1
 EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
 EE_leach = copy.deepcopy(EE_MPC)
-kill = False #Variable for exciting the greater loop
+kill = False #Variable for exiting the greater loop
 
 x, y = EE_MPC.sink.getPos()  # Get position/coordinates of sink
 
