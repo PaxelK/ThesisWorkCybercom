@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 EPISODES = 5
 
-class DQNAgent:
+class DQNAgentold:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     env = gym.make('WSN-v0')
     state_size = env.observation_space.shape[0]  # Get amount of states (Amount of states = 2 + 2*numNodes)
     action_size = env.action_space.n
-    agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
+    agent = DQNAgentold(state_size, action_size)  # Create an instance of the agent
     #agent.load("./save/wsn-dqn.h5")
 
     # Set default values
