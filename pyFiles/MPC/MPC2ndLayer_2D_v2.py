@@ -46,15 +46,18 @@ class MPC2ndLayer(EnvironmentEngineMPC):
 
     def controlEnv(self):
         self.resetGEKKO()
-        self.snkPos = [self.m.Var(value = self.sink.xPos, lb = 0, ub = xSize), self.m.Var(value = self.sink.yPos, lb = 0, ub = ySize)] 
+        #self.snkPos = [self.m.Var(value = self.sink.xPos, lb = 0, ub = xSize), self.m.Var(value = self.sink.yPos, lb = 0, ub = ySize)] 
         #self.snkPos = [self.m.Param(value = 50), self.m.Param(value = 50)]
+        self.snkPos = [self.m.Var(value = 50, lb = 0, ub = xSize), self.m.Var(value = 50, lb = 0, ub = ySize)] 
+
+        
         
         for i in range(len(self.CHds)):
             self.CHxPos.append(self.m.Param(value = self.CHds[i].xPos))
             self.CHyPos.append(self.m.Param(value = self.CHds[i].yPos))
             
             temp = np.sqrt((self.CHds[i].xPos)**2 + (self.CHds[i].yPos)**2)
-            self.CHdstLst.append(self.m.Var())
+            self.CHdstLst.append(self.m.Var(value = temp))
             
             self.m.Equation(self.CHdstLst[i] == self.m.abs2(self.m.sqrt((self.snkPos[0] - self.CHxPos[i])**2 + (self.snkPos[1] - self.CHyPos[i])**2)))
         
@@ -64,7 +67,9 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             print('CHdstLst:\n {0}'.format(self.CHdstLst))
         
         
-        
+        """ 
+        # OPTED TO TAKE AWAY FREE NON CHS FROM EQUATION AND TRANSMIT FROM THEM 
+        # UNDER 1ST ROUND INSTEAD.
         for nch in self.nonCHds:
             if(type(nch.CHparent) is MPCsink):
                 self.freeNonCHds.append(nch)
@@ -75,22 +80,22 @@ class MPC2ndLayer(EnvironmentEngineMPC):
                 
             temp = np.sqrt((self.freeNonCHds[i].xPos)**2 + (self.freeNonCHds[i].yPos)**2)
                 
-            self.nonCHdstLst.append(self.m.Var())
+            self.nonCHdstLst.append(self.m.Var(value = temp))
             self.m.Equation(self.nonCHdstLst[i] == self.m.abs2(self.m.sqrt((self.snkPos[0] - self.nonCHxPos[i])**2 + (self.snkPos[1] - self.nonCHyPos[i])**2)))
         
         if self.verbose:
             print('nonCHxPos:\n {0}'.format(self.nonCHxPos))
             print('nonCHyPos:\n {0}'.format(self.nonCHyPos))
             print('nonCHdstLst:\n {0}'.format(self.nonCHdstLst))
-        
+        """
 
         self.rnds = self.m.Var(lb = 0, integer = True)
 
         
         for i in range(len(self.CHds)):
             self.ECH_sum.append(self.m.Var(value = self.CHds[i].energy))
-        for i in range(len(self.freeNonCHds)):
-            self.EnonCH_sum.append(self.m.Var(value = self.freeNonCHds[i].energy))
+        #for i in range(len(self.freeNonCHds)):
+        #    self.EnonCH_sum.append(self.m.Var(value = self.freeNonCHds[i].energy))
         
         if self.verbose:
             print('ECH_sum:\n {0}'.format(self.ECH_sum))
@@ -102,20 +107,21 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         E_temp = 0
         for n in self.CHds:
             E_temp += n.energy
-        for nf in self.freeNonCHds:
-            E_temp += nf.energy
+        #for nf in self.freeNonCHds:
+        #    E_temp += nf.energy
         self.E_tot = self.m.Param(value = E_temp)
         
         for i in range(len(self.CHds)):
             self.dtrLst.append(self.m.Var(lb = 1, ub = 20))
             self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.CHds[i].conChildren + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdstLst[i]**2)))
             self.m.Equation(self.ECH_sum[i] >= self.e1Sum[i])
+        """
         for i in range(len(self.freeNonCHds)):
             #self.e2Sum.append(self.m.Intermediate(self.freeNonCHds[i].PA*self.pSize*(Eelec + Eamp * self.nonCHdstLst[i]**2)))
             self.e2Sum.append(self.m.Intermediate(1*self.pSize*(Eelec + Eamp * self.nonCHdstLst[i]**2)))
 
             self.m.Equation(self.EnonCH_sum[i] >= self.e2Sum[i])
-            
+        """  
         if self.verbose:
             print('dtrLst:\n {0}'.format(self.dtrLst))
             print('e1Sum:\n {0}'.format(self.e1Sum))
@@ -123,7 +129,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             print('E_tot:\n {0}'.format(self.E_tot.value))
          
         #self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum) + self.m.sum(self.e2Sum))*self.rnds)
-        self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum) + self.m.sum(self.e2Sum))*self.rnds)
+        self.m.Equation(self.E_tot >= self.m.sum(self.e1Sum)*self.rnds)
 
         
         self.target = self.m.Intermediate(self.m.sum(self.dtrLst)*(self.rnds-1))
@@ -246,7 +252,26 @@ class MPC2ndLayer(EnvironmentEngineMPC):
 if __name__ == "__main__":
     Hrz = 8
     Res = Hrz + 1
+    moveDists = []
+    oldX = 50
+    oldY = 50
     
+    for i in range(1000):
+        testEnv = MPC2ndLayer(Hrz,Res)
+        testEnv.cluster()
+        print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
+        testEnv.controlEnv()
+        
+        
+        dist = np.sqrt((testEnv.snkPos[0].value[0] - oldX)**2 + (testEnv.snkPos[1].value[0] - oldY)**2)
+        
+        oldX = testEnv.snkPos[0].value[0]
+        oldY = testEnv.snkPos[1].value[0]
+        
+        moveDists.append(dist)
+        
+        
+    """
     testEnv = MPC2ndLayer(Hrz,Res)
     testEnv.cluster()
     print('Amount of Cluster Heads: {0}'.format(len(testEnv.CHds)))
@@ -255,7 +280,9 @@ if __name__ == "__main__":
         print(element.desData)
     testEnv.plot()
     
-    
+    """
+    avrg_moveDist = sum(moveDists)/len(moveDists)
+    print('Average move distance: {0}'.format(avrg_moveDist))
     ch_dist = 0
     non_dist = 0
 

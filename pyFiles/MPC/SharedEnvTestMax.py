@@ -85,12 +85,14 @@ for test in range(1):
             print('Number of nodes alive: {0}'.format(len(EE_MPC.nodesAlive)))
             print('Number of CHs active: {0}'.format(len(EE_MPC.CHds)))
             print('Sink Position: X={0}, Y={1}'.format(EE_MPC.sink.xPos, EE_MPC.sink.yPos))
+            for g in EE_MPC.CHds: 
+                print('Cluster Head {0}, data: {1}'.format(g.ID, g.desData))
             EE_MPC.newCycle = True
             for i in range(time_segments): #time_segments
                 print('TIME SEGMENT: {0}'.format(i))
                 if i==time_segments-1:
                     for n in EE_MPC.nonCHds:
-                        if n.alive:
+                        if n.alive and type(n.CHparent) is not MPCsink:
                             outcome = n.sendMsg(EE_MPC.sink)
                             if not outcome and EE_MPC.verbose:
                                 print(f"Node {n.ID} failed to send to node {n.CHparent.ID}!\n")
@@ -107,10 +109,19 @@ for test in range(1):
                                 actionmsg = c.getActionMsg()
                                 print(str(actionmsg) + "\n")
                     """
-            
-        
+                # ALL NON-CHs CONNECTED TO SINK SENDS IN BEGINNING BEFORE MOVEMENT
+                if i == 0:
+                    for n in EE_MPC.nonCHds:
+                        if n.alive and type(n.CHparent) is MPCsink:
+                            outcome = n.sendMsg(EE_MPC.sink)
+                            if not outcome and EE_MPC.verbose:
+                                print(f"Node {n.ID} failed to send to node {n.CHparent.ID}!\n")
+                                actionmsg = n.getActionMsg()
+                                print(str(actionmsg) + "\n")   
+                                
+                                
                 EE_MPC.sink.produce_MoveVector()
-                
+                EE_MPC.sink.move(EE_MPC.sink.xMove.value[1], EE_MPC.sink.yMove.value[1])
                 
                 
                 for c in EE_MPC.CHds:
@@ -128,7 +139,7 @@ for test in range(1):
                             actionmsg = c.getActionMsg()
                             print(str(actionmsg) + "\n")
                 
-                EE_MPC.sink.move(EE_MPC.sink.xMove.value[1], EE_MPC.sink.yMove.value[1])
+                
                 #print('xVec: {0}, yVec: {1}'.format(EE_MPC.sink.xMove.value, EE_MPC.sink.yMove.value))
             
             #EE_MPC.iterateRound()
@@ -208,7 +219,7 @@ for test in range(1):
         print('Packets per Joule for MPC: {0}\nPackets per Joule for leach: {1}'.format(ppJ_MPC, ppJ_leach))
         print('\n\n')
         if(ppJ_MPC<ppJ_leach):
-            plotEnv(EE_MPC) 
+            plotEnv(EE_MPC,1) 
         
         if(len(EE_leach.deadNodes) != numNodes):
             EE_leach.iterateRound()
