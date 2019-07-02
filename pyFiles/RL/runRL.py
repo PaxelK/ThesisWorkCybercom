@@ -16,7 +16,7 @@ import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from setParams import *
 from plotEnv import *
-from EnvironmentEngine import *
+from EnvironmentEngineMPC import *
 
 import matplotlib.pyplot as plt
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
 
     '''
-    # If node placement needs to be hardcoded 
+    # Uncomment if node placement needs to be hardcoded 
     env.EE.nodes[0].xPos = 130
     env.EE.nodes[0].yPos = 130
 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     TESTS = 8
 
     for tests in range(TESTS):
-        nodePlacementGeneration.run()  # Generate new node placement and save in csv file
+        nodePlacementGeneration.run()  # Generate new node placement for each test and save in csv file
         LEACHenv = LEACHtest.create()  # Create instance of LEACH environment
         LEACHenv.placeNodes()  # Place nodes according to node generation
 
