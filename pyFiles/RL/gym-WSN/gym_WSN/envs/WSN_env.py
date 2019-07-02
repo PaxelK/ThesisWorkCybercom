@@ -9,8 +9,9 @@ from gym import spaces
 # Import needed files
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
+sys.path.append("../MPC")  # Adds higher directory to python modules path.
 from setParams import *
-from EnvironmentEngine import *
+from EnvironmentEngineMPC import *
 from plotEnv import *
 
 # Continous WSN class
@@ -35,7 +36,7 @@ class WSN(gym.Env):
     '''
     def __init__(self):
         # Init the WSN env
-        self.EE = EnvironmentEngine()
+        self.EE = EnvironmentEngineMPC(10, 11)
 
         # Used when time segments are implemented
         self.timeSegTemp = 0 # Current time segment
@@ -124,7 +125,7 @@ class WSN(gym.Env):
         done = False
 
 
-        if len(self.EE.deadNodes) >= 1: # numNodes  # Episode is done if all nodes have died
+        if len(self.EE.deadNodes)  == numNodes: # >= 1: # Episode is done if all nodes have died
             done = True
 
         if action == 0:  # This action is yPos -= 1

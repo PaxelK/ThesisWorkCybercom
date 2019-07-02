@@ -2,16 +2,17 @@ import csv
 import sys
 
 sys.path.append("..")  # Adds higher directory to python modules path.
+sys.path.append("../MPC")  # Adds higher directory to python modules path.
 
 from random import *
-from EnvironmentEngine import *
+from EnvironmentEngineMPC import *
 from setParams import *
 from plotEnv import *
 
 class LEACHtest():
     def __init__(self):
         self.timeSegTemp = 0
-        self.EE = EnvironmentEngine()  # Initiate environment
+        self.EE = EnvironmentEngineMPC(10, 11)  # Initiate environment
 
 
     def placeNodes(self):

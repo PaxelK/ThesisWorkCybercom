@@ -12,14 +12,15 @@ from keras.optimizers import Adam
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
+sys.path.append("../MPC")  # Adds higher directory to python modules path.
 from setParams import *
 from plotEnv import *
-from EnvironmentEngine import *
+from EnvironmentEngineMPC import *
 
 import matplotlib.pyplot as plt
 
 
-EPISODES = 300
+EPISODES = 330
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -83,7 +84,7 @@ if __name__ == "__main__":
     state_size = env.observation_space.shape[0]  # Get amount of states (Amount of states = 2 + 2*numNodes)
     action_size = env.action_space.n  # Get amount of actions
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
-    #agent.load("./save/wsn-dqn.h5")
+    #agent.load("./save/wsn-dqn-new.h5")
 
     '''
     with open('nodePlacement.csv') as nodePlacement_file:
@@ -106,8 +107,8 @@ if __name__ == "__main__":
                     env.EE.nodes[i].yPos = valueY
                     i += 1
             row_count += 1
-
     '''
+
     '''
     env.EE.nodes[0].xPos = 40
     env.EE.nodes[0].yPos = 40
@@ -168,18 +169,20 @@ if __name__ == "__main__":
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
 
+            #env.render()  # Uncomment if plot is wanted
+
         avrRnd.append(rnd)
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
-        #agent.save("./save/wsn-dqn-new.h5")
+        agent.save("./save/wsn-dqn-new.h5")
 
-        if e % 20 == 0: # Change node placement after every 20th round
+        if e % 30 == 0: # Change node placement after every 20th round
             for i in range(numNodes):
                 env.EE.nodes[i].xPos = round(random.random()*xSize)
                 env.EE.nodes[i].yPos = round(random.random()*ySize)
 
-        #env.render()  # Uncomment if plot is wanted
+
 
     # Print episode information
     print(f"avrRnd: {avrRnd}")
@@ -217,8 +220,8 @@ if __name__ == "__main__":
         state = next_state
 
         if done:
-            print(f"Episode: {e + 1}/{EPISODES}, e: {agent.epsilon}, rnd: {env.EE.rnd} \n")
-            print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
+            print(f"Episode: {1}/{1}, e: {agent.epsilon}, rnd: {env.EE.rnd}")
+            print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000}")
             energyList = []
             for i in range(numNodes):
                 energyList.append(env.EE.nodes[i].getEC())

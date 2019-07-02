@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
             if done or LEACHbool:  # Break when one environment is dead
                 print(f"Test: {tests+1}/{TESTS}")
-                print("-------------LEACH Results------------- ")
+                print("-------------LEACH Results-------------")
                 print(f"Rounds survived: {LEACHenv.EE.rnd}")
                 print(f"Data packets received: {LEACHenv.EE.sink.dataRec / 1000}")
                 energyList = []
@@ -194,7 +194,7 @@ if __name__ == "__main__":
                 '''
 
 
-                print("---------------DQN Results------------")
+                print("--------------DQN Results--------------")
                 print(f"Rounds survived: {env.EE.rnd}")
                 print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000}")
                 energyListDQN = []

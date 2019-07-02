@@ -8,14 +8,17 @@ from setParams import *
 from plotEnv import *
 
 
+
 def run():
     EE = EnvironmentEngine()  # Initiate environment
 
 
+    '''
     with open('../RL/nodePlacement.csv') as nodePlacement_file:
         csv_reader = csv.reader(nodePlacement_file, delimiter=',')
         row_count = 0
 
+    
         for row in csv_reader:
             i = 0
             rowVec = []
@@ -32,6 +35,8 @@ def run():
                     EE.nodes[i].yPos = valueY
                     i += 1
             row_count += 1
+
+    '''
 
 
     '''
@@ -116,7 +121,7 @@ def run():
             if i == 0:
                 EE.cluster()
 
-            if timeSegTemp == time_segments-1:  # Send one package at the end of each round
+            if timeSegTemp == time_segments - 1:  # Send one package at the end of each round
                 for i in range(numNodes):
                     PRcontrol = []
                     PRcontrol.append([i, 1])  # [Node ID, PR of node]
@@ -149,6 +154,7 @@ def run():
 
 
             timeSegTemp += 1
+            plotEnv(EE, 1)
 
         EE.iterateRound()
         print(f"rnd: {EE.rnd}")
