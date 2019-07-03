@@ -1,87 +1,176 @@
+import csv
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 
 from random import *
 from EnvironmentEngine import *
+from setParams import *
 from plotEnv import *
 
-EE = EnvironmentEngine()  # Initiate environment
-
-x, y = EE.sink.getPos()  # Get position/coordinates of sink
-
-EE.nodes[0].xPos = 130
-EE.nodes[0].yPos = 130
-
-EE.nodes[1].xPos = 170
-EE.nodes[1].yPos = 130
-
-EE.nodes[2].xPos = 130
-EE.nodes[2].yPos = 170
-
-EE.nodes[3].xPos = 170
-EE.nodes[3].yPos = 170
-
-# Get PR for all nodes (PR should be zero for dead nodes)
-PRcontrl = []
-for i in range(numNodes):
-    PRcontrl.append([i, 15])  # [Node ID, PR of node]
-
-'''
-EE.updateEnv(20, 43, PRcontrl)  # [sinkx, sinky, PRlist]
-x, y = EE.sink.getPos()
-print(f"x = {x},  y = {y} \n")
-print("----------------------------------------")
-for i in range(numNodes):
-    print(EE.nodes[i].PA)
-EE.updateEnv(-120, 30, PRcontrl)  # [sinkx, sinky, PRlist]
-x, y = EE.sink.getPos()
-print(f"x = {x},  y = {y} \n")
-print("----------------------------------------")
-EE.updateEnv(305, 660, PRcontrl)  # [sinkx, sinky, PRlist]
-x, y = EE.sink.getPos()
-print(f"x = {x},  y = {y} \n")
-print("----------------------------------------")
-EE.updateEnv(-1000, -1000, PRcontrl)
-x, y, d = EE.sinkStatus()
-print(f"x = {x},  y = {y}, dataRecieved = {d} \n")
-print("----------------------------------------")
-EE.updateEnv(20, 20, PRcontrl)
-x, y, d = EE.sinkStatus()
-print(f"x = {x},  y = {y}, dataRecieved = {d} \n")
-print("----------------------------------------")
-states = EE.getStates()
-'''
-while True:  # Run until all node dies
-    print(f"Round = {EE.rnd}")
-
-    # print(f"plotRnd Length = {len(EE.plotRnd)}")
-    # print(f"meanEClist Length = {len(EE.meanEClist)}")
-    # print(f"EClist Length = {len(EE.EClist)}")
-    # print(f"PackReclist Length = {len(EE.PackReclist)}")
-    # print(f"deadnodes Length = {len(EE.deadNodes)}")
-
-    #plotEnv(EE)
-    temp = random.random()
-    x = 0
-    y = 0
-
-    if temp < 0.25 and temp >= 0:
-        x = -1
-    elif temp < 0.5 and temp >= 0.25:
-        x = 1
-    elif temp < 0.75 and temp >= 0.5:
-        y = -1
-    elif temp < 1 and temp >= 0.75:
-        y = 1
 
 
-    EE.cluster()
-    EE.updateEnv(0, 0, PRcontrl)
-    EE.communicate()
-    EE.iterateRound()
+def run():
+    EE = EnvironmentEngine()  # Initiate environment
 
-    if len(EE.deadNodes) == numNodes:  # Break when all nodes have died
-        break
+
+    '''
+    with open('../RL/nodePlacement.csv') as nodePlacement_file:
+        csv_reader = csv.reader(nodePlacement_file, delimiter=',')
+        row_count = 0
+
+    
+        for row in csv_reader:
+            i = 0
+            rowVec = []
+
+            for element in row:
+                rowVec.append(float(element))
+
+            if row_count == 0:
+                for valueX in rowVec:
+                    EE.nodes[i].xPos = valueX
+                    i += 1
+            if row_count == 1:
+                for valueY in rowVec:
+                    EE.nodes[i].yPos = valueY
+                    i += 1
+            row_count += 1
+
+    '''
+
+
+    '''
+    EE.nodes[0].xPos = 130
+    EE.nodes[0].yPos = 130
+    
+    EE.nodes[1].xPos = 170
+    EE.nodes[1].yPos = 130
+    
+    EE.nodes[2].xPos = 130
+    EE.nodes[2].yPos = 170
+    
+    EE.nodes[3].xPos = 170
+    EE.nodes[3].yPos = 170
+    '''
+
+    # Change default sink position to being in middle of grid
+    EE.sink.xPos = xSize/2
+    EE.sink.yPos = ySize/2
+
+    PRcontrol = []
+    timeSegTemp = 0
+
+    '''
+    EE.updateEnv(20, 43, PRcontrl)  # [sinkx, sinky, PRlist]
+    x, y = EE.sink.getPos()
+    print(f"x = {x},  y = {y} \n")
+    print("----------------------------------------")
+    for i in range(numNodes):
+        print(EE.nodes[i].PA)
+    EE.updateEnv(-120, 30, PRcontrl)  # [sinkx, sinky, PRlist]
+    x, y = EE.sink.getPos()
+    print(f"x = {x},  y = {y} \n")
+    print("----------------------------------------")
+    EE.updateEnv(305, 660, PRcontrl)  # [sinkx, sinky, PRlist]
+    x, y = EE.sink.getPos()
+    print(f"x = {x},  y = {y} \n")
+    print("----------------------------------------")
+    EE.updateEnv(-1000, -1000, PRcontrl)
+    x, y, d = EE.sinkStatus()
+    print(f"x = {x},  y = {y}, dataRecieved = {d} \n")
+    print("----------------------------------------")
+    EE.updateEnv(20, 20, PRcontrl)
+    x, y, d = EE.sinkStatus()
+    print(f"x = {x},  y = {y}, dataRecieved = {d} \n")
+    print("----------------------------------------")
+    states = EE.getStates()
+    '''
+    while True:  # Run until all node dies
+        #print(f"Round = {EE.rnd}")
+
+        # print(f"plotRnd Length = {len(EE.plotRnd)}")
+        # print(f"meanEClist Length = {len(EE.meanEClist)}")
+        # print(f"EClist Length = {len(EE.EClist)}")
+        # print(f"PackReclist Length = {len(EE.PackReclist)}")
+        # print(f"deadnodes Length = {len(EE.deadNodes)}")
+
+        #plotEnv(EE)
+
+        '''
+        temp = random.random()
+        x = 0
+        y = 0
+
+        if temp < 0.25 and temp >= 0:
+            x = -1
+        elif temp < 0.5 and temp >= 0.25:
+            x = 1
+        elif temp < 0.75 and temp >= 0.5:
+            y = -1
+        elif temp < 1 and temp >= 0.75:
+            
+            y = 1
+            
+        '''
+
+
+        timeSegTemp = 0
+
+        for i in range(time_segments):
+
+            if i == 0:
+                EE.cluster()
+
+            if timeSegTemp == time_segments - 1:  # Send one package at the end of each round
+                for i in range(numNodes):
+                    PRcontrol = []
+                    PRcontrol.append([i, 1])  # [Node ID, PR of node]
+            if timeSegTemp == 0:
+                for i in range(numNodes):
+                    PRcontrol = []
+                    PRcontrol.append([i, 0])  # [Node ID, PR of node]
+
+            EE.updateEnv(0, 0, PRcontrol)
+
+
+            if timeSegTemp == time_segments - 1: # Non CH sending at end of each round
+                for i in range(len(EE.nodes)):
+                    if EE.nodes[i].alive:
+                        if(EE.nodes[i].CHstatus == 0):
+                            outcome = EE.nodes[i].sendMsg(EE.sink)
+                            if not outcome:
+                                print(f"Node {EE.nodes[i].ID} failed to send to node {EE.nodes[i].CHparent.ID}!\n")
+                                actionmsg = EE.nodes[i].getActionMsg()
+                                print(str(actionmsg) + "\n")
+
+            for i in range(len(EE.nodes)): # CH sending
+                if EE.nodes[i].alive:
+                    if(EE.nodes[i].CHstatus == 1):
+                        outcome = EE.nodes[i].sendMsg(EE.sink)
+                        if not outcome:
+                            print(f"Node {EE.nodes[i].ID} failed to send to node {EE.nodes[i].CHparent.ID}!\n")
+                            actionmsg = EE.nodes[i].getActionMsg()
+                            print(str(actionmsg) + "\n")
+
+
+            timeSegTemp += 1
+            plotEnv(EE, 1)
+
+        EE.iterateRound()
+        print(f"rnd: {EE.rnd}")
+
+        if len(EE.deadNodes) == numNodes:  # Break when all nodes have died
+            break
+
+    print(f"Rounds survived: {EE.rnd}")
+    print(f"Data packets received: {EE.sink.dataRec/1000}")
+
+    '''
+    with open('LEACHresults.txt', 'a', newline='') as f:
+        f.write(str(EE.rnd) + ",")
+        f.write(str(EE.sink.dataRec/1000) + ",")
+    '''
+
 
 '''
 # Testing of classes starts here 
@@ -165,3 +254,5 @@ nodeList[4].connect(nodeList[6])
 nodeList[4].sendMsg(sink)
 print(nodeList[4].actionMsg)
 '''
+
+run()

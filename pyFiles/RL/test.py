@@ -12,14 +12,15 @@ from keras.optimizers import Adam
 
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
+sys.path.append("../MPC")  # Adds higher directory to python modules path.
 from setParams import *
 from plotEnv import *
-from EnvironmentEngine import *
+from EnvironmentEngineMPC import *
 
 import matplotlib.pyplot as plt
 
 
-EPISODES = 10
+EPISODES = 330
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -69,6 +70,8 @@ class DQNAgent:
 
     def load(self, name):
         self.model.load_weights(name)
+        self.model.compile(loss='mae', optimizer=Adam(lr=self.learning_rate))  # Compile NN
+
 
     def save(self, name):
         open(name, 'w').close() # Clear file contents before saving
@@ -81,8 +84,7 @@ if __name__ == "__main__":
     state_size = env.observation_space.shape[0]  # Get amount of states (Amount of states = 2 + 2*numNodes)
     action_size = env.action_space.n  # Get amount of actions
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
-    #agent.load("./save/wsn-dqn.h5")
-    #agent.model.compile(loss='mae', optimizer=Adam(lr=agent.learning_rate))
+    #agent.load("./save/wsn-dqn-new.h5")
 
     '''
     with open('nodePlacement.csv') as nodePlacement_file:
@@ -105,8 +107,8 @@ if __name__ == "__main__":
                     env.EE.nodes[i].yPos = valueY
                     i += 1
             row_count += 1
-
     '''
+
     '''
     env.EE.nodes[0].xPos = 40
     env.EE.nodes[0].yPos = 40
@@ -129,6 +131,8 @@ if __name__ == "__main__":
     avrRnd = []
     # Train agent on episodes
     for e in range(EPISODES):
+
+        # rnd need to be changed here
         done = False
         rnd = 0
         state = env.reset()  # Reset env to a random state
@@ -137,45 +141,54 @@ if __name__ == "__main__":
             state[i] = state[i][1]
         state = np.reshape(state, [1, state_size])  # Reshape for NN
 
-        while not done:
+        while not done: # While-loop trains one episode
             rnd += 1
             action = agent.act(state)
-            next_state_temp, reward, done, _ = env.step(action)
+            next_state_temp, reward, done, _ = env.step(action) # Take one step through WSN env
 
             next_state = [next_state_temp[0], next_state_temp[1]]
             for i in range(numNodes):
-                next_state.append(next_state_temp[2][i][1])
+                next_state.append(next_state_temp[2][i][1]) # Append PR status
             for ii in range(numNodes):
-                next_state.append(next_state_temp[3][ii])
+                next_state.append(next_state_temp[3][ii]) # Append CH status
             next_state = np.array(next_state)
             next_state = np.reshape(next_state, [1, state_size])
-            agent.remember(state, action, reward, next_state, done)
-            state = next_state
+            agent.remember(state, action, reward, next_state, done)  # Fit NN model
+            state = next_state # Current state is now next_state
 
-            if done:
-                print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {rnd} \n")
+
+            if done: # Done if all nodes have died
+                print(f"Episode: {e+1}/{EPISODES}, e: {agent.epsilon}, rnd: {env.EE.rnd} \n")
                 print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000} \n")
+                energyList = []
+                for i in range(numNodes):
+                    energyList.append(env.EE.nodes[i].getEC())
+                print(f"Energy consumed: {sum(energyList)}")
                 break
 
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
 
+            #env.render()  # Uncomment if plot is wanted
+
         avrRnd.append(rnd)
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
-        #agent.save("./save/wsn-dqn.h5")
+        agent.save("./save/wsn-dqn-new.h5")
 
-        if e % 15 == 0: # Change node placement after every 15th round
+        if e % 30 == 0: # Change node placement after every 20th round
             for i in range(numNodes):
-                env.EE.nodes[i].xPos = random.random()*xSize
-                env.EE.nodes[i].yPos = random.random()*ySize
+                env.EE.nodes[i].xPos = round(random.random()*xSize)
+                env.EE.nodes[i].yPos = round(random.random()*ySize)
 
-        #env.render()
 
+
+    # Print episode information
     print(f"avrRnd: {avrRnd}")
     print(f"Mean Rounds Survived: {sum(avrRnd)/len(avrRnd)}")
 
+    # After all episodes have ended, plot how many rounds WSN has survived for every episode
     x = np.linspace(0, len(avrRnd), num=len(avrRnd), endpoint=True)
     plt.plot(x, avrRnd)
     plt.show()
@@ -184,6 +197,8 @@ if __name__ == "__main__":
     done = False
     rnd = 0
     state = env.reset()  # Reset env to a random state
+    env.EE.sink.xPos = xSize/2
+    env.EE.sink.yPos = ySize/2
     # Format state such that it can be used for training
     for i in range(2, numNodes + 2):
         state[i] = state[i][1]
@@ -205,6 +220,12 @@ if __name__ == "__main__":
         state = next_state
 
         if done:
+            print(f"Episode: {1}/{1}, e: {agent.epsilon}, rnd: {env.EE.rnd}")
+            print(f"Data Packets Received Sink: {env.EE.sink.dataRec / 1000}")
+            energyList = []
+            for i in range(numNodes):
+                energyList.append(env.EE.nodes[i].getEC())
+            print(f"Energy consumed: {sum(energyList)}")
             break
 
         env.render()

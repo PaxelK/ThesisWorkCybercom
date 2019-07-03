@@ -9,8 +9,9 @@ from gym import spaces
 # Import needed files
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
+sys.path.append("../MPC")  # Adds higher directory to python modules path.
 from setParams import *
-from EnvironmentEngine import *
+from EnvironmentEngineMPC import *
 from plotEnv import *
 
 # Continous WSN class
@@ -35,7 +36,12 @@ class WSN(gym.Env):
     '''
     def __init__(self):
         # Init the WSN env
-        self.EE = EnvironmentEngine()
+        self.EE = EnvironmentEngineMPC(10, 11)
+
+        # Used when time segments are implemented
+        self.timeSegTemp = 0 # Current time segment
+        self.sendStatus = [False] * numNodes # List containing status if node has sent a packet during current round
+        self.CHtemp = []
 
         # Define size of WSN grid in meters
         self.xSize = xSize
@@ -91,28 +97,35 @@ class WSN(gym.Env):
         # Assert that chosen action is within action space
         assert self.action_space.contains(action), "%r (%s) invalid" % (action, type(action))
 
-        if self.rndCounter % time_segments == 0:  # How often nodes are clustered is determined by time_segment (setParams)
-            # Cluster nodes in WSN env
-            self.EE.cluster()
+        if self.timeSegTemp == time_segments: # New round starts if currentTimeSegment = timeSegment
+            self.EE.iterateRound()
+            self.rndCounter += 1  # Rnd counter for RL env (In this class)
+            self.timeSegTemp = 0
 
-        # Get state of current time step
+        if self.timeSegTemp == 0:
+            # Cluster nodes in WSN env after every round is finished
+            self.EE.cluster()
+            self.sendStatus = [False] * numNodes # Reset transmission status after each round
+
+
+        # Get state of current time step (for action)
         self.state = self.EE.getStates()[0:2]  # Gets the first two elements in the list that's returned by getStates
         # Get PR of every node
         PRtemp  = []
-        CHtemp = []
+        self.CHtemp = []
         for i in range(numNodes):
                 PRtemp.append([self.EE.nodes[i].ID, self.EE.nodes[i].PA])
-                CHtemp.append(self.EE.nodes[i].getCHstatus())
+                self.CHtemp.append(self.EE.nodes[i].getCHstatus())
         self.state.append(PRtemp)
-        self.state.append(CHtemp)
+        self.state.append(self.CHtemp)
         _, _, PR, _ = self.state
 
         # Default values
-        reward = -2
+        reward = -20
         done = False
 
 
-        if len(self.EE.deadNodes) == numNodes:  # Episode is done if all nodes have died
+        if len(self.EE.deadNodes)  == numNodes: # >= 1: # Episode is done if all nodes have died
             done = True
 
         if action == 0:  # This action is yPos -= 1
@@ -182,7 +195,7 @@ class WSN(gym.Env):
         if not action in self.tempActList:
             act_temp = 0  # Variable used to get the corresponding action pair for every node
             for i in range(numNodes):
-                if action == i + act_temp + 4:  # This action is PR += 1
+                if action == i + act_temp + 8:  # This action is PR += 1
                     if self.EE.nodes[i].PA < maxPR:
                         #reward += 5 # self.EE.nodes[i].PA
                         PR[i][1] += 1
@@ -192,8 +205,8 @@ class WSN(gym.Env):
                         reward = -50
                     break  # Break from for-loop when the correct action is found
 
-                elif action == i + act_temp + 5:  # This action is PR -= 1
-                    if self.EE.nodes[i].PA > 1:
+                elif action == i + act_temp + 9:  # This action is PR -= 1
+                    if self.EE.nodes[i].PA > 0:
                         #reward -= 5 # 1/self.EE.nodes[i].PA
                         PR[i][1] -= 1
                         self.state[2][i][1] = self.EE.nodes[i].PA - 1
@@ -203,28 +216,60 @@ class WSN(gym.Env):
                     break  # Break from for-loop when the correct action is found
                 act_temp += 1
 
+        for i in range(numNodes):  # Change send status to True if node has sent during time segment
+            if self.EE.nodes[i].PA > 0 and self.sendStatus == False:
+                self.sendStatus[i] = True
+
+
+
+
+        if self.timeSegTemp == time_segments - 1 and not all(self.sendStatus): # Ensure that all node sends 1 packet each round
+            reward -= 1000
+            for i in range(numNodes):
+                if self.sendStatus[i] == False:
+                    self.EE.nodes[i].PA = 1 # If node didn't send anything during a round, it now sends 1 packet
+
         for i in range(numNodes):
             #if self.EE.nodes[i].CHstatus == 1:  # If node is a CH
             dist = self.EE.nodes[i].getDistance(self.EE.sink)
             pacRate = self.EE.nodes[i].PA
             if dist >= max(xSize, ySize) / 2:
-                reward -= 100000 * dist
-                reward += 0.0001 * pacRate
+                reward -= 0.6 * dist
+                reward += 1 * pacRate
             elif dist < max(xSize, ySize) / 2 and pacRate >= maxPR / 2:
-                reward -= 25000 * dist
-                reward += 0.0005 * pacRate
+                reward -= 3.4 * dist
+                reward += 5 * pacRate
             elif dist < max(xSize, ySize) / 2 and pacRate < maxPR / 2:
-                reward -= 60000 * dist
-                reward += 0.0003 * pacRate
+                reward -= 2 * dist
+                reward += 3 * pacRate
             # reward -= (self.EE.nodes[i].getDistance(self.EE.sink) * 400) # * 0.05)  # Reward for distance to each CH
             # reward += self.EE.nodes[i].energy * 0.05
             # reward += self.EE.nodes[i].PA * 0.01
         # reward += (self.EE.nodes[0].getEnergy() * 0.0001)
 
         # Increment WSN env
-        self.EE.communicate()
-        self.EE.iterateRound()
-        self.rndCounter += 1
+        # Substitute for communicate function in EnvironmentalEngine
+        if self.timeSegTemp == time_segments - 1:  # Non CH sending at end of each round
+            for i in range(len(self.EE.nodes)):
+                if self.EE.nodes[i].alive:
+                    if (self.EE.nodes[i].CHstatus == 0):
+                        outcome = self.EE.nodes[i].sendMsg(self.EE.sink)
+                        if not outcome:
+                            print(f"Node {self.EE.nodes[i].ID} failed to send to node {self.EE.nodes[i].CHparent.ID}!\n")
+                            actionmsg = self.EE.nodes[i].getActionMsg()
+                            print(str(actionmsg) + "\n")
+
+        for i in range(len(self.EE.nodes)):  # CH can send every time segment
+            if self.EE.nodes[i].alive:
+                if (self.EE.nodes[i].CHstatus == 1):
+                    outcome = self.EE.nodes[i].sendMsg(self.EE.sink)
+                    if not outcome:
+                        print(f"Node {self.EE.nodes[i].ID} failed to send to node {self.EE.nodes[i].CHparent.ID}!\n")
+                        actionmsg = self.EE.nodes[i].getActionMsg()
+                        print(str(actionmsg) + "\n")
+
+        self.timeSegTemp += 1
+
 
         return np.array(self.state), reward, done, {}
 
@@ -232,6 +277,8 @@ class WSN(gym.Env):
         '''
         Resets the entire WSN by placing the sink in a random position and all nodes have a random PR
         '''
+        self.sendStatus = [False] * numNodes
+        self.timeSegTemp = 0
 
         self.rndCounter = 0
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
@@ -315,6 +362,5 @@ class WSN(gym.Env):
         This method plots the WSN env
         :return: None
         '''
-        plotEnv(self.EE)
-
+        plotEnv(self.EE, 3)
 
