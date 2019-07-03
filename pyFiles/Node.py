@@ -40,6 +40,7 @@ class Node:
         self.CHflag = 0                        # Determines if node has been CH during a LEACH episode
         self.conChildren = 0                   # Number of connected children.
         self.tempDataRec = 0                   # Temporary held data that are then going to the sink.
+        self.tempDataSent = 0
         self.maxPR = sP.maxPR                  # Maximum amount of packets that can be sent during a transmission round
         if self.energy > 0:
             self.alive = True                  # Boolean for if node is alive
@@ -219,6 +220,7 @@ class Node:
                                      " successfully sent to target node " + str(self.CHparent.ID) + " of type " +\
                                      str(self.CHparent.CHstatus) + '.'
                     self.PS += k + self.tempDataRec               # Update packages sent
+                    self.tempDataSent += k
                     self.CHparent.dataRec += k          # Update packets received for CH
                     self.CHparent.tempDataRec += k      # Update temporary packets received for CH which are then sent on to the sink as well
                     outcome = True
@@ -258,7 +260,7 @@ class Node:
                     # If no power failure was had, data has been transmitted and received
                     self.actionMsg = "Node " + str(self.ID) + " successfully sent to sink " + str(sink.ID) + "!\n"
                     self.PS += k + self.tempDataRec
-                    
+                    self.tempDataSent += k
                     sink.dataRec += self.tempDataRec + k
                     outcome = True
 
