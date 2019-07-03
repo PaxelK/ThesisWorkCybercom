@@ -2,6 +2,9 @@ import math  # Needed for sqrt
 import random
 import setParams as sP
 import numpy as np
+import matplotlib.pyplot as plt
+import pylab as pl
+
 
 class Node:
     def __init__(self, id, x, y, nrj):
@@ -349,8 +352,16 @@ class Node:
             self.CHflag = 1
         else:
             self.CHstatus = 0
+            
+        return t
 
 
 
 if __name__ == "__main__":
     n = Node(1, 5, 5, 0.5)
+    t = []
+    p = 0.1
+    for i in range(30):
+        t_temp = n.generateCHstatus(1.5, 2,2,p,i)
+        t.append(t_temp)
+    print(t)
