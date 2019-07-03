@@ -46,6 +46,10 @@ temp_leach_dat = 0
 temp_ppJleach = 0
 temp_ppjMPC = 0
 
+totEn = 0
+
+for node in EE_MPC.nodes:
+    totEn += node.energy
 """
 The greater loop. One loop represents a round. During this loop the following steps occur:
     1. The environment is plotted, shows change in network energy and packages aggrevated
@@ -80,7 +84,7 @@ for test in range(1):
             EE_MPC.sink.setTarPoint(optimalP[0], optimalP[1])
             
             print('Expected lifetime in rounds: {0}'.format(EE_MPC.expLifetime))
-            print('Packages received by sink: {0}'.format(EE_MPC.sink.dataRec))
+            print('Data received by sink: {0}'.format(EE_MPC.sink.dataRec))
             print('Alive nodes: {0}\nDeadNodes: {1}'.format(len(EE_MPC.nodesAlive), len(EE_MPC.deadNodes)))
             print('Number of nodes alive: {0}'.format(len(EE_MPC.nodesAlive)))
             print('Number of CHs active: {0}'.format(len(EE_MPC.CHds)))
@@ -230,13 +234,13 @@ for test in range(1):
         
         for e in EE_MPC.nodes:
             sumen += e.energy
-        MPC_en = 5-sumen
+        MPC_en = totEn-sumen
         MPC_enDiff = MPC_en - temp_MPC_en
         temp_MPC_en = MPC_en
         
         for e in EE_leach.nodes:
             sumen1 += e.energy
-        leach_en = 5-sumen1   
+        leach_en = totEn-sumen1   
         leach_enDiff = leach_en - temp_leach_en
         temp_leach_en = leach_en
         
