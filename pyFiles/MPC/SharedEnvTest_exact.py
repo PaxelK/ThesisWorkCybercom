@@ -11,14 +11,14 @@ import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from MPCnode_v3 import MPCnode
 from MPCsink import MPCsink
-from MPC2ndLayer_2D_v2 import MPC2ndLayer
+from MPC2ndLayerTest import MPC2ndLayer
 from plotEnv import *
 from setParamsMPC import *
 import copy
 import csv
 
 
-ctrlHrz = 2
+ctrlHrz = 10
 ctrlRes = ctrlHrz + 1
 EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
 EE_leach = copy.deepcopy(EE_MPC)
@@ -37,6 +37,7 @@ enQuotas = []
 datQuotas = []
 ppJleach = []
 ppJMPC = []
+ch_amounts = []
 
 temp_MPC_en = 0
 temp_leach_en = 0
@@ -68,11 +69,13 @@ The greater loop. One loop represents a round. During this loop the following st
                 d) The sink moves another step on its planned route.
     6. iterateRound() is called to record network stats and prepare the network for the next round.            
 """
+desdatasum = 0
+actualdatasum = 0
 for test in range(1):
     EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
     EE_leach = copy.deepcopy(EE_MPC)
     while True:  # Run until all node dies
-    #for q in range(100):
+    #for q in range(2):
         print(f"Round = {EE_MPC.rnd}")
         
         #plotEnv(EE_leach)
@@ -89,8 +92,10 @@ for test in range(1):
             print('Number of nodes alive: {0}'.format(len(EE_MPC.nodesAlive)))
             print('Number of CHs active: {0}'.format(len(EE_MPC.CHds)))
             print('Sink Position: X={0}, Y={1}'.format(EE_MPC.sink.xPos, EE_MPC.sink.yPos))
+            
             for g in EE_MPC.CHds: 
                 print('Cluster Head {0}, data: {1}'.format(g.ID, g.desData))
+                desdatasum += g.desData
                 
             EE_MPC.newCycle = True
             for i in range(time_segments): #time_segments
@@ -214,7 +219,7 @@ for test in range(1):
         If the number of dead nodes reaches the total number of nodes, the network is seen as
         dead and the loop ceases.
         """
-        if len(EE_MPC.deadNodes) == 1 or len(EE_leach.deadNodes) == 1:  # Break when all nodes have died
+        if len(EE_MPC.deadNodes) >= 1 or len(EE_leach.deadNodes) >= 1:  # Break when all nodes have died
                 print('MPC BREAKPOINT AT ROUND {0}'.format(EE_MPC.rnd))
                 print('LEACH BREAKPOINT AT ROUND {0}'.format(EE_leach.rnd))
                 totRounds_MPC.append(EE_MPC.rnd)
@@ -267,13 +272,15 @@ for test in range(1):
         ppJMPC.append(ppJ_MPC)
         """
         if(leach_enDiff != 0):
-            ppJ_leach = leach_datDiff/leach_enDiff/ps
+            ppJ_leach = (leach_datDiff/ps)/leach_enDiff
         ppJleach.append(ppJ_leach)
         if(MPC_enDiff != 0 and MPC_datDiff != 0):    
-            ppJ_MPC = MPC_datDiff/MPC_enDiff/ps
+            ppJ_MPC = (MPC_datDiff/ps)/MPC_enDiff
         ppJMPC.append(ppJ_MPC)
         print('Packets per Joule for MPC: {0}\nPackets per Joule for leach: {1}'.format(ppJ_MPC, ppJ_leach))
         print('\n\n')
+        
+        ch_amounts.append(len(EE_MPC.CHds))
         
         plotEnv(EE_MPC,1) 
         plotEnv(EE_leach,1) 
@@ -281,19 +288,31 @@ for test in range(1):
         #if(q==2):
         #    break
         
-        if(len(EE_leach.deadNodes) != 1):
+        if(len(EE_leach.deadNodes) < 1):
             EE_leach.iterateRound()
-        if(len(EE_MPC.deadNodes) != 1):
+        if(len(EE_MPC.deadNodes) < 1):
+            for g in EE_MPC.CHds: 
+                actualdatasum += g.tempDataSent
             EE_MPC.iterateRound()
         
             
-pltrnds = np.linspace(0,len(ppJleach)-1, len(ppJleach))
+pltrnds = np.linspace(1,len(ppJleach), len(ppJleach))
+plt.figure(1)
 plt.plot(pltrnds, ppJleach, pltrnds, ppJMPC)
 plt.legend(['LEACH', 'MPC'])
 plt.xlabel("Round", fontsize =11)
 plt.ylabel("Pack/J", fontsize =11)
 avrgppJ_MPC = sum(ppJMPC)/len(ppJMPC)
 avrgppJ_leach = sum(ppJleach)/len(ppJleach)
+
+plt.figure(2)
+plt.plot(pltrnds, ch_amounts)
+plt.xlabel("Round", fontsize =11)
+plt.ylabel("#CHs", fontsize =11)
+           
+avrgppJ_MPC = sum(ppJMPC)/len(ppJMPC)
+avrgppJ_leach = sum(ppJleach)/len(ppJleach)
+
 
 print('Average ppJ MPC: {0}'.format(avrgppJ_MPC))
 print('Average ppJ LEACH: {0}'.format(avrgppJ_leach))

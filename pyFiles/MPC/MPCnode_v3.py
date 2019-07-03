@@ -221,7 +221,7 @@ class MPCnode(Node):
             self.errorFlag = True
             self.DLcounter += 1
         
-        if(self.DLcounter > time_segments):
+        if(self.DLcounter >= time_segments):
             self.DLcounter = 0
 
         rmtree(self.m._path)
@@ -250,13 +250,13 @@ if __name__ == "__main__":
     testNode1.setDesData(70)
     testNode.energy = 0.005
     testNode1.energy = 0.05
-    for j in range(1):
+    for j in range(2):
         if(j > 0):
             testNode.PS = 0
             testNode1.PS = 0
             testNode.resetGEKKO()
             testNode1.resetGEKKO()
-        for i in range(2):
+        for i in range(10):
             testNode.updateEnergy(-testNode.Egen)
             testNode1.updateEnergy(-testNode1.Egen)
             sink.produce_MoveVector()
