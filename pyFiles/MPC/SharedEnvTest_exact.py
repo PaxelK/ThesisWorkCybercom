@@ -18,7 +18,7 @@ import copy
 import csv
 
 
-ctrlHrz = 10
+ctrlHrz = 4
 ctrlRes = ctrlHrz + 1
 EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
 EE_leach = copy.deepcopy(EE_MPC)
