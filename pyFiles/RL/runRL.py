@@ -107,7 +107,7 @@ if __name__ == "__main__":
     env.EE.nodes[3].yPos = 60
     '''
 
-    TESTS = 8
+    TESTS = 10
 
     for tests in range(TESTS):
         nodePlacementGeneration.run()  # Generate new node placement for each test and save in csv file
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 LEACHbool = LEACHenv.step(env.CHtemp)
 
 
-            if done or LEACHbool:  # Break when one environment is dead
+            if done or LEACHbool:  # Break when one environment is dead (or)
                 print(f"Test: {tests+1}/{TESTS}")
                 print("-------------LEACH Results-------------")
                 print(f"Rounds survived: {LEACHenv.EE.rnd}")
@@ -186,12 +186,12 @@ if __name__ == "__main__":
                 print(f"Energy consumed: {sum(energyList)}")
 
                 # Uncomment if results shall be saved
-                '''
+
                 with open('LEACHresults.txt', 'a', newline='') as f:
                     f.write(str(LEACHenv.EE.rnd) + ",")
                     f.write(str(LEACHenv.EE.sink.dataRec / 1000) + ",")
-                    f.write(str(sum(energyList)))
-                '''
+                    f.write(str(sum(energyList)) + ",")
+
 
 
                 print("--------------DQN Results--------------")
@@ -203,12 +203,12 @@ if __name__ == "__main__":
                 print(f"Energy consumed: {sum(energyListDQN)}")
 
                 # Uncomment if results shall be saved
-                '''
+
                 with open('RLresults.txt', 'a', newline='') as fDQN:
                     fDQN.write(str(env.EE.rnd) + ",")
                     fDQN.write(str(env.EE.sink.dataRec / 1000) + ",")
-                    fDQN.write(str(sum(energyListDQN)))
-                '''
+                    fDQN.write(str(sum(energyListDQN)) + ",")
+
                 break
 
             if len(agent.memory) > batch_size:
