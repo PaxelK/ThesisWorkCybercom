@@ -31,7 +31,7 @@ class MPCnode(Node):
         self.ctrlRes = ctrlRes                  # Control Resolution. Number of control steps within the control horizon
         #self.m.time = np.linspace( 0, self.ctrlHrz, self.ctrlRes)
         self.desData = 0
-        self.DLcounter = 0                      # Counts control steps during a round in order to be able to move the deadline forward after each control cycle
+        self.DLcounter = 1                     # Counts control steps during a round in order to be able to move the deadline forward after each control cycle
         # constants
         self.Egen = 1*10**-5
         self.Egen = 0
@@ -222,7 +222,7 @@ class MPCnode(Node):
             self.DLcounter += 1
         
         if(self.DLcounter > time_segments):
-            self.DLcounter = 0
+            self.DLcounter = 1
 
         rmtree(self.m._path)
 
@@ -250,13 +250,13 @@ if __name__ == "__main__":
     testNode1.setDesData(70)
     testNode.energy = 0.005
     testNode1.energy = 0.05
-    for j in range(1):
+    for j in range(2):
         if(j > 0):
             testNode.PS = 0
             testNode1.PS = 0
             testNode.resetGEKKO()
             testNode1.resetGEKKO()
-        for i in range(2):
+        for i in range(10):
             testNode.updateEnergy(-testNode.Egen)
             testNode1.updateEnergy(-testNode1.Egen)
             sink.produce_MoveVector()

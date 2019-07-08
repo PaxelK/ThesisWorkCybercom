@@ -219,6 +219,7 @@ class EnvironmentEngineMPC:
 
         for node in self.nodes:
             tempNRJ += node.nrjCons
+            node.tempDataSent = 0
             if node.alive:
                 self.nodesAlive.append(node)
             else:
