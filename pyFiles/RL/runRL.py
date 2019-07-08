@@ -16,7 +16,7 @@ import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
 from setParams import *
 from plotEnv import *
-from EnvironmentEngine import *
+from EnvironmentEngineMPC import *
 
 import matplotlib.pyplot as plt
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
 
     '''
-    # If node placement needs to be hardcoded 
+    # Uncomment if node placement needs to be hardcoded 
     env.EE.nodes[0].xPos = 130
     env.EE.nodes[0].yPos = 130
 
@@ -107,10 +107,10 @@ if __name__ == "__main__":
     env.EE.nodes[3].yPos = 60
     '''
 
-    TESTS = 8
+    TESTS = 10
 
     for tests in range(TESTS):
-        nodePlacementGeneration.run()  # Generate new node placement and save in csv file
+        nodePlacementGeneration.run()  # Generate new node placement for each test and save in csv file
         LEACHenv = LEACHtest.create()  # Create instance of LEACH environment
         LEACHenv.placeNodes()  # Place nodes according to node generation
 
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 LEACHbool = LEACHenv.step(env.CHtemp)
 
 
-            if done or LEACHbool:  # Break when one environment is dead
+            if done or LEACHbool:  # Break when one environment is dead (or)
                 print(f"Test: {tests+1}/{TESTS}")
                 print("-------------LEACH Results-------------")
                 print(f"Rounds survived: {LEACHenv.EE.rnd}")
@@ -186,12 +186,12 @@ if __name__ == "__main__":
                 print(f"Energy consumed: {sum(energyList)}")
 
                 # Uncomment if results shall be saved
-                '''
+
                 with open('LEACHresults.txt', 'a', newline='') as f:
                     f.write(str(LEACHenv.EE.rnd) + ",")
                     f.write(str(LEACHenv.EE.sink.dataRec / 1000) + ",")
-                    f.write(str(sum(energyList)))
-                '''
+                    f.write(str(sum(energyList)) + ",")
+
 
 
                 print("--------------DQN Results--------------")
@@ -203,12 +203,12 @@ if __name__ == "__main__":
                 print(f"Energy consumed: {sum(energyListDQN)}")
 
                 # Uncomment if results shall be saved
-                '''
+
                 with open('RLresults.txt', 'a', newline='') as fDQN:
                     fDQN.write(str(env.EE.rnd) + ",")
                     fDQN.write(str(env.EE.sink.dataRec / 1000) + ",")
-                    fDQN.write(str(sum(energyListDQN)))
-                '''
+                    fDQN.write(str(sum(energyListDQN)) + ",")
+
                 break
 
             if len(agent.memory) > batch_size:

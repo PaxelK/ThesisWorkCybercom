@@ -20,7 +20,7 @@ from EnvironmentEngineMPC import *
 import matplotlib.pyplot as plt
 
 
-EPISODES = 330
+EPISODES = 270
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -29,8 +29,8 @@ class DQNAgent:
         self.memory = deque(maxlen=10000)
         self.gamma = 0.8 #0.9    # discount rate
         self.epsilon = 1.0  # exploration rate
-        self.epsilon_min = 0.05
-        self.epsilon_decay = 0.9995
+        self.epsilon_min = 0.01
+        self.epsilon_decay = 0.995
         self.learning_rate = 0.01
         self.model = self._build_model()
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     state_size = env.observation_space.shape[0]  # Get amount of states (Amount of states = 2 + 2*numNodes)
     action_size = env.action_space.n  # Get amount of actions
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
-    #agent.load("./save/wsn-dqn-new.h5")
+    #agent.load("./save/wsn-dqn.h5")
 
     '''
     with open('nodePlacement.csv') as nodePlacement_file:
@@ -175,7 +175,7 @@ if __name__ == "__main__":
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
-        agent.save("./save/wsn-dqn-new.h5")
+        agent.save("./save/wsn-dqn.h5")
 
         if e % 30 == 0: # Change node placement after every 20th round
             for i in range(numNodes):
