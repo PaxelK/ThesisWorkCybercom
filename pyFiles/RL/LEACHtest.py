@@ -47,8 +47,8 @@ class LEACHtest():
         PRcontrol = []
         if self.timeSegTemp == 0: # Cluster at each round (not time segment)
             # Change CH status of nodes (Uncomment if until all node dies)
-            #self.EE.cluster()
-
+            self.EE.cluster()
+            '''
             for i in range(len(self.EE.nodes)):
                 self.EE.nodes[i].resetConChildren()
                 self.EE.nodes[i].clearTempDataRec()
@@ -77,7 +77,7 @@ class LEACHtest():
                 else:  # If node is CH, connect to sink
                     self.EE.nodes[i].connect(self.EE.sink)
         
-
+            '''
         # -------------------------------Identical CH status generation ends here--------------------------------
 
         if self.timeSegTemp == time_segments - 1:  # All ndoes send one package at the end of each round
@@ -116,7 +116,7 @@ class LEACHtest():
 
 
         # When one node have died the episode has finished (can be changed to all nodes died)
-        if len(self.EE.deadNodes) >= 1:  # == numNodes:
+        if len(self.EE.deadNodes) == numNodes:  # >= 1:
             return True  # Return True if LEACH is finished
         else:
             return False  # Otherwise return False
