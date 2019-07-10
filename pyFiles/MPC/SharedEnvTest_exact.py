@@ -18,7 +18,7 @@ import copy
 import csv
 
 
-ctrlHrz = 4
+ctrlHrz = 2
 ctrlRes = ctrlHrz + 1
 EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
 EE_leach = copy.deepcopy(EE_MPC)
@@ -75,7 +75,7 @@ for test in range(1):
     EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
     EE_leach = copy.deepcopy(EE_MPC)
     while True:  # Run until all node dies
-    #for q in range(15):
+    #for q in range(1):
         print(f"Round = {EE_MPC.rnd}")
         
         #plotEnv(EE_leach)
