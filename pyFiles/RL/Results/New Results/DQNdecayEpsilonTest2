@@ -1,9 +1,16 @@
-------------One Node Dies----------
+------------One Node Dies 1J ----------
 LEACH:
 RL:
-------------All Node Dies----------
+------------One Node Dies 0.05J ----------
 LEACH:
 RL:
+------------All Node Dies 1J----------
+LEACH:
+RL:
+------------All Node Dies 0.05J----------
+LEACH:
+RL:
+
 
 
 Rewards:
