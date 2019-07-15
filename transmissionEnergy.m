@@ -37,7 +37,7 @@ end
 
 ppJ = (b.*ones(maxDist) + k.*ones(maxDist).*conChildr')./(k.*(nrj));
 
-ppJ_dtr = (dtr.*ones(maxDist) + k.*ones(maxDist).*conCh)./(k.*(nrj_dtr));
+ppJ_dtr = (dtr'.*ones(maxDist) + k.*ones(maxDist).*conCh)./(k.*(nrj_dtr)');
 
 figure(1)
 surfl(d, conChildr, nrj)
