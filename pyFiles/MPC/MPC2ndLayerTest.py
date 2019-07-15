@@ -50,22 +50,47 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         #self.snkPos = [self.m.Param(value = 50), self.m.Param(value = 50)]
         self.snkPos = [self.m.Var(value = 50, lb = 0, ub = xSize), self.m.Var(value = 50, lb = 0, ub = ySize)] 
 
+        E_temp = 0
+        if self.CHds:
+            for i in range(len(self.CHds)):
+                self.CHxPos.append(self.m.Param(value = self.CHds[i].xPos))
+                self.CHyPos.append(self.m.Param(value = self.CHds[i].yPos))
+                
+                temp = np.sqrt((self.CHds[i].xPos)**2 + (self.CHds[i].yPos)**2)
+                self.CHdstLst.append(self.m.Var(value = temp))
+                
+                self.m.Equation(self.CHdstLst[i] == self.m.abs2(self.m.sqrt((self.snkPos[0] - self.CHxPos[i])**2 + (self.snkPos[1] - self.CHyPos[i])**2)))
+                
+                self.ECH_sum.append(self.m.Var(value = self.CHds[i].energy))
+                
+                E_temp += self.CHds[i].energy
+                
+                self.dtrLst.append(self.m.Var(value = 1, lb = 1, ub = 20))
+                self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.CHds[i].conChildren + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdstLst[i]**2)))
+                self.m.Equation(self.ECH_sum[i] >= self.e1Sum[i])
+                
+            self.E_tot = self.m.Param(value = E_temp)
+            self.m.Equation(self.E_tot >= self.m.sum(self.e1Sum))
+            self.denominator = self.m.Intermediate(self.m.sum(self.e1Sum))
+        else:
+            for i in range(len(self.nonCHds)):
+                self.CHxPos.append(self.m.Param(value = self.nonCHds[i].xPos))
+                self.CHyPos.append(self.m.Param(value = self.nonCHds[i].yPos))
+                
+                temp = np.sqrt((self.nonCHds[i].xPos)**2 + (self.nonCHds[i].yPos)**2)
+                self.CHdstLst.append(self.m.Var(value = temp))
+                
+                self.m.Equation(self.CHdstLst[-1] == self.m.abs2(self.m.sqrt((self.snkPos[0] - self.CHxPos[-1])**2 + (self.snkPos[1] - self.CHyPos[-1])**2)))
+                
+                
+            #self.rnds = self.m.Var(lb = 0, integer = True)
         
         
-        for i in range(len(self.CHds)):
-            self.CHxPos.append(self.m.Param(value = self.CHds[i].xPos))
-            self.CHyPos.append(self.m.Param(value = self.CHds[i].yPos))
             
-            temp = np.sqrt((self.CHds[i].xPos)**2 + (self.CHds[i].yPos)**2)
-            self.CHdstLst.append(self.m.Var(value = temp))
-            
-            self.m.Equation(self.CHdstLst[i] == self.m.abs2(self.m.sqrt((self.snkPos[0] - self.CHxPos[i])**2 + (self.snkPos[1] - self.CHyPos[i])**2)))
+        #for i in range(len(self.freeNonCHds)):
+        #    self.EnonCH_sum.append(self.m.Var(value = self.freeNonCHds[i].energy))
         
-        if self.verbose:
-            print('CHxPos:\n {0}'.format(self.CHxPos))
-            print('CHyPos:\n {0}'.format(self.CHyPos))
-            print('CHdstLst:\n {0}'.format(self.CHdstLst))
-        
+
         
         """ 
         # OPTED TO TAKE AWAY FREE NON CHS FROM EQUATION AND TRANSMIT FROM THEM 
@@ -89,31 +114,10 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             print('nonCHdstLst:\n {0}'.format(self.nonCHdstLst))
         """
 
-        #self.rnds = self.m.Var(lb = 0, integer = True)
-        
-        for i in range(len(self.CHds)):
-            self.ECH_sum.append(self.m.Var(value = self.CHds[i].energy))
-        #for i in range(len(self.freeNonCHds)):
-        #    self.EnonCH_sum.append(self.m.Var(value = self.freeNonCHds[i].energy))
-        
-        if self.verbose:
-            print('ECH_sum:\n {0}'.format(self.ECH_sum))
-            print('ECH_sum:\n {0}'.format(self.m.sum(self.ECH_sum).value))
-            print('EnonCH_sum:\n {0}'.format(self.EnonCH_sum))
-
-
-        
-        E_temp = 0
-        for n in self.CHds:
-            E_temp += n.energy
         #for nf in self.freeNonCHds:
         #    E_temp += nf.energy
-        self.E_tot = self.m.Param(value = E_temp)
         
-        for i in range(len(self.CHds)):
-            self.dtrLst.append(self.m.Var(value = 1, lb = 1, ub = 20))
-            self.e1Sum.append(self.m.Intermediate((Eelec+EDA)*self.CHds[i].conChildren + self.dtrLst[-1]*self.pSize*(Eelec + Eamp * self.CHdstLst[i]**2)))
-            self.m.Equation(self.ECH_sum[i] >= self.e1Sum[i])
+        
         """
         for i in range(len(self.freeNonCHds)):
             #self.e2Sum.append(self.m.Intermediate(self.freeNonCHds[i].PA*self.pSize*(Eelec + Eamp * self.nonCHdstLst[i]**2)))
@@ -128,17 +132,18 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             print('E_tot:\n {0}'.format(self.E_tot.value))
          
         #self.m.Equation(self.E_tot >= (self.m.sum(self.e1Sum) + self.m.sum(self.e2Sum))*self.rnds)
-        self.m.Equation(self.E_tot >= self.m.sum(self.e1Sum))
-        self.denominator = self.m.Intermediate(self.m.sum(self.e1Sum))
+        
         
         #print('E1SUM: {0}'.format(self.m.sum(self.e1Sum).value))
-        C  = 1*10**-10
+        self.sumDist = self.m.Intermediate(self.m.sum(self.CHdstLst))
         
-        self.target = self.m.Intermediate(self.m.sum(self.dtrLst)/(self.denominator+C))
-
-        
-        self.m.Obj(-self.target)        
-        
+        if self.CHds:
+            C  = 1*10**-10
+            self.target = self.m.Intermediate(self.m.sum(self.dtrLst)/(self.denominator+C)) 
+            self.m.Obj(-self.target)
+        else:
+            self.target = self.m.Intermediate(self.m.sum(self.CHdstLst)**2) 
+            self.m.Obj(self.target) 
         
         
         try:
@@ -148,8 +153,15 @@ class MPC2ndLayer(EnvironmentEngineMPC):
             self.errorFlag = True
         print('Sink X: {0}'.format(self.snkPos[0].value))
         print('Sink Y: {0}'.format(self.snkPos[1].value))
-        print('ppJ: {0}'.format(self.target.value))
-        print('Denominator: {0}'.format(self.denominator.value))
+        if self.CHds:
+            print('ppJ: {0}'.format(self.target.value))
+            print('Denominator: {0}'.format(self.denominator.value))
+            
+            mdist = self.sumDist[0]/len(self.CHds)
+            print('Mean Distance: {0}'.format(mdist))
+        else:
+            mdist = np.sqrt(self.target.value)/len(self.nonCHds)
+            print('Mean Distance: {0}'.format(mdist))
         ################################################################
         #   This part executes the control input on the nodes and sink #
         if self.errorFlag:
@@ -202,10 +214,20 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         self.m.options.MAX_TIME = 10
     def plot(self):
         IDs = []
-        for ch in self.CHds:
-            IDs.append(str(ch.ID))
-
-
+        if self.CHds:
+            for ch in self.CHds:
+                IDs.append(str(ch.ID))
+            
+            DTRL = []
+            if(self.errorFlag):
+                for chd in self.CHds:
+                    DTRL.append(chd.desData)         
+            else:
+                for i in range(len(self.dtrLst)):  
+                    DTRL.append(self.dtrLst[i][0])
+        else:
+            for n_ch in self.nonCHds:
+                IDs.append(str(n_ch.ID))
         ydtr = np.linspace(0,20,11)
         
         #maxDist = np.floor(np.sqrt(xSize**2 + ySize**2))
@@ -216,14 +238,7 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         for i in range(len(self.CHdstLst)):
             CHDL.append(self.CHdstLst[i][0])
         
-        DTRL = []
-        if(self.errorFlag):
-            for chd in self.CHds:
-                DTRL.append(chd.desData)
-                
-        else:
-            for i in range(len(self.dtrLst)):  
-                DTRL.append(self.dtrLst[i][0])
+        
         
         plt.figure(self.nrplots)
         plt.subplot(2,1,1)
@@ -232,14 +247,14 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         plt.ylabel('distance')
         
 
-        
-        plt.subplot(2,1,2)
-        plt.bar(IDs, DTRL, align='center', alpha=0.5)
-        plt.yticks(ydtr, ydtr)
-        plt.ylabel('Packets Desired')
-        plt.xlabel('Node ID')
-        plt.xticks(IDs, IDs)
-        plt.show()
+        if self.CHds:
+            plt.subplot(2,1,2)
+            plt.bar(IDs, DTRL, align='center', alpha=0.5)
+            plt.yticks(ydtr, ydtr)
+            plt.ylabel('Packets Desired')
+            plt.xlabel('Node ID')
+            plt.xticks(IDs, IDs)
+            plt.show()
         
         plt.figure(self.nrplots+1)
         for ch in self.CHds:
