@@ -154,11 +154,14 @@ class MPC2ndLayer(EnvironmentEngineMPC):
         print('Sink X: {0}'.format(self.snkPos[0].value))
         print('Sink Y: {0}'.format(self.snkPos[1].value))
         if self.CHds:
-            print('ppJ: {0}'.format(self.target.value))
+            print('Estimated ppJ: {0}'.format(self.target.value))
             print('Denominator: {0}'.format(self.denominator.value))
             
-            mdist = self.sumDist[0]/len(self.CHds)
-            print('Mean Distance: {0}'.format(mdist))
+            if self.sumDist is list:
+                mdist = self.sumDist[0]/len(self.CHds)
+                print('Mean Distance: {0}'.format(mdist))
+            else:
+                mdist = self.sumDist/len(self.CHds)
         else:
             mdist = np.sqrt(self.target.value)/len(self.nonCHds)
             print('Mean Distance: {0}'.format(mdist))
