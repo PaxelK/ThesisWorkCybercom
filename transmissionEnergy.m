@@ -1,4 +1,5 @@
 clc, clear all, close all
+
 Eelec = 50*10^(-9);   	% Energy required to run circuity (both for transmitter and receiver), units in Joules/bit
 Eamp = 100*10^(-12);  	% Transmit Amplifier Types, units in Joules/bit/m^2 (amount of energy spent by the amplifier to transmit the bits)
 EDA = 5*10^(-9);      	% Data Aggregation Energy, units in Joules/bit
@@ -6,7 +7,6 @@ k = 1000;
 
 maxDist = 100;
 d = [1:maxDist];
-
 
 
 conChildr = [1:maxDist];
@@ -23,7 +23,7 @@ for i = 1:maxDist
     end
 end
 
-conCh = 20;
+conCh = 5;
 dtr = 1190:190:20000;
 ERx = conCh*((Eelec + EDA)*k);
 for it = 1:maxDist
@@ -32,8 +32,6 @@ for it = 1:maxDist
         nrj_dtr(it, j) = ERx + ETx;
     end
 end
-
-
 
 ppJ = (b.*ones(maxDist) + k.*ones(maxDist).*conChildr')./(k.*(nrj));
 
@@ -54,11 +52,11 @@ ylabel('Connected Children')
 zlabel('PPJ')
 
 figure(3)
-surfl(d, dtr,nrj_dtr)
+surfl(d, dtr,nrj_dtr')
 title('Energy Cost During Transmission Round for Varying Distance and Packets Transmitted')
 xlabel('Distance [m]')
 ylabel('Bits Transmitted')
-zlabel('PPJ')
+zlabel('Energy Cost')
 
 figure(4)
 surfl(d, dtr,ppJ_dtr)
