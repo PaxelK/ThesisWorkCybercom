@@ -309,7 +309,7 @@ class WSN(gym.Env):
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
             self.state.append([i, random.randint(0, maxPR)])  # CH status is appended below
-            self.EE.nodes[i].energy = random.random() * maxNrj # maxNrj
+            self.EE.nodes[i].energy =  maxNrj # random.random() * maxNrj
             self.EE.nodes[i].SoC = self.EE.nodes[i].energy / self.EE.nodes[i].maxEnergy
             self.EE.nodes[i].PS = 0  # Packages sent = amount of packages the node has sent
             self.EE.nodes[i].nrjCons = 0  # Energy consumed [J] = Amount of energy the node has consumed
