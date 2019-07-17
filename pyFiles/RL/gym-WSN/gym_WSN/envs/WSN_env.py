@@ -42,6 +42,9 @@ class WSN(gym.Env):
         self.timeSegTemp = 0 # Current time segment
         self.sendStatus = [False] * numNodes # List containing status if node has sent a packet during current round
         self.CHtemp = []
+        self.PPJ = []
+        self.nrjList = []
+        self.dataList = []
 
         # Define size of WSN grid in meters
         self.xSize = xSize
@@ -103,6 +106,20 @@ class WSN(gym.Env):
             self.timeSegTemp = 0
 
         if self.timeSegTemp == 0:
+            energy = []
+
+            if self.EE.rnd == 1:
+                self.nrjList.append(0)
+                self.dataList.append(0)
+                self.PPJ.append(0)
+            else:
+                for i in range(numNodes):
+                    energy.append(self.EE.nodes[i].nrjCons)
+                self.nrjList.append(sum(energy))
+                self.dataList.append(self.EE.sink.dataRec)
+
+                self.PPJ.append((self.dataList[-1]-self.dataList[-2])/(self.nrjList[-1]-self.nrjList[-2]))
+
             # Cluster nodes in WSN env after every round is finished
             self.EE.cluster()
             self.sendStatus = [False] * numNodes # Reset transmission status after each round
@@ -125,8 +142,15 @@ class WSN(gym.Env):
         done = False
 
 
-        if len(self.EE.deadNodes) == numNodes: # >= 1:  # Episode is done if all nodes have died
+        if len(self.EE.deadNodes) >= 1: # == numNodes:  # Episode is done if all nodes have died
             done = True
+            '''
+            with open('PPJresultsRL.txt', 'a', newline='') as f:
+                f.write(str(self.PPJ) + ",")
+                f.write(str(self.nrjList) + ",")
+                f.write(str(self.dataList) + ",")
+            '''
+
 
         if action == 0:  # This action is yPos -= 1
             if self.state[1] > 0:
@@ -279,12 +303,13 @@ class WSN(gym.Env):
         '''
         self.sendStatus = [False] * numNodes
         self.timeSegTemp = 0
+        self.PPJ = []
 
         self.rndCounter = 0
         self.state = [random.randint(0, self.xSize), random.randint(0, self.ySize)]
         for i in range(numNodes):
             self.state.append([i, random.randint(0, maxPR)])  # CH status is appended below
-            self.EE.nodes[i].energy = maxNrj  #random.random() * maxNrj
+            self.EE.nodes[i].energy = random.random() * maxNrj # maxNrj
             self.EE.nodes[i].SoC = self.EE.nodes[i].energy / self.EE.nodes[i].maxEnergy
             self.EE.nodes[i].PS = 0  # Packages sent = amount of packages the node has sent
             self.EE.nodes[i].nrjCons = 0  # Energy consumed [J] = Amount of energy the node has consumed

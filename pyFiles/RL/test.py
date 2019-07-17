@@ -28,9 +28,9 @@ class DQNAgent:
         self.action_size = action_size
         self.memory = deque(maxlen=10000)
         self.gamma = 0.8 #0.9    # discount rate
-        self.epsilon = 1.0  # exploration rate
+        self.epsilon = 0.1  # exploration rate
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
+        self.epsilon_decay = 1
         self.learning_rate = 0.01
         self.model = self._build_model()
 
@@ -86,8 +86,7 @@ if __name__ == "__main__":
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
     #agent.load("./save/wsn-dqn.h5")
 
-    '''
-    with open('nodePlacement.csv') as nodePlacement_file:
+    with open('fixNodePlacement.csv') as nodePlacement_file:
         csv_reader = csv.reader(nodePlacement_file, delimiter=',')
         row_count = 0
 
@@ -107,7 +106,7 @@ if __name__ == "__main__":
                     env.EE.nodes[i].yPos = valueY
                     i += 1
             row_count += 1
-    '''
+
 
     '''
     env.EE.nodes[0].xPos = 40
@@ -175,12 +174,14 @@ if __name__ == "__main__":
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
-        agent.save("./save/wsn-dqn.h5")
+        #agent.save("./save/wsn-dqn-fix.h5")
 
+        '''
         if e % 30 == 0: # Change node placement after every 20th round
             for i in range(numNodes):
                 env.EE.nodes[i].xPos = round(random.random()*xSize)
                 env.EE.nodes[i].yPos = round(random.random()*ySize)
+        '''
 
 
 

@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 LEACHbool = LEACHenv.step(env.CHtemp)
 
 
-            if done and LEACHbool:  # Break when one environment is dead (or)
+            if done or LEACHbool:  # Break when one environment is dead (or)
                 print(f"Test: {tests+1}/{TESTS}")
                 print("-------------LEACH Results-------------")
                 print(f"Rounds survived: {LEACHenv.EE.rnd}")

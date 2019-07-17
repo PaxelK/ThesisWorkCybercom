@@ -13,7 +13,9 @@ class LEACHtest():
     def __init__(self):
         self.timeSegTemp = 0
         self.EE = EnvironmentEngineMPC(10, 11)  # Initiate environment
-
+        self.PPJ = []
+        self.nrjList =[]
+        self.dataList = []
 
     def placeNodes(self):
         with open('../RL/nodePlacement.csv') as nodePlacement_file:
@@ -45,10 +47,25 @@ class LEACHtest():
 
     def step(self, CHlist):
         PRcontrol = []
+
         if self.timeSegTemp == 0: # Cluster at each round (not time segment)
+            energy = []
+
+            if self.EE.rnd == 1:
+                self.nrjList.append(0)
+                self.dataList.append(0)
+                self.PPJ.append(0)
+            else:
+                for i in range(numNodes):
+                    energy.append(self.EE.nodes[i].nrjCons)
+                self.nrjList.append(sum(energy))
+                self.dataList.append(self.EE.sink.dataRec)
+
+                self.PPJ.append((self.dataList[-1]-self.dataList[-2])/(self.nrjList[-1]-self.nrjList[-2]))
+
             # Change CH status of nodes (Uncomment if until all node dies)
-            self.EE.cluster()
-            '''
+            #self.EE.cluster()
+
             for i in range(len(self.EE.nodes)):
                 self.EE.nodes[i].resetConChildren()
                 self.EE.nodes[i].clearTempDataRec()
@@ -76,8 +93,8 @@ class LEACHtest():
                         self.EE.nodes[i].connect(self.EE.sink)  # Otherwise connect to the sink
                 else:  # If node is CH, connect to sink
                     self.EE.nodes[i].connect(self.EE.sink)
-        
-            '''
+
+
         # -------------------------------Identical CH status generation ends here--------------------------------
 
         if self.timeSegTemp == time_segments - 1:  # All ndoes send one package at the end of each round
@@ -116,7 +133,14 @@ class LEACHtest():
 
 
         # When one node have died the episode has finished (can be changed to all nodes died)
-        if len(self.EE.deadNodes) == numNodes:  # >= 1:
+        if len(self.EE.deadNodes) >= 1: # == numNodes:
+            '''
+            with open('PPJresultsLEACH.txt', 'a', newline='') as f:
+                f.write(str(self.PPJ) + ",")
+                f.write(str(self.nrjList) + ",")
+                f.write(str(self.dataList) + ",")
+            '''
+
             return True  # Return True if LEACH is finished
         else:
             return False  # Otherwise return False
