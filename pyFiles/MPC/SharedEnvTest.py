@@ -74,7 +74,7 @@ for test in range(1):
     
     for node in EE_MPC.nodes:
         totEn += node.energy
-        node.otherBLEACH = True
+        #node.otherBLEACH = True
     while True:  # Run until all node dies
     #for q in range(1):
         print(f"Round = {EE_leach.rnd}")

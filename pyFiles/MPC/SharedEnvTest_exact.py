@@ -18,13 +18,10 @@ import copy
 import csv
 
 
-ctrlHrz = 10
+ctrlHrz = 2
 ctrlRes = ctrlHrz + 1
-EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
-EE_leach = copy.deepcopy(EE_MPC)
 kill = False #Variable for exiting the greater loop
 
-x, y = EE_MPC.sink.getPos()  # Get position/coordinates of sink
 
 
 totRounds_MPC = []
@@ -49,8 +46,7 @@ temp_ppjMPC = 0
 
 totEn = 0
 
-for node in EE_MPC.nodes:
-    totEn += node.energy
+
 """
 The greater loop. One loop represents a round. During this loop the following steps occur:
     1. The environment is plotted, shows change in network energy and packages aggrevated
@@ -74,6 +70,9 @@ actualdatasum = 0
 for test in range(1):
     EE_MPC = MPC2ndLayer(ctrlHrz, ctrlRes)  # Initiate environment
     EE_leach = copy.deepcopy(EE_MPC)
+    for node in EE_MPC.nodes:
+        totEn += node.energy
+    
     while True:  # Run until all node dies
     #for q in range(1):
         print(f"Round = {EE_MPC.rnd}")
