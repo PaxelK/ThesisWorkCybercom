@@ -1,4 +1,4 @@
-BLEACH rounds: ,[7473]
-BLEACH data [packets]: ,[327718.0]
-LEACH rounds: ,[7026]
-LEACH data [packets]: ,[327496.0]
+BLEACH rounds: ,[7005]
+BLEACH data [packets]: ,[350606.0]
+LEACH rounds: ,[7114]
+LEACH data [packets]: ,[350794.0]
