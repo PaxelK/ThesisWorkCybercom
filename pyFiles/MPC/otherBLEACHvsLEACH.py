@@ -53,7 +53,7 @@ def threadFunc_BLEACH(EE,totRounds_bleach, totPackRec_bleach, case):
 if __name__ == '__main__':
     sprdV = np.linspace(0.5,0.1,5)
     for sprd in sprdV:
-        testRange = 1
+        testRange = 50
         
         totRounds_bleach = multiprocessing.Array('i', testRange)
         totRounds_leach = multiprocessing.Array('i', testRange)
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     
         
         for i in range(testRange):
-            print("Current test case: {0}".format(i))
+            print("Current test case: {0}, with spread = {1}".format(i, sprd))
             EE_leach = EnvironmentEngineMPC(10,11)
             for a in EE_leach.nodes:
                 a.otherBLEACH = True
