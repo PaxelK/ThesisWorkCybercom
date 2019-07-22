@@ -52,6 +52,8 @@ def threadFunc_BLEACH(EE,totRounds_bleach, totPackRec_bleach, case):
         
 if __name__ == '__main__':
     sprdV = np.linspace(0.5,0.1,5)
+    totNrj = 0
+    totNrjList = []
     for sprd in sprdV:
         testRange = 50
         
@@ -68,6 +70,9 @@ if __name__ == '__main__':
             for a in EE_leach.nodes:
                 a.otherBLEACH = True
                 a.spread = sprd
+                totNrj += a.energy
+            totNrjList.append(totNrj)
+            
             EE_BLEACH = copy.deepcopy(EE_leach)
             
             EE_BLEACH.fParam = 0.8
@@ -83,7 +88,7 @@ if __name__ == '__main__':
             thr_bleach.join()
             thr_leach.join()
         
-        fileOpenName = 'Results_ObleachVSleach_REGsprd_0'+str(round(sprd,1))[-1]+ '.txt'
+        fileOpenName = 'Results_ObleachVSleach_RANDsprd_0'+str(round(sprd,1))[-1]+ '.txt'
         with open(fileOpenName, 'w', newline='') as f:
             results = csv.writer(f)
             
@@ -104,4 +109,6 @@ if __name__ == '__main__':
     
             results.writerow(['LEACH rounds: ', totrnd_leach])
             results.writerow(['LEACH data [packets]: ', totpr_leach])
+
+            results.writerow(['Total Energy: ', totNrjList])
   
