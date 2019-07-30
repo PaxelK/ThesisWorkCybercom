@@ -1,0 +1,5 @@
+BLEACH rounds: ,[6522]
+BLEACH data [packets]: ,[169777.0]
+LEACH rounds: ,[6672]
+LEACH data [packets]: ,[169623.0]
+Total Energy: ,"[24.16059724061618, 48.176676689551726, 73.47104773364363]"

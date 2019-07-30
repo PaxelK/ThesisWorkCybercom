@@ -343,7 +343,7 @@ class Node:
         # to generate a t-value according to it's state of charge.
         if(self.otherBLEACH):   
             instance = int(round(self.SoC,2)*100)
-            if instance == 100:
+            if instance >= 100:
                 instance -= 1
             rndIndex = int(round(rnd % (1 / p)))
             t = self.tVector[instance][rndIndex]

@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
-from EnvironmentEngineMPCbleach import EnvironmentEngineMPC
+from EnvironmentEngineMPC import EnvironmentEngineMPC
 from plotEnv import *
 #from setParams import *
 import copy
@@ -52,8 +52,10 @@ def threadFunc_BLEACH(EE,totRounds_bleach, totPackRec_bleach, case):
         
 if __name__ == '__main__':
     sprdV = np.linspace(0.5,0.1,5)
+    totNrj = 0
+    totNrjList = []
     for sprd in sprdV:
-        testRange = 1
+        testRange = 50
         
         totRounds_bleach = multiprocessing.Array('i', testRange)
         totRounds_leach = multiprocessing.Array('i', testRange)
@@ -63,11 +65,14 @@ if __name__ == '__main__':
     
         
         for i in range(testRange):
-            print("Current test case: {0}".format(i))
+            print("Current test case: {0}, with spread = {1}".format(i, sprd))
             EE_leach = EnvironmentEngineMPC(10,11)
             for a in EE_leach.nodes:
                 a.otherBLEACH = True
                 a.spread = sprd
+                totNrj += a.energy
+            totNrjList.append(totNrj)
+            
             EE_BLEACH = copy.deepcopy(EE_leach)
             
             EE_BLEACH.fParam = 0.8
@@ -83,7 +88,7 @@ if __name__ == '__main__':
             thr_bleach.join()
             thr_leach.join()
         
-        fileOpenName = 'Results_ObleachVSleach_REGsprd_0'+str(round(sprd,1))[-1]+ '.txt'
+        fileOpenName = 'Results_ObleachVSleach_RANDsprd_0'+str(round(sprd,1))[-1]+ '.txt'
         with open(fileOpenName, 'w', newline='') as f:
             results = csv.writer(f)
             
@@ -104,4 +109,6 @@ if __name__ == '__main__':
     
             results.writerow(['LEACH rounds: ', totrnd_leach])
             results.writerow(['LEACH data [packets]: ', totpr_leach])
+
+            results.writerow(['Total Energy: ', totNrjList])
   
