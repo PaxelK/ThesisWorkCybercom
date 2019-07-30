@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 import random
 import math
 import gym
@@ -160,6 +161,7 @@ if __name__ == "__main__":
                 action = agent.act(state)
                 next_state_temp, reward, done, _ = env.step(action)
 
+
                 # Format data for training
                 next_state = [next_state_temp[0], next_state_temp[1]]
                 for i in range(numNodes):
@@ -170,6 +172,7 @@ if __name__ == "__main__":
                 next_state = np.reshape(next_state, [1, state_size])
                 agent.remember(state, action, reward, next_state, done)
                 state = next_state
+
 
             if len(LEACHenv.EE.deadNodes) != numNodes: # If LEACH environment is still alive
                 LEACHbool = LEACHenv.step(env.CHtemp)
