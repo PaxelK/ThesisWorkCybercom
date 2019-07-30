@@ -115,10 +115,10 @@ if __name__ == "__main__":
         LEACHenv.placeNodes()  # Place nodes according to node generation
 
         # Run WSN env with plotting after training
-        agent.load("./save/wsn-dqn-new.h5")  # Load weights of DQN from file
+        agent.load("./save/wsn-dqn-fix.h5")  # Load weights of DQN from file
         avrRnd = []
 
-        with open('nodePlacement.csv') as nodePlacement_file:  # Load the new node placement into DQN
+        with open('fixNodePlacement.csv') as nodePlacement_file:  # Load the new node placement into DQN
             csv_reader = csv.reader(nodePlacement_file, delimiter=',')
             row_count = 0
 
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 LEACHbool = LEACHenv.step(env.CHtemp)
 
 
-            if done or LEACHbool:  # Break when one environment is dead (or)
+            if done and LEACHbool:  # Break when one environment is dead (or)
                 print(f"Test: {tests+1}/{TESTS}")
                 print("-------------LEACH Results-------------")
                 print(f"Rounds survived: {LEACHenv.EE.rnd}")

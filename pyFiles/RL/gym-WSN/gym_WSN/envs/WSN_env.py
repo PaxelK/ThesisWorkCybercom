@@ -142,7 +142,7 @@ class WSN(gym.Env):
         done = False
 
 
-        if len(self.EE.deadNodes) >= 1: # == numNodes:  # Episode is done if all nodes have died
+        if len(self.EE.deadNodes) == numNodes: #>= 1:   # Episode is done if all nodes have died
             done = True
             '''
             with open('PPJresultsRL.txt', 'a', newline='') as f:
