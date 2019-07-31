@@ -6,6 +6,7 @@ import numpy as np
 from gym.envs.toy_text import discrete
 from random import *
 from gym import spaces
+import math
 # Import needed files
 import sys
 sys.path.append("..")  # Adds higher directory to python modules path.
@@ -24,6 +25,7 @@ class WSN(gym.Env):
     Y position          0       ySize
     CHstatus            0       1           The same amount as amount of nodes
     PR                  0       3           Amount is amount of nodes multiplied with maxPR
+    Sink speed          1       5
 
     # Actions:
     Type: Discrete(6)
@@ -31,8 +33,10 @@ class WSN(gym.Env):
     1 = Move north
     2 = Move east
     3 = Move west
+        Move diagonally
     4 = Increase packet rate  (One for each node)
     5 = Decrease Packet rate  (One for each node)
+    n = Move sink with different speeds in all directions
     '''
     def __init__(self):
         # Init the WSN env
@@ -52,6 +56,7 @@ class WSN(gym.Env):
 
         self.numNodes = numNodes  # Number of nodes
         self.rndCounter = 0
+        self.sinkSpeed = 1
 
         # Define the high values of each state
         high = [int(self.xSize), int(self.ySize)]
@@ -59,16 +64,18 @@ class WSN(gym.Env):
             high.append(maxPR)
         for ii in range(numNodes):
             high.append(1)  # CH status
+        high.append(5) # Sink Speed
         high = np.array(high)
 
         # Define the low values of each state
         low = []
         for i in range(2+(2*numNodes)):
             low.append(0)
+        low.append(1)
         low = np.array(low)
 
         # Create action space (discrete) and observation space (Box/continuos)
-        self.action_space = spaces.Discrete(8+(2*numNodes))
+        self.action_space = spaces.Discrete(40+(2*numNodes)) # 40 (sink speed) 2*numNodes(INcrease and decrease PR)
         self.observation_space = spaces.Box(low, high, dtype=np.float32)
 
         # Set default values
@@ -80,6 +87,7 @@ class WSN(gym.Env):
             self.state.append(self.EE.nodes[i].PA)
         for ii in range(numNodes):
             self.state.append(self.EE.nodes[ii].getCHstatus())
+        self.state.append(self.sinkSpeed) # Sink speed is 1 per default
 
         self.tempActList = [] #[0, 1, 2, 3]
         for i in range(8):
@@ -135,7 +143,8 @@ class WSN(gym.Env):
                 self.CHtemp.append(self.EE.nodes[i].getCHstatus())
         self.state.append(PRtemp)
         self.state.append(self.CHtemp)
-        _, _, PR, _ = self.state
+        self.state.append(self.sinkSpeed)
+        _, _, PR, _, _ = self.state
 
         # Default values
         reward = -20
@@ -155,13 +164,16 @@ class WSN(gym.Env):
         if action == 0:  # This action is yPos -= 1
             if self.state[1] > 0:
                 self.state[1] -= 1
+                self.sinkSpeed = 1
                 self.EE.updateEnv(0, -1, PR)
+
             else:
                 reward = -50
 
         elif action == 1: # This action is yPos += 1
             if self.state[1] < ySize:
                 self.state[1] += 1
+                self.sinkSpeed = 1
                 self.EE.updateEnv(0, 1, PR)
             else:
                 reward = -50
@@ -169,6 +181,7 @@ class WSN(gym.Env):
         elif action == 2:  # This action is xPos += 1
             if self.state[0] < xSize:
                 self.state[0] += 1
+                self.sinkSpeed = 1
                 self.EE.updateEnv(1, 0, PR)
             else:
                 reward = -50
@@ -176,6 +189,7 @@ class WSN(gym.Env):
         elif action == 3:  # This action is xPos -= 1
             if self.state[0] > 0:
                 self.state[0] -= 1
+                self.sinkSpeed = 1
                 self.EE.updateEnv(-1, 0, PR)
             else:
                 reward = -50
@@ -183,36 +197,40 @@ class WSN(gym.Env):
         elif action == 4:  # This action is xPos -= 1 and yPos += 1
             if self.state[0] > 0 and self.state[1] < ySize:
                 self.state[0] -= 1
-                self.EE.updateEnv(-1, 0, PR)
+                self.EE.updateEnv(-1, 1, PR)
                 self.state[1] += 1
-                self.EE.updateEnv(0, 1, PR)
+                self.sinkSpeed = math.sqrt(2) # sqrt(1^2 + 1^2)
+                #self.EE.updateEnv(0, 1, PR)
             else:
                 reward = -50
 
         elif action == 5:  # This action is xPos += 1 and yPos += 1
             if self.state[0] < xSize and self.state[1] < ySize:
                 self.state[0] += 1
-                self.EE.updateEnv(1, 0, PR)
+                self.EE.updateEnv(1, 1, PR)
                 self.state[1] += 1
-                self.EE.updateEnv(0, 1, PR)
+                self.sinkSpeed = math.sqrt(2) # sqrt(1^2 + 1^2)
+                #self.EE.updateEnv(0, 1, PR)
             else:
                 reward = -50
 
         elif action == 6:  # This action is xPos -= 1 and yPos -= 1
             if self.state[0] > 0 and self.state[1] > 0:
                 self.state[0] -= 1
-                self.EE.updateEnv(-1, 0, PR)
+                self.EE.updateEnv(-1, -1, PR)
                 self.state[1] -= 1
-                self.EE.updateEnv(0, -1, PR)
+                self.sinkSpeed = math.sqrt(2) # sqrt(1^2 + 1^2)
+                #self.EE.updateEnv(0, -1, PR)
             else:
                 reward = -50
 
         elif action == 7:  # This action is xPos += 1 and yPos -= 1
             if self.state[0] < xSize and self.state[1] > 0:
                 self.state[0] += 1
-                self.EE.updateEnv(1, 0, PR)
+                self.EE.updateEnv(1, -1, PR)
                 self.state[1] -= 1
-                self.EE.updateEnv(0, -1, PR)
+                self.sinkSpeed = math.sqrt(2) # sqrt(1^2 + 1^2)
+               #self.EE.updateEnv(0, -1, PR)
             else:
                 reward = -50
 
@@ -239,6 +257,85 @@ class WSN(gym.Env):
                         reward = -50
                     break  # Break from for-loop when the correct action is found
                 act_temp += 1
+
+            i += 1
+            speed_temp = 2
+            step_temp = 0
+
+            for j in range(3): # For different sink speeds
+                if action == i + j + step_temp + act_temp + 8:  # This action is yPos -= 1
+                    if self.state[1] > speed_temp-1:
+                        self.state[1] -= speed_temp
+                        self.sinkSpeed = speed_temp
+                        self.EE.updateEnv(0, -speed_temp, PR)
+                    else:
+                        reward = -50
+
+                elif action ==  i + j + step_temp + act_temp + 9:  # This action is yPos += 1
+                    if self.state[1] < ySize-speed_temp+1:
+                        self.state[1] += speed_temp
+                        self.sinkSpeed = speed_temp
+                        self.EE.updateEnv(0, speed_temp, PR)
+                    else:
+                        reward = -50
+
+                elif  i + j + step_temp + act_temp + 10:  # This action is xPos += 1
+                    if self.state[0] < xSize-speed_temp+1:
+                        self.state[0] += speed_temp
+                        self.sinkSpeed = speed_temp
+                        self.EE.updateEnv(speed_temp, 0, PR)
+                    else:
+                        reward = -50
+
+                elif action ==  i + j + step_temp + act_temp + 11:  # This action is xPos -= 1
+                    if self.state[0] > speed_temp-1:
+                        self.state[0] -= speed_temp
+                        self.sinkSpeed = speed_temp
+                        self.EE.updateEnv(-speed_temp, 0, PR)
+                    else:
+                        reward = -50
+
+                elif action ==  i + j + step_temp + act_temp + 12:  # This action is xPos -= 1 and yPos += 1
+                    if self.state[0] > speed_temp-1 and self.state[1] < ySize-speed_temp+1:
+                        self.state[0] -= speed_temp
+                        self.EE.updateEnv(-speed_temp, speed_temp, PR)
+                        self.state[1] += speed_temp
+                        self.sinkSpeed = math.sqrt(2*speed_temp) # sqrt(speed_temp^2+speed_temp^2)
+                        # self.EE.updateEnv(0, 1, PR)
+                    else:
+                        reward = -50
+
+                elif action ==  i + j + step_temp + act_temp + 13:  # This action is xPos += 1 and yPos += 1
+                    if self.state[0] < xSize-speed_temp+1 and self.state[1] < ySize-speed_temp+1:
+                        self.state[0] += speed_temp
+                        self.EE.updateEnv(speed_temp, speed_temp, PR)
+                        self.state[1] += speed_temp
+                        self.sinkSpeed = math.sqrt(2*speed_temp) # sqrt(speed_temp^2+speed_temp^2)
+                        # self.EE.updateEnv(0, 1, PR)
+                    else:
+                        reward = -50
+
+                elif action ==  i + j + step_temp + act_temp + 14:  # This action is xPos -= 1 and yPos -= 1
+                    if self.state[0] > speed_temp-1 and self.state[1] > speed_temp-1:
+                        self.state[0] -= speed_temp
+                        self.EE.updateEnv(-speed_temp, -speed_temp, PR)
+                        self.state[1] -= speed_temp
+                        self.sinkSpeed = math.sqrt(2*speed_temp) # sqrt(speed_temp^2+speed_temp^2)
+                        # self.EE.updateEnv(0, -1, PR)
+                    else:
+                        reward = -50
+
+                elif action ==  i + j + step_temp + act_temp + 15:  # This action is xPos += 1 and yPos -= 1
+                    if self.state[0] < xSize-speed_temp+1 and self.state[1] > speed_temp-1:
+                        self.state[0] += speed_temp
+                        self.EE.updateEnv(speed_temp, -speed_temp, PR)
+                        self.state[1] -= speed_temp
+                        self.sinkSpeed = math.sqrt(2*speed_temp) # sqrt(speed_temp^2+speed_temp^2)
+                    # self.EE.updateEnv(0, -1, PR)
+                    else:
+                        reward = -50
+                step_temp += 7
+
 
         for i in range(numNodes):  # Change send status to True if node has sent during time segment
             if self.EE.nodes[i].PA > 0 and self.sendStatus == False:
@@ -323,6 +420,7 @@ class WSN(gym.Env):
                 self.EE.nodes[i].alive = False
         for ii in range(numNodes):
             self.state.append(self.EE.nodes[ii].getCHstatus())
+        self.state.append(self.sinkSpeed)
 
 
         self.EE.rnd = 1  # Round number

@@ -116,10 +116,10 @@ if __name__ == "__main__":
         LEACHenv.placeNodes()  # Place nodes according to node generation
 
         # Run WSN env with plotting after training
-        agent.load("./save/wsn-dqn-fix.h5")  # Load weights of DQN from file
+        agent.load("./save/wsn-dqn-speed.h5")  # Load weights of DQN from file
         avrRnd = []
 
-        with open('fixNodePlacement.csv') as nodePlacement_file:  # Load the new node placement into DQN
+        with open('nodePlacement.csv') as nodePlacement_file:  # Load the new node placement into DQN
             csv_reader = csv.reader(nodePlacement_file, delimiter=',')
             row_count = 0
 
@@ -153,6 +153,7 @@ if __name__ == "__main__":
         # Format state such that it can be used for training
         for i in range(2, numNodes + 2):
             state[i] = state[i][1]
+        state[numNodes + 3] = env.sinkSpeed
         state = np.reshape(state, [1, state_size])
 
         while not done or not LEACHbool:
@@ -168,6 +169,7 @@ if __name__ == "__main__":
                     next_state.append(next_state_temp[2][i][1])
                 for ii in range(numNodes):
                     next_state.append(next_state_temp[3][ii])
+                next_state.append(env.sinkSpeed)
                 next_state = np.array(next_state)
                 next_state = np.reshape(next_state, [1, state_size])
                 agent.remember(state, action, reward, next_state, done)

@@ -18,7 +18,7 @@ class LEACHtest():
         self.dataList = []
 
     def placeNodes(self):
-        with open('../RL/fixNodePlacement.csv') as nodePlacement_file:
+        with open('../RL/nodePlacement.csv') as nodePlacement_file:
             csv_reader = csv.reader(nodePlacement_file, delimiter=',')
             row_count = 0
 

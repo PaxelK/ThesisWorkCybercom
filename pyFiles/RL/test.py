@@ -86,7 +86,7 @@ if __name__ == "__main__":
     agent = DQNAgent(state_size, action_size)  # Create an instance of the agent
     #agent.load("./save/wsn-dqn.h5")
 
-    with open('fixNodePlacement.csv') as nodePlacement_file:
+    with open('nodePlacement.csv') as nodePlacement_file:
         csv_reader = csv.reader(nodePlacement_file, delimiter=',')
         row_count = 0
 
@@ -138,6 +138,7 @@ if __name__ == "__main__":
         # Format state such that it can be used for training
         for i in range(2, numNodes+2):
             state[i] = state[i][1]
+        state[numNodes+3] = env.sinkSpeed
         state = np.reshape(state, [1, state_size])  # Reshape for NN
 
         while not done: # While-loop trains one episode
@@ -150,6 +151,7 @@ if __name__ == "__main__":
                 next_state.append(next_state_temp[2][i][1]) # Append PR status
             for ii in range(numNodes):
                 next_state.append(next_state_temp[3][ii]) # Append CH status
+            next_state.append(env.sinkSpeed)
             next_state = np.array(next_state)
             next_state = np.reshape(next_state, [1, state_size])
             agent.remember(state, action, reward, next_state, done)  # Fit NN model
@@ -174,14 +176,14 @@ if __name__ == "__main__":
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
-        #agent.save("./save/wsn-dqn-fix.h5")
+        agent.save("./save/wsn-dqn-speed.h5")
 
-        '''
+
         if e % 30 == 0: # Change node placement after every 20th round
             for i in range(numNodes):
                 env.EE.nodes[i].xPos = round(random.random()*xSize)
                 env.EE.nodes[i].yPos = round(random.random()*ySize)
-        '''
+
 
 
 
