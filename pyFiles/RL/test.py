@@ -138,7 +138,7 @@ if __name__ == "__main__":
         # Format state such that it can be used for training
         for i in range(2, numNodes+2):
             state[i] = state[i][1]
-        state[numNodes+3] = env.sinkSpeed
+        state[(2*numNodes)+2] = env.sinkSpeed
         state = np.reshape(state, [1, state_size])  # Reshape for NN
 
         while not done: # While-loop trains one episode
