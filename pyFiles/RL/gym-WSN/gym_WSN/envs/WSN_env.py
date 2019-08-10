@@ -151,7 +151,7 @@ class WSN(gym.Env):
         done = False
 
 
-        if len(self.EE.deadNodes) == numNodes: #>= 1:   # Episode is done if all nodes have died
+        if len(self.EE.deadNodes) >= 1: # == numNodes:   # Episode is done if all nodes have died
             done = True
             '''
             with open('PPJresultsRL.txt', 'a', newline='') as f:
@@ -300,8 +300,8 @@ class WSN(gym.Env):
                         self.state[0] -= speed_temp
                         self.EE.updateEnv(-speed_temp, speed_temp, PR)
                         self.state[1] += speed_temp
-                        self.sinkSpeed = math.sqrt(2*speed_temp) # sqrt(speed_temp^2+speed_temp^2)
-                        # self.EE.updateEnv(0, 1, PR)
+                        self.sinkSpeed = math.sqrt(2*(speed_temp**2)) # sqrt(speed_temp^2+speed_temp^2)
+                        #self.EE.updateEnv(0, 1, PR)
                     else:
                         reward = -50
 
@@ -310,8 +310,8 @@ class WSN(gym.Env):
                         self.state[0] += speed_temp
                         self.EE.updateEnv(speed_temp, speed_temp, PR)
                         self.state[1] += speed_temp
-                        self.sinkSpeed = math.sqrt(2*speed_temp) # sqrt(speed_temp^2+speed_temp^2)
-                        # self.EE.updateEnv(0, 1, PR)
+                        self.sinkSpeed = math.sqrt(2*(speed_temp**2)) # sqrt(speed_temp^2+speed_temp^2)
+                        #self.EE.updateEnv(0, 1, PR)
                     else:
                         reward = -50
 
@@ -320,8 +320,8 @@ class WSN(gym.Env):
                         self.state[0] -= speed_temp
                         self.EE.updateEnv(-speed_temp, -speed_temp, PR)
                         self.state[1] -= speed_temp
-                        self.sinkSpeed = math.sqrt(2*speed_temp) # sqrt(speed_temp^2+speed_temp^2)
-                        # self.EE.updateEnv(0, -1, PR)
+                        self.sinkSpeed = math.sqrt(2*(speed_temp**2)) # sqrt(speed_temp^2+speed_temp^2)
+                        #self.EE.updateEnv(0, -1, PR)
                     else:
                         reward = -50
 
@@ -330,8 +330,8 @@ class WSN(gym.Env):
                         self.state[0] += speed_temp
                         self.EE.updateEnv(speed_temp, -speed_temp, PR)
                         self.state[1] -= speed_temp
-                        self.sinkSpeed = math.sqrt(2*speed_temp) # sqrt(speed_temp^2+speed_temp^2)
-                    # self.EE.updateEnv(0, -1, PR)
+                        self.sinkSpeed = math.sqrt(2*(speed_temp**2)) # sqrt(speed_temp^2+speed_temp^2)
+                        #self.EE.updateEnv(0, -1, PR)
                     else:
                         reward = -50
                 step_temp += 7

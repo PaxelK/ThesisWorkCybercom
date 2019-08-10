@@ -176,7 +176,7 @@ if __name__ == "__main__":
 
         #if rnd >= max(avrRnd):  # Save "best" run
         #if rnd % 5 == 0: # Save every 5th round
-        agent.save("./save/wsn-dqn-speed.h5")
+        #agent.save("./save/wsn-dqn-speed.h5")
 
 
         if e % 30 == 0: # Change node placement after every 20th round
@@ -217,6 +217,7 @@ if __name__ == "__main__":
             next_state.append(next_state_temp[2][i][1])
         for ii in range(numNodes):
             next_state.append(next_state_temp[3][ii])
+        next_state.append(env.sinkSpeed)
         next_state = np.array(next_state)
         next_state = np.reshape(next_state, [1, state_size])
         agent.remember(state, action, reward, next_state, done)

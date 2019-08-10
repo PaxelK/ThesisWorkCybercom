@@ -64,8 +64,8 @@ class LEACHtest():
                 self.PPJ.append((self.dataList[-1]-self.dataList[-2])/(self.nrjList[-1]-self.nrjList[-2]))
 
             # Change CH status of nodes (Uncomment if until all node dies)
-            self.EE.cluster()
-            '''
+            #self.EE.cluster()
+
             for i in range(len(self.EE.nodes)):
                 self.EE.nodes[i].resetConChildren()
                 self.EE.nodes[i].clearTempDataRec()
@@ -93,7 +93,7 @@ class LEACHtest():
                         self.EE.nodes[i].connect(self.EE.sink)  # Otherwise connect to the sink
                 else:  # If node is CH, connect to sink
                     self.EE.nodes[i].connect(self.EE.sink)
-            '''
+
 
         # -------------------------------Identical CH status generation ends here--------------------------------
 
@@ -133,7 +133,7 @@ class LEACHtest():
 
 
         # When one node have died the episode has finished (can be changed to all nodes died)
-        if len(self.EE.deadNodes) == numNodes: #>= 1:
+        if len(self.EE.deadNodes) >= 1: # == numNodes:
             '''
             with open('PPJresultsLEACH.txt', 'a', newline='') as f:
                 f.write(str(self.PPJ) + ",")
